@@ -1,0 +1,8 @@
+{
+    "name": "Test Garage XYZ",
+    "type": "Garage",
+    "owner": "Ram Bahadur",
+    "email": "ram@testgarage.com",
+    "plan_id": "PLAN-FREE",
+    "password": "Ram@123"
+}

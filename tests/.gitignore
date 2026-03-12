@@ -1,0 +1,5 @@
+# TestCafe artifacts
+tests/screenshots/
+tests/videos/
+tests/reports/
+.testcafe-*

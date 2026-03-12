@@ -1,0 +1,33 @@
+{
+  "name": "gadisewa-garage-management",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6",
+    "recharts": "^3.5.1",
+    "@google/genai": "^1.34.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "testcafe": "^3.7.4",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "testcafe chrome tests/fixtures --screenshots path=screenshots,takeOnFails=true",
+    "test:headless": "testcafe chrome:headless tests/fixtures",
+    "test:workflows": "testcafe chrome tests/workflows --screenshots path=workflow-screenshots,takeOnFails=true --speed 0.5",
+    "test:workflows:headless": "testcafe chrome:headless tests/workflows --screenshots path=workflow-screenshots,takeOnFails=true",
+    "test:garage": "testcafe chrome tests/workflows/garage-owner-workflow.test.ts --screenshots path=workflow-screenshots",
+    "test:vendor": "testcafe chrome tests/workflows/vendor-workflow.test.ts --screenshots path=workflow-screenshots",
+    "test:customer": "testcafe chrome tests/workflows/customer-workflow.test.ts --screenshots path=workflow-screenshots",
+    "test:all": "npm run test:garage && npm run test:vendor && npm run test:customer"
+  }
+}

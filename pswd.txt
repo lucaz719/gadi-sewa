@@ -1,0 +1,5 @@
+You can now try logging in at gadisewa.com with:
+
+Email: admin@gadisewa.com
+Password: Admin@123
+Access Token: GS-ADMIN-2026

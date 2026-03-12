@@ -1,0 +1,5 @@
+{
+  "name": "GadiSewa Garage Management",
+  "description": "A comprehensive Garage Management System (GMS) covering job cards, inventory, staff, financials, POS, and customer management.",
+  "requestFramePermissions": []
+}

@@ -8,6 +8,10 @@ This contains everything you need to run your app locally.
 
 View your app in AI Studio: https://ai.studio/apps/drive/15OpszFQw0_H8s3mxEdwMstJlALk6MFiW
 
+<p>The fastest path from prompt to production with Gemini.</p>
+
+<a href="https://aistudio.google.com/apps">Start building</a>
+
 ## Run Locally
 
 **Prerequisites:**  Node.js

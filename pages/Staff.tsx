@@ -1,26 +1,58 @@
 import React, { useState } from 'react';
 import { useToast } from '../App';
-
-const staffData = [
-  { id: 1, name: 'Liam Johnson', role: 'Lead Mechanic', status: 'Present', checkIn: '09:02 AM', checkOut: '06:05 PM', hours: '8h 3m', avatar: 'https://i.pravatar.cc/150?u=8' },
-  { id: 2, name: 'Olivia Chen', role: 'Service Advisor', status: 'Absent', checkIn: '--:--', checkOut: '--:--', hours: '0h 0m', avatar: 'https://i.pravatar.cc/150?u=9' },
-  { id: 3, name: 'Benjamin Carter', role: 'Mechanic', status: 'Half Day', checkIn: '09:15 AM', checkOut: '01:00 PM', hours: '3h 45m', note: 'Approved leave', avatar: 'https://i.pravatar.cc/150?u=10' },
-  { id: 4, name: 'Sophia Rodriguez', role: 'Apprentice', status: 'On Leave', checkIn: '--:--', checkOut: '--:--', hours: '0h 0m', avatar: 'https://i.pravatar.cc/150?u=11' },
-];
+import { db } from '../services/db';
 
 export default function Staff() {
-  const [staff, setStaff] = useState(staffData);
-  const [showModal, setShowModal] = useState(false);
   const { showToast } = useToast();
+  const [staff, setStaff] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const authUser = db.getAuthUser();
+  const enterpriseId = authUser?.enterprise_id;
 
-  const handleAddStaff = (e: React.FormEvent) => {
-      e.preventDefault();
-      showToast('success', 'Staff member added');
-      setShowModal(false);
+  const [newStaff, setNewStaff] = useState({
+    name: '',
+    role: 'Mechanic',
+    phone: '',
+    salary: 0
+  });
+
+  const loadStaff = async () => {
+    if (!enterpriseId) return;
+    setLoading(true);
+    try {
+      const data = await db.getStaff(enterpriseId);
+      setStaff(data);
+    } catch (err) {
+      showToast('error', 'Failed to load staff data.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSaveAttendance = () => {
-      showToast('success', 'Attendance records updated');
+  React.useEffect(() => { loadStaff(); }, [enterpriseId]);
+
+  const handleAddStaff = async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        await db.saveStaff(newStaff, enterpriseId);
+        showToast('success', 'Staff member added');
+        setShowModal(false);
+        setNewStaff({ name: '', role: 'Mechanic', phone: '', salary: 0 });
+        loadStaff();
+      } catch (err) {
+        showToast('error', 'Failed to add staff.');
+      }
+  };
+
+  const handleUpdateStatus = async (id: number, status: string) => {
+    try {
+      await db.updateStaff(id, { status });
+      showToast('success', 'Status updated');
+      loadStaff();
+    } catch (err) {
+      showToast('error', 'Update failed.');
+    }
   };
 
   return (
@@ -37,42 +69,29 @@ export default function Staff() {
        </div>
 
        {/* Overview Stats */}
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-             <p className="text-sm text-slate-500 font-medium">Total Staff</p>
-             <p className="text-3xl font-bold mt-1">52</p>
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:scale-[1.02]">
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Active Staff</p>
+             <p className="text-3xl font-black mt-1">{staff.length}</p>
           </div>
-          <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-             <p className="text-sm text-slate-500 font-medium">Present Today</p>
-             <div className="flex items-baseline gap-2 mt-1">
-                <p className="text-3xl font-bold">48</p>
-                <span className="text-green-500 font-medium text-sm">92%</span>
-             </div>
+          <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:scale-[1.02]">
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Salary Liability</p>
+             <p className="text-3xl font-black mt-1 text-red-600">Rs. {staff.reduce((acc, s) => acc + (s.salary || 0), 0).toLocaleString()}</p>
           </div>
-          <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-             <p className="text-sm text-slate-500 font-medium">On Leave</p>
-             <p className="text-3xl font-bold mt-1">4</p>
-          </div>
-          <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
-             <p className="text-sm text-slate-500 font-medium">New Hires</p>
-             <p className="text-3xl font-bold mt-1">2</p>
+          <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:scale-[1.02]">
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Team Composition</p>
+             <p className="text-sm font-bold mt-1 text-slate-500">
+                {Array.from(new Set(staff.map(s => s.role))).slice(0, 3).join(', ')} {staff.length > 3 ? '...' : ''}
+              </p>
           </div>
        </div>
 
        {/* Attendance Section */}
-       <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+       <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
           <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
              <div>
-                <h2 className="text-xl font-bold">Mark Staff Attendance</h2>
-                <p className="text-slate-500 text-sm">Tuesday, 20 August 2024</p>
-             </div>
-             <div className="flex gap-2">
-                <button className="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                   <span className="material-symbols-outlined text-base">done_all</span> Mark Selected Present
-                </button>
-                <button className="bg-white border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                   <span className="material-symbols-outlined text-base">calendar_today</span> Change Date
-                </button>
+                <h2 className="text-xl font-bold">Staff Directory & Attendance</h2>
+                <p className="text-slate-500 text-sm font-medium">{new Date().toLocaleDateString('en-NE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
              </div>
           </div>
 
@@ -81,48 +100,73 @@ export default function Staff() {
                 <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                    <tr>
                       <th className="p-4 w-10"><input type="checkbox" className="rounded"/></th>
-                      <th className="p-4">Staff Name</th>
-                      <th className="p-4">Status</th>
-                      <th className="p-4">Check-in</th>
-                      <th className="p-4">Check-out</th>
-                      <th className="p-4">Working Hours</th>
-                      <th className="p-4">Notes</th>
+                      <th className="p-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Staff Name</th>
+                      <th className="p-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Status</th>
+                      <th className="p-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Phone</th>
+                      <th className="p-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Salary</th>
+                      <th className="p-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Joined On</th>
+                      <th className="p-4 text-right text-[10px] font-black uppercase text-slate-400 tracking-widest">Actions</th>
                    </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                   {staff.map(person => (
-                      <tr key={person.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                         <td className="p-4"><input type="checkbox" className="rounded"/></td>
-                         <td className="p-4">
-                            <div className="flex items-center gap-3">
-                               <img src={person.avatar} alt="" className="w-10 h-10 rounded-full" />
-                               <div>
-                                  <p className="font-medium">{person.name}</p>
-                                  <p className="text-xs text-slate-500">{person.role}</p>
-                               </div>
-                            </div>
-                         </td>
-                         <td className="p-4">
-                            <select className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-primary-500" defaultValue={person.status}>
-                               <option>Present</option>
-                               <option>Absent</option>
-                               <option>Half Day</option>
-                               <option>On Leave</option>
-                            </select>
-                         </td>
-                         <td className="p-4 text-slate-600 dark:text-slate-400">{person.checkIn}</td>
-                         <td className="p-4 text-slate-600 dark:text-slate-400">{person.checkOut}</td>
-                         <td className="p-4 text-slate-600 dark:text-slate-400">{person.hours}</td>
-                         <td className="p-4 text-slate-500 text-xs italic">{person.note}</td>
-                      </tr>
-                   ))}
-                </tbody>
+                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {loading ? (
+                       <tr><td colSpan={7} className="p-8 text-center text-slate-400 font-medium italic animate-pulse">Synchronizing staff records...</td></tr>
+                    ) : staff.length === 0 ? (
+                       <tr><td colSpan={7} className="p-12 text-center">
+                          <span className="material-symbols-outlined text-4xl text-slate-100 mb-2">group_off</span>
+                          <p className="text-slate-400 font-medium">No active employees found.</p>
+                       </td></tr>
+                    ) : staff.map(person => (
+                       <tr key={person.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                          <td className="p-4"><input type="checkbox" className="rounded"/></td>
+                          <td className="p-4">
+                             <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 font-black text-lg">
+                                    {person.name?.[0] || 'S'}
+                                </div>
+                                <div>
+                                   <p className="font-bold text-slate-900 dark:text-white">{person.name}</p>
+                                   <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{person.role}</p>
+                                </div>
+                             </div>
+                          </td>
+                          <td className="p-4">
+                             <select 
+                                value={person.status}
+                                onChange={(e) => handleUpdateStatus(person.id, e.target.value)}
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-none pointer-events-auto outline-none shadow-sm ${
+                                    person.status === 'Present' ? 'bg-green-600 text-white' :
+                                    person.status === 'Absent' ? 'bg-red-100 text-red-700' :
+                                    'bg-amber-100 text-amber-700'
+                                }`}
+                             >
+                                <option>Present</option>
+                                <option>Absent</option>
+                                <option>Half Day</option>
+                                <option>On Leave</option>
+                             </select>
+                          </td>
+                          <td className="p-4 text-slate-600 dark:text-slate-400 font-mono text-xs">{person.phone}</td>
+                          <td className="p-4 text-slate-900 dark:text-slate-200 font-black text-xs">Rs. {(person.salary || 0).toLocaleString()}</td>
+                          <td className="p-4 text-slate-500 text-[10px] font-bold uppercase">{new Date(person.created_at).toLocaleDateString()}</td>
+                          <td className="p-4 text-right">
+                             <button onClick={() => db.deleteStaff(person.id).then(loadStaff)} className="w-8 h-8 rounded-lg flex items-center justify-center text-red-300 hover:bg-red-50 hover:text-red-500 transition-all ml-auto">
+                                <span className="material-symbols-outlined text-lg">delete</span>
+                             </button>
+                          </td>
+                       </tr>
+                    ))}
+                 </tbody>
              </table>
           </div>
           
-          <div className="mt-6 flex justify-end">
-             <button onClick={handleSaveAttendance} className="bg-primary-500 text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-primary-600 flex items-center gap-2">
-                <span className="material-symbols-outlined">save</span> Save All Changes
+          <div className="mt-6 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+             <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="material-symbols-outlined text-sm">shield</span>
+                Enterprise-grade encryption enabled.
+             </div>
+             <button onClick={loadStaff} className="bg-primary-500 text-white px-5 py-2 rounded-lg font-bold text-xs hover:bg-primary-600 flex items-center gap-2 shadow-lg transition-all active:scale-95">
+                <span className="material-symbols-outlined text-sm">sync</span> Sync Now
              </button>
           </div>
        </div>
@@ -130,47 +174,47 @@ export default function Staff() {
        {/* Add Staff Modal */}
        {showModal && (
            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-               <div className="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700">
-                   <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                       <h3 className="text-lg font-bold">Add New Staff</h3>
-                       <button onClick={() => setShowModal(false)}><span className="material-symbols-outlined text-slate-400">close</span></button>
-                   </div>
-                   <form onSubmit={handleAddStaff} className="p-6 space-y-4">
-                       <div>
-                           <label className="block text-sm font-medium mb-1">Full Name</label>
-                           <input type="text" required className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-primary-500" />
-                       </div>
-                       <div className="grid grid-cols-2 gap-4">
-                           <div>
-                               <label className="block text-sm font-medium mb-1">Role</label>
-                               <select className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-primary-500">
-                                   <option>Mechanic</option>
-                                   <option>Service Advisor</option>
-                                   <option>Helper</option>
-                                   <option>Accountant</option>
-                               </select>
-                           </div>
-                           <div>
-                               <label className="block text-sm font-medium mb-1">Phone</label>
-                               <input type="tel" required className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-primary-500" />
-                           </div>
-                       </div>
-                       <div className="grid grid-cols-2 gap-4">
-                           <div>
-                               <label className="block text-sm font-medium mb-1">Salary (Monthly)</label>
-                               <input type="number" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-primary-500" />
-                           </div>
-                           <div>
-                               <label className="block text-sm font-medium mb-1">Join Date</label>
-                               <input type="date" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent outline-none focus:ring-2 focus:ring-primary-500" />
-                           </div>
-                       </div>
-                       
-                       <div className="pt-4 flex justify-end gap-3">
-                           <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 text-sm font-medium">Cancel</button>
-                           <button type="submit" className="px-6 py-2 bg-primary-600 text-white rounded-lg text-sm font-bold hover:bg-primary-700">Add Staff</button>
-                       </div>
-                   </form>
+               <div className="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                        <h3 className="text-xl font-black tracking-tighter">Onboard New Talent</h3>
+                        <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors">
+                            <span className="material-symbols-outlined text-slate-400">close</span>
+                        </button>
+                    </div>
+                    <form onSubmit={handleAddStaff} className="p-6 space-y-4">
+                        <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Legal Full Name</label>
+                            <input type="text" required value={newStaff.name} onChange={e => setNewStaff({...newStaff, name: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl p-3 outline-none focus:border-primary-500 transition-colors font-medium" placeholder="Ex: Liam Johnson" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Designated Role</label>
+                                <select value={newStaff.role} onChange={e => setNewStaff({...newStaff, role: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl p-3 outline-none font-medium">
+                                    <option>Mechanic</option>
+                                    <option>Lead Mechanic</option>
+                                    <option>Service Advisor</option>
+                                    <option>Helper</option>
+                                    <option>Accountant</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Contact Phone</label>
+                                <input type="tel" required value={newStaff.phone} onChange={e => setNewStaff({...newStaff, phone: e.target.value})} className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl p-3 outline-none focus:border-primary-500 transition-colors font-medium" placeholder="98XXXXXXXX" />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Monthly Package (NPR)</label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs uppercase">Rs.</span>
+                                <input type="number" required value={newStaff.salary} onChange={e => setNewStaff({...newStaff, salary: Number(e.target.value)})} className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl p-3 pl-10 outline-none focus:border-primary-500 transition-colors font-black" placeholder="0.00" />
+                            </div>
+                        </div>
+                        
+                        <div className="pt-6 flex gap-3">
+                            <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 text-slate-500 font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 rounded-2xl transition-all">Discard</button>
+                            <button type="submit" className="flex-1 py-4 bg-primary-600 hover:bg-primary-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-[0_4px_15px_rgba(var(--primary-rgb),0.3)] transition-all active:scale-[0.98]">Confirm Hire</button>
+                        </div>
+                    </form>
                </div>
            </div>
        )}

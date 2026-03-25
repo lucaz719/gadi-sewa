@@ -35,6 +35,10 @@ import ActivityLogs from './pages/admin/ActivityLogs';
 import PlanManagement from './pages/admin/PlanManagement';
 import AdminSettings from './pages/admin/AdminSettings';
 import VoucherManagement from './pages/admin/VoucherManagement';
+import AdminRevenue from './pages/admin/AdminRevenue';
+import AdminNotifications from './pages/admin/AdminNotifications';
+import AdminSupport from './pages/admin/AdminSupport';
+import EnterpriseDetail from './pages/admin/EnterpriseDetail';
 
 // Vendor Pages
 import VendorDashboard from './pages/vendor/VendorDashboard';
@@ -137,10 +141,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {isAdmin ? (
             <>
               <SidebarItem icon="dashboard" label="Admin Home" path="/admin" active={path === '/admin'} />
+              <SidebarItem icon="bar_chart" label="Revenue" path="/admin/revenue" active={path === '/admin/revenue'} />
               <SidebarItem icon="inventory" label="Global Catalog" path="/admin/global-catalog" active={path === '/admin/global-catalog'} />
               <SidebarItem icon="confirmation_number" label="Voucher Center" path="/admin/vouchers" active={path === '/admin/vouchers'} />
               <SidebarItem icon="payments" label="Plan Mgmt" path="/admin/plans" active={path === '/admin/plans'} />
               <SidebarItem icon="group" label="Enterprise Users" path="/admin/users" active={path === '/admin/users'} />
+              <SidebarItem icon="campaign" label="Notifications" path="/admin/notifications" active={path === '/admin/notifications'} />
+              <SidebarItem icon="support_agent" label="Support Hub" path="/admin/support" active={path === '/admin/support'} />
               <SidebarItem icon="history" label="System Logs" path="/admin/logs" active={path === '/admin/logs'} />
             </>
           ) : isCustomer ? (
@@ -304,6 +311,10 @@ export default function App() {
               <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
               <Route path="/admin/logs" element={<ProtectedRoute><ActivityLogs /></ProtectedRoute>} />
               <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
+              <Route path="/admin/revenue" element={<ProtectedRoute><AdminRevenue /></ProtectedRoute>} />
+              <Route path="/admin/notifications" element={<ProtectedRoute><AdminNotifications /></ProtectedRoute>} />
+              <Route path="/admin/support" element={<ProtectedRoute><AdminSupport /></ProtectedRoute>} />
+              <Route path="/admin/enterprises/:id" element={<ProtectedRoute><EnterpriseDetail /></ProtectedRoute>} />
 
               {/* Vendor Pages */}
               <Route path="/vendor/products" element={<ProtectedRoute><VendorProducts /></ProtectedRoute>} />
@@ -315,6 +326,7 @@ export default function App() {
               <Route path="/vendor/network" element={<ProtectedRoute><VendorNetwork /></ProtectedRoute>} />
               <Route path="/vendor/network/:id" element={<ProtectedRoute><VendorGarageProfile /></ProtectedRoute>} />
               <Route path="/vendor/financials" element={<ProtectedRoute><VendorFinancials /></ProtectedRoute>} />
+              <Route path="/vendor/marketing" element={<ProtectedRoute><VendorMarketing /></ProtectedRoute>} />
               <Route path="/vendor/settings" element={<ProtectedRoute><VendorSettings /></ProtectedRoute>} />
               <Route path="/vendor/pos" element={<ProtectedRoute><VendorPOS /></ProtectedRoute>} />
               <Route path="/vendor/cash-flow" element={<ProtectedRoute><VendorCashFlow /></ProtectedRoute>} />

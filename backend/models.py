@@ -142,3 +142,111 @@ class UserAchievement(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     achievement_id = Column(Integer, ForeignKey("achievements.id"))
     earned_at = Column(DateTime, default=datetime.utcnow)
+
+class ActivityLog(Base):
+    __tablename__ = "activity_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_name = Column(String) # For display even if user is deleted
+    action = Column(String) # Created, Updated, Deleted, Login, etc.
+    entity = Column(String) # Job, Inventory, User, etc.
+    details = Column(String)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+class PlatformSettings(Base):
+    __tablename__ = "platform_settings"
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String, unique=True, index=True)
+    value = Column(String)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Notification(Base):
+    __tablename__ = "notifications"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String)
+    message = Column(String)
+    target_role = Column(String, default="all") # all, garage, vendor, admin
+    priority = Column(String, default="info") # info, warning, critical
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class StaffMember(Base):
+    __tablename__ = "staff_members"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    role = Column(String)
+    phone = Column(String)
+    salary = Column(Float, default=0.0)
+    status = Column(String, default="Present")
+    enterprise_id = Column(Integer, ForeignKey("enterprises.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class Appointment(Base):
+    __tablename__ = "appointments"
+    id = Column(Integer, primary_key=True, index=True)
+    customer_id = Column(Integer, ForeignKey("customers.id"))
+    vehicle_info = Column(String)
+    date = Column(String) # For simplicity in this demo
+    time = Column(String)
+    service_type = Column(String)
+    mechanic_name = Column(String, nullable=True)
+    status = Column(String, default="Confirmed")
+    enterprise_id = Column(Integer, ForeignKey("enterprises.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class SupportTicket(Base):
+    __tablename__ = "support_tickets"
+    id = Column(Integer, primary_key=True, index=True)
+    enterprise_id = Column(Integer, ForeignKey("enterprises.id"))
+    subject = Column(String)
+    message = Column(String)
+    status = Column(String, default="Open") # Open, Resolved
+    priority = Column(String, default="Normal")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class EnterpriseInvoice(Base):
+    __tablename__ = "enterprise_invoices"
+    id = Column(Integer, primary_key=True, index=True)
+    enterprise_id = Column(Integer, ForeignKey("enterprises.id"))
+    invoice_number = Column(String, unique=True)
+    amount = Column(Float)
+    status = Column(String, default="Unpaid") # Paid, Unpaid, Overdue
+    due_date = Column(DateTime)
+    billing_month = Column(String) # e.g. "March 2026"
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class PendingEnterprise(Base):
+    __tablename__ = "pending_enterprises"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    type = Column(String)
+    owner = Column(String)
+    email = Column(String, unique=True)
+    plan_id = Column(String)
+    status = Column(String, default="Pending")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class VendorProduct(Base):
+    __tablename__ = "vendor_products"
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("enterprises.id"))
+    name = Column(String)
+    sku = Column(String, index=True)
+    category = Column(String)
+    price = Column(Float)
+    retail_price = Column(Float)
+    stock = Column(Integer, default=0)
+    image_url = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class VendorOrder(Base):
+    __tablename__ = "vendor_orders"
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("enterprises.id"))
+    garage_id = Column(Integer, ForeignKey("enterprises.id"))
+    items = Column(JSON) # List of {product_id, name, qty, price}
+    total_amount = Column(Float)
+    status = Column(String, default="New") # New, Processing, Shipped, Delivered, Cancelled
+    payment_status = Column(String, default="Pending") # Pending, Paid
+    created_at = Column(DateTime, default=datetime.utcnow)

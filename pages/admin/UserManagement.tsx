@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../../services/db';
 import { useToast } from '../../App';
 
 export default function UserManagement() {
     const { showToast } = useToast();
+    const navigate = useNavigate();
     const [enterprises, setEnterprises] = useState<any[]>([]);
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -144,7 +146,7 @@ export default function UserManagement() {
                     <h2 className="text-xs font-black uppercase text-slate-400 tracking-widest px-1">Registered Organizations</h2>
                     <div className="space-y-3 max-h-[600px] overflow-y-auto">
                         {enterprises.map((ent: any) => (
-                            <div key={ent.id} className="p-4 bg-white dark:bg-[#1e293b] rounded-xl border dark:border-slate-800 shadow-sm">
+                            <div key={ent.id} onClick={() => navigate(`/admin/enterprises/${ent.id}`)} className="p-4 bg-white dark:bg-[#1e293b] rounded-xl border dark:border-slate-800 shadow-sm cursor-pointer hover:border-red-300 dark:hover:border-red-800 transition-all">
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-bold text-sm">{ent.name}</h3>
                                     <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest ${ent.type === 'Garage' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>

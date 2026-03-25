@@ -41,27 +41,34 @@ export const db = {
   getAuthUser: () => JSON.parse(localStorage.getItem('gadisewa_auth_user') || 'null'),
   getAuthToken: () => localStorage.getItem('gadisewa_auth_token'),
 
-  // Plans (Static for now or fetch from backend)
-  getPlans: async () => [
-    { id: 'PLAN-FREE', name: 'Free Tier', price: 0, features: ['3 Jobs/mo', '1 Staff'], duration: 'Lifetime' },
-    { id: 'PLAN-PRO', name: 'Garage Pro', price: 2999, features: ['Unlimited Jobs', '5 Staff', 'Marketplace'], duration: 'Monthly' }
-  ],
+  // Plans
+  getPlans: async () => db.fetchApi('/admin/plans'),
+  savePlan: async (plan: any) => db.fetchApi('/admin/plans', {
+    method: 'POST',
+    body: JSON.stringify(plan)
+  }),
+  deletePlan: async (id: string) => db.fetchApi(`/admin/plans/${id}`, {
+    method: 'DELETE'
+  }),
+  updateEnterprisePlan: async (entId: number | string, planId: string) => db.fetchApi(`/admin/enterprises/${entId}/plan`, {
+    method: 'PATCH',
+    body: JSON.stringify({ plan_id: planId })
+  }),
 
   // Enterprises
   getEnterprises: async () => db.fetchApi('/admin/enterprises'),
-  getPendingRegistrations: async () => {
-    const ents = await db.getEnterprises();
-    return ents.filter((e: any) => e.status === 'Pending');
-  },
-  approveRegistration: async (id: number | string) => db.fetchApi(`/admin/enterprises/${id}/status`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status: 'Active' })
+  getPendingRegistrations: async () => db.fetchApi('/admin/pending-registrations'),
+  approveRegistration: async (id: number | string) => db.fetchApi(`/admin/registrations/${id}/approve`, {
+    method: 'POST'
   }),
-  rejectRegistration: async (id: number | string) => db.fetchApi(`/admin/enterprises/${id}/status`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status: 'Rejected' })
+  rejectRegistration: async (id: number | string) => db.fetchApi(`/admin/registrations/${id}/reject`, {
+    method: 'POST'
   }),
   saveEnterprise: async (ent: any) => db.fetchApi('/admin/enterprises', {
+    method: 'POST',
+    body: JSON.stringify(ent)
+  }),
+  registerInterest: async (ent: any) => db.fetchApi('/admin/register-interest', {
     method: 'POST',
     body: JSON.stringify(ent)
   }),
@@ -90,6 +97,7 @@ export const db = {
     method: 'PATCH',
     body: JSON.stringify(data)
   }),
+  deleteJob: async (id: number) => db.fetchApi(`/jobs/${id}`, { method: 'DELETE' }),
 
   // Transactions & Financials
   getTransactions: async (entId?: number) => {
@@ -128,6 +136,31 @@ export const db = {
     body: JSON.stringify(v)
   }),
   toggleVoucher: async (id: number) => db.fetchApi(`/admin/vouchers/${id}/toggle-active`, { method: 'PATCH' }),
+  getActivityLogs: async () => db.fetchApi('/admin/logs'),
+
+  // Admin Stats & Analytics
+  getAdminStats: async () => db.fetchApi('/admin/stats'),
+  getGrowthData: async () => db.fetchApi('/admin/growth-data'),
+  getRevenueAnalytics: async () => db.fetchApi('/admin/revenue-analytics'),
+
+  // Enterprise Detail
+  getEnterpriseDetail: async (id: number | string) => db.fetchApi(`/admin/enterprises/${id}/detail`),
+
+  // Platform Settings
+  getAdminSettings: async () => db.fetchApi('/admin/settings'),
+  saveAdminSettings: async (settings: any) => db.fetchApi('/admin/settings', {
+    method: 'POST',
+    body: JSON.stringify(settings)
+  }),
+
+  // Notifications
+  getNotifications: async () => db.fetchApi('/admin/notifications'),
+  createNotification: async (notif: any) => db.fetchApi('/admin/notifications', {
+    method: 'POST',
+    body: JSON.stringify(notif)
+  }),
+  markNotificationRead: async (id: number) => db.fetchApi(`/admin/notifications/${id}/read`, { method: 'PATCH' }),
+
 
   // Global Catalog
   getGlobalCatalog: async () => db.fetchApi('/admin/global-catalog'),
@@ -162,6 +195,61 @@ export const db = {
   updateCRMSettings: async (settings: any) => db.fetchApi('/crm/settings', {
     method: 'POST',
     body: JSON.stringify(settings)
+  }),
+
+  // Phase 2: Operational & Commercial Integration
+  getStaff: async (enterpriseId: number) => db.fetchApi(`/staff/?enterprise_id=${enterpriseId}`),
+  saveStaff: async (staff: any, enterpriseId: number) => db.fetchApi(`/staff/?enterprise_id=${enterpriseId}`, {
+    method: 'POST',
+    body: JSON.stringify(staff)
+  }),
+  updateStaff: async (id: number, data: any) => db.fetchApi(`/staff/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  }),
+  deleteStaff: async (id: number) => db.fetchApi(`/staff/${id}`, { method: 'DELETE' }),
+
+  getAppointments: async (enterpriseId: number) => db.fetchApi(`/appointments/?enterprise_id=${enterpriseId}`),
+  saveAppointment: async (app: any, enterpriseId: number) => db.fetchApi(`/appointments/?enterprise_id=${enterpriseId}`, {
+    method: 'POST',
+    body: JSON.stringify(app)
+  }),
+  updateAppointmentStatus: async (id: number, status: string) => db.fetchApi(`/appointments/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  }),
+  deleteAppointment: async (id: number) => db.fetchApi(`/appointments/${id}`, { method: 'DELETE' }),
+
+  getSupportTickets: async (enterpriseId?: number) => db.fetchApi(`/support/tickets${enterpriseId ? `?enterprise_id=${enterpriseId}` : ''}`),
+  saveSupportTicket: async (ticket: any, enterpriseId: number) => db.fetchApi(`/support/tickets?enterprise_id=${enterpriseId}`, {
+    method: 'POST',
+    body: JSON.stringify(ticket)
+  }),
+  updateTicketStatus: async (id: number, status: string) => db.fetchApi(`/support/tickets/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  }),
+
+  getEnterpriseInvoices: async (enterpriseId?: number) => db.fetchApi(`/billing/invoices${enterpriseId ? `?enterprise_id=${enterpriseId}` : ''}`),
+  generateEnterpriseInvoice: async (enterpriseId: number) => db.fetchApi(`/billing/generate-invoice?enterprise_id=${enterpriseId}`, {
+    method: 'POST'
+  }),
+
+  // Phase 3: Marketplace Interoperability
+  getMarketplaceProducts: async () => db.fetchApi('/marketplace/products'),
+  getVendorProducts: async (vendorId: number) => db.fetchApi(`/marketplace/vendor/${vendorId}/products`),
+  saveVendorProduct: async (product: any, vendorId: number) => db.fetchApi(`/marketplace/vendor/${vendorId}/products`, {
+    method: 'POST',
+    body: JSON.stringify(product)
+  }),
+  placeMarketplaceOrder: async (order: any, garageId: number) => db.fetchApi(`/marketplace/orders?garage_id=${garageId}`, {
+    method: 'POST',
+    body: JSON.stringify(order)
+  }),
+  getVendorOrders: async (vendorId: number) => db.fetchApi(`/marketplace/vendor/${vendorId}/orders`),
+  updateVendorOrderStatus: async (id: number, status: string, paymentStatus?: string) => db.fetchApi(`/marketplace/orders/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status, payment_status: paymentStatus })
   }),
 
   // Initialization (No-op as backend handles it)

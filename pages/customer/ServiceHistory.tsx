@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 const history = [
-  { id: 'JOB-12345', date: '20 Aug 2024', vehicle: 'Toyota Camry', garage: 'City Auto Works', service: 'General Service, Oil Change', cost: '₹4,500', status: 'Completed', invoice: 'INV-1001' },
-  { id: 'JOB-11200', date: '15 May 2024', vehicle: 'Toyota Camry', garage: 'Quick Fix Mechanics', service: 'Brake Pad Replacement', cost: '₹2,800', status: 'Completed', invoice: 'INV-0854' },
-  { id: 'JOB-09800', date: '10 Jan 2024', vehicle: 'Honda Activa 6G', garage: 'City Auto Works', service: 'Full Service', cost: '₹1,200', status: 'Completed', invoice: 'INV-0620' },
+  { id: 'JOB-12345', date: '20 Aug 2024', vehicle: 'Toyota Camry', garage: 'City Auto Works', service: 'General Service, Oil Change', cost: 'Rs. 4,500', status: 'Completed', invoice: 'INV-1001' },
+  { id: 'JOB-11200', date: '15 May 2024', vehicle: 'Toyota Camry', garage: 'Quick Fix Mechanics', service: 'Brake Pad Replacement', cost: 'Rs. 2,800', status: 'Completed', invoice: 'INV-0854' },
+  { id: 'JOB-09800', date: '10 Jan 2024', vehicle: 'Honda Activa 6G', garage: 'City Auto Works', service: 'Full Service', cost: 'Rs. 1,200', status: 'Completed', invoice: 'INV-0620' },
 ];
 
 export default function ServiceHistory() {

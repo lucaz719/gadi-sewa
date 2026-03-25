@@ -210,3 +210,173 @@ class CRMSummary(BaseModel):
     due_for_service: int
     upcoming_followups: int
     followup_rate: float
+
+class ActivityLogBase(BaseModel):
+    user_id: Optional[int] = None
+    user_name: str
+    action: str
+    entity: str
+    details: str
+
+class ActivityLog(ActivityLogBase):
+    id: int
+    timestamp: datetime
+    class Config:
+        from_attributes = True
+
+class PlanBase(BaseModel):
+    id: str
+    name: str
+    price: float
+    features: List[str]
+    duration: str
+
+class Plan(PlanBase):
+    class Config:
+        from_attributes = True
+
+class AdminStats(BaseModel):
+    total_enterprises: int
+    active_users: int
+    pending_approvals: int
+    system_health: str
+    mrr: float
+    churn_rate: float
+
+class VendorProductBase(BaseModel):
+    name: str
+    sku: str
+    category: str
+    price: float
+    retail_price: float
+    stock: int
+    image_url: Optional[str] = None
+    description: Optional[str] = None
+
+class VendorProductCreate(VendorProductBase):
+    pass
+
+class VendorProduct(VendorProductBase):
+    id: int
+    vendor_id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class VendorOrderItem(BaseModel):
+    product_id: int
+    name: str
+    qty: int
+    price: float
+
+class VendorOrderCreate(BaseModel):
+    vendor_id: int
+    items: List[VendorOrderItem]
+    total_amount: float
+
+class VendorOrder(BaseModel):
+    id: int
+    vendor_id: int
+    garage_id: int
+    items: List[VendorOrderItem]
+    total_amount: float
+    status: str
+    payment_status: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class VendorOrderStatusUpdate(BaseModel):
+    status: str
+
+class NotificationBase(BaseModel):
+    title: str
+    message: str
+    target_role: str = "all"
+    priority: str = "info"
+
+class NotificationOut(NotificationBase):
+    id: int
+    is_read: bool
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class PlatformSettingsUpdate(BaseModel):
+    trial_period_days: int = 14
+    max_users_basic: int = 3
+    maintenance_mode: bool = False
+    registration_freeze: bool = False
+
+# New Phase 2 Schemas
+class StaffMemberBase(BaseModel):
+    name: str
+    role: str
+    phone: str
+    salary: float = 0.0
+    status: str = "Present"
+
+class StaffMember(StaffMemberBase):
+    id: int
+    enterprise_id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class AppointmentBase(BaseModel):
+    customer_id: int
+    vehicle_info: str
+    date: str
+    time: str
+    service_type: str
+    mechanic_name: Optional[str] = None
+    status: str = "Confirmed"
+
+class Appointment(AppointmentBase):
+    id: int
+    enterprise_id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class SupportTicketBase(BaseModel):
+    subject: str
+    message: str
+    priority: str = "Normal"
+
+class SupportTicket(SupportTicketBase):
+    id: int
+    enterprise_id: int
+    status: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class EnterpriseInvoiceBase(BaseModel):
+    enterprise_id: int
+    invoice_number: str
+    amount: float
+    status: str = "Unpaid"
+    due_date: datetime
+    billing_month: str
+
+class EnterpriseInvoice(EnterpriseInvoiceBase):
+    id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class PendingEnterpriseBase(BaseModel):
+    name: str
+    type: str # Garage, Vendor
+    owner: str
+    email: str
+    plan_id: str
+
+class PendingEnterprise(PendingEnterpriseBase):
+    id: int
+    status: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+

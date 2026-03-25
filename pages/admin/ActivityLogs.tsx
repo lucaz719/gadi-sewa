@@ -1,16 +1,38 @@
-import React, { useState } from 'react';
-
-const initialLogs = [
-  { id: 1, user: 'John Doe', action: 'Created Job', entity: 'JOB-12345', timestamp: '24 Oct, 10:30 AM', details: 'Created new service job for Toyota Camry' },
-  { id: 2, user: 'Sarah Lane', action: 'Updated Stock', entity: 'Inventory', timestamp: '24 Oct, 09:15 AM', details: 'Added 50 units of 5W-30 Oil' },
-  { id: 3, user: 'John Doe', action: 'Deleted User', entity: 'Mike Ross', timestamp: '23 Oct, 04:45 PM', details: 'Deactivated user account' },
-  { id: 4, user: 'System', action: 'Backup', entity: 'Database', timestamp: '23 Oct, 02:00 AM', details: 'Automated daily backup completed' },
-  { id: 5, user: 'Sarah Lane', action: 'Login', entity: 'Session', timestamp: '24 Oct, 08:55 AM', details: 'Logged in from IP 192.168.1.5' },
-];
+import React, { useState, useEffect } from 'react';
+import { db } from '../../services/db';
 
 export default function ActivityLogs() {
-  const [logs] = useState(initialLogs);
+  const [logs, setLogs] = useState<any[]>([]);
   const [filter, setFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const data = await db.getActivityLogs();
+        setLogs(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLogs();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const d = new Date(dateString);
+    return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}, ${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+  };
+
+  const filteredLogs = logs.filter(log => {
+      if (filter === 'All') return true;
+      if (filter === 'Jobs' && log.entity.toLowerCase().includes('job')) return true;
+      if (filter === 'Inventory' && log.entity.toLowerCase().includes('inventory')) return true;
+      if (filter === 'Users' && log.entity.toLowerCase().includes('user')) return true;
+      if (filter === 'System' && log.entity.toLowerCase().includes('system')) return true;
+      return false;
+  });
 
   return (
     <div className="space-y-6">
@@ -53,10 +75,19 @@ export default function ActivityLogs() {
                 </tr>
              </thead>
              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                {logs.map(log => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-slate-400">Loading activity logs...</td>
+                  </tr>
+                ) : filteredLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-slate-400">No activity logs found for this filter.</td>
+                  </tr>
+                ) : (
+                  filteredLogs.map(log => (
                    <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="p-4 font-mono text-xs text-slate-500">{log.timestamp}</td>
-                      <td className="p-4 font-medium text-slate-900 dark:text-white">{log.user}</td>
+                      <td className="p-4 font-mono text-xs text-slate-500">{formatDate(log.timestamp)}</td>
+                      <td className="p-4 font-medium text-slate-900 dark:text-white">{log.user_name || log.user}</td>
                       <td className="p-4">
                          <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                             log.action.includes('Delete') ? 'bg-red-100 text-red-700' :
@@ -72,7 +103,8 @@ export default function ActivityLogs() {
                          <button className="text-slate-400 hover:text-slate-600"><span className="material-symbols-outlined">info</span></button>
                       </td>
                    </tr>
-                ))}
+                  ))
+                )}
              </tbody>
           </table>
        </div>

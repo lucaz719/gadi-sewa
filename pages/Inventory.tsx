@@ -107,7 +107,7 @@ const InventoryModal = ({ isOpen, onClose, onSave, item }: { isOpen: boolean, on
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase mb-1">Buy Price (₹)</label>
+              <label className="block text-sm font-bold text-slate-500 uppercase mb-1">Buy Price (Rs. )</label>
               <input
                 type="number" required
                 value={formData.buyPrice}
@@ -116,7 +116,7 @@ const InventoryModal = ({ isOpen, onClose, onSave, item }: { isOpen: boolean, on
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 uppercase mb-1">Sell Price (₹)</label>
+              <label className="block text-sm font-bold text-slate-500 uppercase mb-1">Sell Price (Rs. )</label>
               <input
                 type="number" required
                 value={formData.sellPrice}
@@ -221,7 +221,7 @@ export default function Inventory() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Inventory Value</p>
-          <p className="text-2xl font-black mt-1">₹{totalValue.toLocaleString()}</p>
+          <p className="text-2xl font-black mt-1">Rs. {totalValue.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
           <div className="flex justify-between items-start">
@@ -317,8 +317,8 @@ export default function Inventory() {
                   </td>
                   <td className="p-4">
                     <div className="text-xs">
-                      <p className="text-slate-400 line-through">₹{item.buyPrice}</p>
-                      <p className="font-bold text-slate-900 dark:text-white">₹{item.sellPrice}</p>
+                      <p className="text-slate-400 line-through">Rs. {item.buyPrice}</p>
+                      <p className="font-bold text-slate-900 dark:text-white">Rs. {item.sellPrice}</p>
                     </div>
                   </td>
                   <td className="p-4 text-slate-600 dark:text-slate-300 font-medium">{item.supplier || '-'}</td>

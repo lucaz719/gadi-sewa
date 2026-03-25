@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local development and data
+*.db
+*.sqlite3
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+backend/venv/
+.pytest_cache/
+
+# Artifacts and Screenshots
+workflow-screenshots/
+gadisewa-backend.zip
+gadisewa-deploy.zip
+

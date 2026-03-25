@@ -101,16 +101,16 @@ export default function CashFlow() {
        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-slate-700">
              <p className="text-sm font-medium text-slate-500">Total Inflow</p>
-             <p className="text-3xl font-bold mt-2 text-green-600">₹{totalInflow.toLocaleString()}</p>
+             <p className="text-3xl font-bold mt-2 text-green-600">Rs. {totalInflow.toLocaleString()}</p>
           </div>
           <div className="bg-white dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-slate-700">
              <p className="text-sm font-medium text-slate-500">Total Outflow</p>
-             <p className="text-3xl font-bold mt-2 text-red-600">₹{totalOutflow.toLocaleString()}</p>
+             <p className="text-3xl font-bold mt-2 text-red-600">Rs. {totalOutflow.toLocaleString()}</p>
           </div>
           <div className="bg-white dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-slate-700">
              <p className="text-sm font-medium text-slate-500">Net Cash Flow</p>
              <p className={`text-3xl font-bold mt-2 ${netCashFlow >= 0 ? 'text-primary-600' : 'text-orange-600'}`}>
-                {netCashFlow >= 0 ? '+' : '-'} ₹{Math.abs(netCashFlow).toLocaleString()}
+                {netCashFlow >= 0 ? '+' : '-'} Rs. {Math.abs(netCashFlow).toLocaleString()}
              </p>
           </div>
        </div>
@@ -169,7 +169,7 @@ export default function CashFlow() {
                                   <td className="p-4 font-medium">{t.description}</td>
                                   <td className="p-4"><span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-xs">{t.category}</span></td>
                                   <td className={`p-4 text-right font-bold ${t.type === 'inflow' ? 'text-green-600' : 'text-red-600'}`}>
-                                     {t.type === 'inflow' ? '+' : '-'} ₹{t.amount.toLocaleString()}
+                                     {t.type === 'inflow' ? '+' : '-'} Rs. {t.amount.toLocaleString()}
                                   </td>
                                </tr>
                             ))}
@@ -197,8 +197,8 @@ export default function CashFlow() {
                                   </span>
                                </div>
                                <div className="flex justify-between text-sm text-slate-500 mb-2">
-                                  <span>Spent: ₹{budget.spent.toLocaleString()}</span>
-                                  <span>Limit: ₹{budget.limit.toLocaleString()}</span>
+                                  <span>Spent: Rs. {budget.spent.toLocaleString()}</span>
+                                  <span>Limit: Rs. {budget.limit.toLocaleString()}</span>
                                 </div>
                                 <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                    <div className={`h-full ${color} transition-all duration-500`} style={{ width: `${percent}%` }}></div>

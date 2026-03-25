@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
 import models, schemas
+from services.crm_service import update_customer_service_dates
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
@@ -30,12 +31,21 @@ def update_job(job_id: int, job_update: schemas.JobUpdate, db: Session = Depends
     
     # CRM Logic: If job is completed, update customer service dates
     if db_job.status == "Completed":
+        update_customer_service_dates(db, db_job.customer_id)
+        
+        # Gamification: Award points to the enterprise owner/users
+        # Find enterprise for this customer
         customer = db.query(models.Customer).filter(models.Customer.id == db_job.customer_id).first()
-        enterprise = db.query(models.Enterprise).filter(models.Enterprise.id == 1).first() # Default for now
-        if customer and enterprise:
-            customer.last_service_date = datetime.utcnow()
-            interval = enterprise.service_interval_days or 90
-            customer.next_service_date = customer.last_service_date + timedelta(days=interval)
+        if customer and customer.enterprise_id:
+            # Find a user to award points to (proxy for enterprise points)
+            user = db.query(models.User).filter(models.User.enterprise_id == customer.enterprise_id).first()
+            if user:
+                new_points = models.GadiPoint(
+                    user_id=user.id,
+                    points=50, # 50 points per completed job
+                    action_type="Service"
+                )
+                db.add(new_points)
             
     db.commit()
     db.refresh(db_job)

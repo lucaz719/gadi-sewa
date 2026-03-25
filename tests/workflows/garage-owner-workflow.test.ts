@@ -27,7 +27,7 @@ test('Complete Garage Owner Journey', async t => {
 
     // Verify dashboard elements
     await t.expect(Selector('h2').withText('Dashboard').exists).ok('Should see Dashboard title');
-    await t.expect(Selector('div').withText(/Today's Schedule|Pending Jobs|Active Vehicles/i).exists).ok('Should see stat cards');
+    await t.expect(Selector('div').withText(/Total Customers|Due for Service|Upcoming Followups/i).exists).ok('Should see stat cards');
     await t.wait(2000);
 
     // Step 3: Create New Job Card

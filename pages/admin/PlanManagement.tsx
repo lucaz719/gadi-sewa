@@ -31,15 +31,31 @@ export default function PlanManagement() {
 
     const handleSavePlan = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Assuming db.savePlan is implemented in db.ts, if not we add it
-        // For now we simulate or use existing saveVoucher pattern if it existed
-        showToast('info', 'Plan update feature under system maintenance.');
-        setShowPlanModal(false);
+        try {
+            await db.savePlan({
+                id: editingPlan.id || `PLAN-${editingPlan.name.toUpperCase().replace(/\s+/g, '-')}`,
+                name: editingPlan.name,
+                price: parseFloat(editingPlan.price) || 0,
+                duration: editingPlan.duration,
+                features: editingPlan.features
+            });
+            showToast('success', 'Plan configuration saved successfully.');
+            setShowPlanModal(false);
+            loadData();
+        } catch (err: any) {
+             showToast('error', err.message || 'Failed to save plan.');
+        }
     };
 
     const handleDeletePlan = async (id: string) => {
-        if (confirm('Delete this plan tier?')) {
-            showToast('info', 'Plan deletion restricted for system integrity.');
+        if (confirm('Delete this plan tier? This cannot be undone.')) {
+            try {
+                await db.deletePlan(id);
+                showToast('success', 'Plan deleted.');
+                loadData();
+            } catch (err: any) {
+                showToast('error', err.message || 'Failed to delete plan.');
+            }
         }
     };
 
@@ -198,7 +214,7 @@ export default function PlanManagement() {
                                             key={p.id}
                                             onClick={async () => {
                                                 try {
-                                                    await db.saveEnterprise({ ...selectedEnt, plan_id: p.id });
+                                                    await db.updateEnterprisePlan(selectedEnt.id, p.id);
                                                     showToast('success', `Enterprise upgraded to ${p.name}`);
                                                     setSelectedEnt(null);
                                                     loadData();

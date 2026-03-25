@@ -1,31 +1,35 @@
 {
-  "startTime": "2026-02-09T09:06:49.487Z",
-  "endTime": "2026-02-09T09:07:26.874Z",
+  "startTime": "2026-03-23T08:41:50.049Z",
+  "endTime": "2026-03-23T08:43:59.909Z",
   "userAgents": [
-    "Chrome 144.0.0.0 / Windows 10"
+    "Chrome 146.0.0.0 / Windows 11"
   ],
   "passed": 1,
   "total": 1,
   "skipped": 0,
   "fixtures": [
     {
-      "name": "Customer Complete Workflow",
-      "path": "D:\\gadisewa-ecosystem\\tests\\workflows\\customer-workflow.test.ts",
+      "name": "Garage Owner Complete Workflow",
+      "path": "C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\workflows\\garage-owner-workflow.test.ts",
       "meta": {},
       "tests": [
         {
-          "name": "Complete Customer Journey",
+          "name": "Complete Garage Owner Journey",
           "meta": {},
           "errs": [],
-          "durationMs": 36987,
+          "durationMs": 128899,
           "unstable": false,
-          "screenshotPath": "D:\\gadisewa-ecosystem\\workflow-screenshots",
+          "screenshotPath": "C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\workflow-screenshots",
           "skipped": false
         }
       ]
     }
   ],
   "warnings": [
-    "The \"src\", \"browsers\", and \"screenshots.path\" options from the configuration file will be ignored."
+    "The \"src\", \"browsers\", and \"screenshots.path\" options from the configuration file will be ignored.",
+    "TestCafe cannot interact with the <a class=\"flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800\" href=\"#/pos\" data-discover=\"true\">...</a> element because another element obstructs it.\nWhen something overlaps the action target, TestCafe performs the action with the topmost element at the original target's location.\nThe following element with a greater z-order replaced the original action target: <div class=\"fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in\">...</div>.\nReview your code to prevent this behavior.\n\n    93 |        await t.click(sidebarLink);\n    94 |    } else {\n    95 |        // 4. Try partial match in aside\n    96 |        const sidebarPartial = Selector('aside').find('a, button').withText(new RegExp(pageName, 'i')).filterVisible();\n    97 |        if (await sidebarPartial.exists) {\n >  98 |            await t.click(sidebarPartial);\n    99 |        } else {\n   100 |            // 5. Try anywhere in the page (links first)\n   101 |            const anyLink = Selector('a, button, span').withText(new RegExp(pageName, 'i')).filterVisible();\n   102 |            if (await anyLink.exists) {\n   103 |                await t.click(anyLink);\n\n   at <anonymous> (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:98:21)\n   at fulfilled (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:5:58)",
+    "TestCafe cannot interact with the <a class=\"flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800\" href=\"#/cash-flow\" data-discover=\"true\">...</a> element because another element obstructs it.\nWhen something overlaps the action target, TestCafe performs the action with the topmost element at the original target's location.\nThe following element with a greater z-order replaced the original action target: <div class=\"fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in\">...</div>.\nReview your code to prevent this behavior.\n\n    93 |        await t.click(sidebarLink);\n    94 |    } else {\n    95 |        // 4. Try partial match in aside\n    96 |        const sidebarPartial = Selector('aside').find('a, button').withText(new RegExp(pageName, 'i')).filterVisible();\n    97 |        if (await sidebarPartial.exists) {\n >  98 |            await t.click(sidebarPartial);\n    99 |        } else {\n   100 |            // 5. Try anywhere in the page (links first)\n   101 |            const anyLink = Selector('a, button, span').withText(new RegExp(pageName, 'i')).filterVisible();\n   102 |            if (await anyLink.exists) {\n   103 |                await t.click(anyLink);\n\n   at <anonymous> (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:98:21)\n   at fulfilled (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:5:58)",
+    "TestCafe cannot interact with the <a class=\"flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800\" href=\"#/staff\" data-discover=\"true\">...</a> element because another element obstructs it.\nWhen something overlaps the action target, TestCafe performs the action with the topmost element at the original target's location.\nThe following element with a greater z-order replaced the original action target: <div class=\"fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in\">...</div>.\nReview your code to prevent this behavior.\n\n    93 |        await t.click(sidebarLink);\n    94 |    } else {\n    95 |        // 4. Try partial match in aside\n    96 |        const sidebarPartial = Selector('aside').find('a, button').withText(new RegExp(pageName, 'i')).filterVisible();\n    97 |        if (await sidebarPartial.exists) {\n >  98 |            await t.click(sidebarPartial);\n    99 |        } else {\n   100 |            // 5. Try anywhere in the page (links first)\n   101 |            const anyLink = Selector('a, button, span').withText(new RegExp(pageName, 'i')).filterVisible();\n   102 |            if (await anyLink.exists) {\n   103 |                await t.click(anyLink);\n\n   at <anonymous> (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:98:21)\n   at fulfilled (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:5:58)",
+    "TestCafe cannot interact with the <button class=\"w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors mt-2\">...</button> element because another element obstructs it.\nWhen something overlaps the action target, TestCafe performs the action with the topmost element at the original target's location.\nThe following element with a greater z-order replaced the original action target: <div class=\"fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in\">...</div>.\nReview your code to prevent this behavior.\n\n   56 | */\n   57 |export async function logout() {\n   58 |    const logoutButton = Selector('button, a').withText(/logout/i);\n   59 |\n   60 |    if (await logoutButton.exists) {\n > 61 |        await t.click(logoutButton);\n   62 |        await t.wait(1000);\n   63 |    }\n   64 |}\n   65 |\n   66 |/**\n\n   at <anonymous> (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:61:17)\n   at fulfilled (C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\tests\\helpers\\auth.ts:5:58)"
   ]
 }

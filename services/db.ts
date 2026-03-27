@@ -190,6 +190,11 @@ export const db = {
   getCustomerInsights: async () => db.fetchApi('/reports/customer-insights'),
 
   // CRM
+  getCustomers: async (enterpriseId?: number) => db.fetchApi(`/crm/customers${enterpriseId ? `?enterprise_id=${enterpriseId}` : ''}`),
+  saveCustomer: async (customer: any) => db.fetchApi('/crm/customers', {
+    method: 'POST',
+    body: JSON.stringify(customer)
+  }),
   getCRMSummary: async (enterpriseId?: number) => db.fetchApi(`/crm/summary${enterpriseId ? `?enterprise_id=${enterpriseId}` : ''}`),
   getFollowUps: async (enterpriseId?: number) => db.fetchApi(`/crm/followups${enterpriseId ? `?enterprise_id=${enterpriseId}` : ''}`),
   updateCRMSettings: async (settings: any) => db.fetchApi('/crm/settings', {

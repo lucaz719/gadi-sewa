@@ -1,6 +1,6 @@
 {
-  "startTime": "2026-03-23T08:41:50.049Z",
-  "endTime": "2026-03-23T08:43:59.909Z",
+  "startTime": "2026-03-27T08:59:47.008Z",
+  "endTime": "2026-03-27T09:01:47.900Z",
   "userAgents": [
     "Chrome 146.0.0.0 / Windows 11"
   ],
@@ -17,7 +17,7 @@
           "name": "Complete Garage Owner Journey",
           "meta": {},
           "errs": [],
-          "durationMs": 128899,
+          "durationMs": 120263,
           "unstable": false,
           "screenshotPath": "C:\\Users\\Acer\\Desktop\\gadisewa\\gadi-sewa\\workflow-screenshots",
           "skipped": false

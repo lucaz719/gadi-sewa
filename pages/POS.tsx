@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../services/db';
@@ -6,15 +5,32 @@ import { useToast } from '../App';
 import { KeypadModal } from '../components/pos/KeypadModal';
 import { RecallModal } from '../components/pos/RecallModal';
 import { CheckoutModal } from '../components/pos/CheckoutModal';
-import { CustomerSelectionModal } from '../components/pos/CustomerSelectionModal';
-
-// Products are now fetched from the database in the POS component
+import { InlineCustomerSection } from '../components/pos/InlineCustomerSection';
 
 export default function POS() {
     const { showToast } = useToast();
     const [products, setProducts] = useState<any[]>([]);
-    const [cart, setCart] = useState<{ id: number, name: string, price: number, stock: number | null, img: string, qty: number }[]>([]);
+    const [cart, setCart] = useState<{ id: string | number, name: string, price: number, stock: number | null, img: string, qty: number, isManual?: boolean, category?: string }[]>([]);
+    const [customer, setCustomer] = useState<any | null>(null);
 
+    // Filter states
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState('All');
+
+    // Modals
+    const [keypadOpen, setKeypadOpen] = useState(false);
+    const [activeCartIndex, setActiveCartIndex] = useState<number | null>(null);
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+    const [showRecallModal, setShowRecallModal] = useState(false);
+    const [discountKeypadOpen, setDiscountKeypadOpen] = useState(false);
+    const [showCustomModal, setShowCustomModal] = useState(false);
+    const [customItem, setCustomItem] = useState({ name: '', price: '', category: 'Services' });
+
+    // Discount
+    const [discountType, setDiscountType] = useState<'amt' | 'pct'>('pct');
+    const [manualDiscount, setManualDiscount] = useState(0);
+
+    // Initial load
     useEffect(() => {
         const loadProducts = async () => {
             try {
@@ -27,20 +43,6 @@ export default function POS() {
         loadProducts();
     }, []);
 
-    // Modals state
-    const [keypadOpen, setKeypadOpen] = useState(false);
-    const [activeCartIndex, setActiveCartIndex] = useState<number | null>(null);
-    const [showCustomerModal, setShowCustomerModal] = useState(false);
-    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-    const [showRecallModal, setShowRecallModal] = useState(false);
-    const [discountKeypadOpen, setDiscountKeypadOpen] = useState(false);
-
-    // Sale/Customer state
-    const [customer, setCustomer] = useState<any | null>(null);
-    const [discountType, setDiscountType] = useState<'amt' | 'pct'>('pct');
-    const [manualDiscount, setManualDiscount] = useState(0);
-
-    // Auto Discount Logic
     useEffect(() => {
         if (customer) {
             let pct = 0;
@@ -50,10 +52,18 @@ export default function POS() {
             setManualDiscount(pct);
             setDiscountType('pct');
             showToast('info', `Auto-applied ${pct}% ${customer.tier} discount`);
+        } else {
+            setManualDiscount(0);
         }
     }, [customer]);
 
-    // Calculations
+    // Derived states
+    const filteredProducts = products.filter(p => {
+        const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesSearch;
+    });
+
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const discountAmount = discountType === 'pct' ? (subtotal * manualDiscount / 100) : manualDiscount;
     const taxable = Math.max(0, subtotal - discountAmount);
@@ -109,6 +119,32 @@ export default function POS() {
         }
     };
 
+    const handleAddCustomItem = () => {
+        if (!customItem.name || !customItem.price) {
+            showToast('error', 'Please fill name and price');
+            return;
+        }
+        const priceNum = parseFloat(customItem.price);
+        if (isNaN(priceNum) || priceNum < 0) {
+            showToast('error', 'Invalid price');
+            return;
+        }
+        const newItem = {
+            id: `MANUAL-${Date.now()}`,
+            name: customItem.name,
+            price: priceNum,
+            stock: null,
+            img: 'https://placehold.co/200x200/slate/white?text=Custom',
+            qty: 1,
+            isManual: true,
+            category: customItem.category
+        };
+        setCart([...cart, newItem]);
+        setShowCustomModal(false);
+        setCustomItem({ name: '', price: '', category: 'Services' });
+        showToast('success', 'Custom item added');
+    };
+
     const handleHold = async () => {
         if (cart.length === 0) return;
         await db.holdCart({ cart, customer, total });
@@ -138,9 +174,24 @@ export default function POS() {
         };
         await db.logTransaction(txn);
 
-        // Update inventory
         for (const item of cart) {
-            if (item.stock !== null) await db.updateStock(item.name, -item.qty);
+            if (item.isManual) {
+                try {
+                    await db.saveInventoryItem({
+                        name: item.name,
+                        sku: `MAN-POS-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                        category: item.category || 'Services',
+                        vehicle_type: 'All',
+                        stock: 0,
+                        price: item.price,
+                        unit: 'Pcs'
+                    });
+                } catch (e) {
+                    console.error("Failed to save manual item to inventory:", e);
+                }
+            } else if (item.stock !== null) {
+                await db.updateStock(item.name, -item.qty);
+            }
         }
 
         setCart([]);
@@ -175,124 +226,176 @@ export default function POS() {
 
             <div className="flex-1 p-4 overflow-hidden">
                 <div className="h-full grid grid-cols-12 gap-4">
-                    {/* Left: Products */}
-                    <div className="col-span-8 bg-white dark:bg-[#1e293b] rounded-xl shadow-sm flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-700 space-y-4">
-                            <div className="relative">
-                                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                                <input type="text" placeholder="Search by name, SKU, or scan barcode..." className="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-900 border-none rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" />
+                    {/* LEFT COLUMN: CUSTOMER & CART */}
+                    <div className="col-span-7 flex flex-col gap-4 overflow-hidden">
+                        <InlineCustomerSection 
+                            selectedCustomer={customer} 
+                            onSelect={setCustomer} 
+                            onClear={() => setCustomer(null)} 
+                        />
+
+                        <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm flex-1 flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+                            <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center shrink-0">
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Billing Items</h2>
+                                <span className="text-sm font-medium text-slate-500">{cart.length} items</span>
                             </div>
-                            <div className="flex gap-2 overflow-x-auto pb-1">
-                                {['All', 'Oils', 'Tires', 'Batteries', 'Filters', 'Services'].map(cat => (
-                                    <button key={cat} className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${cat === 'All' ? 'bg-primary-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>{cat}</button>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-4">
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {products.map(prod => (
-                                    <div key={prod.id} onClick={() => addToCart(prod)} className="p-3 rounded-lg border border-transparent hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 cursor-pointer transition-all group">
-                                        <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-800 mb-2 overflow-hidden relative">
-                                            <img src={prod.img} alt={prod.name} className="w-full h-full object-cover" />
-                                        </div>
-                                        <h4 className="font-medium text-sm text-slate-900 dark:text-white leading-tight mb-1">{prod.name}</h4>
-                                        <p className="text-xs text-slate-500">{prod.stock ? `Stock: ${prod.stock}` : 'Service'} | Rp. {prod.price}</p>
+                            
+                            <div className="flex-1 overflow-y-auto w-full">
+                                {cart.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-slate-400">
+                                        <span className="material-symbols-outlined text-4xl mb-2">shopping_bag</span>
+                                        <p className="text-sm">No items in cart</p>
                                     </div>
-                                ))}
+                                ) : (
+                                    <table className="w-full text-left border-collapse">
+                                        <thead className="sticky top-0 bg-white dark:bg-[#1e293b] shadow-sm z-10">
+                                            <tr className="border-b border-slate-200 dark:border-slate-700">
+                                                <th className="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Item</th>
+                                                <th className="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">Rate</th>
+                                                <th className="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-32 text-center">Quantity</th>
+                                                <th className="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-24 text-right">Total</th>
+                                                <th className="py-3 px-4 w-12"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {cart.map((item, idx) => (
+                                                <tr key={idx} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                                    <td className="py-3 px-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded bg-slate-200 shrink-0 overflow-hidden">
+                                                                <img src={item.img} className="w-full h-full object-cover" alt={item.name} />
+                                                            </div>
+                                                            <span className="font-medium text-sm text-slate-900 dark:text-white line-clamp-1">{item.name}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-3 px-4 text-sm text-slate-600 dark:text-slate-300">Rs. {item.price}</td>
+                                                    <td className="py-3 px-4">
+                                                        <div className="flex items-center justify-center gap-1 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 w-max mx-auto">
+                                                            <button className="w-6 h-6 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-400" onClick={() => updateQty(idx, -1)}>-</button>
+                                                            <button className="text-sm font-bold w-6 text-center text-slate-900 dark:text-white hover:text-primary-500 hover:underline" onClick={() => openKeypad(idx)}>{item.qty}</button>
+                                                            <button className="w-6 h-6 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-600 dark:text-slate-400" onClick={() => updateQty(idx, 1)}>+</button>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-3 px-4 text-sm font-bold text-slate-900 dark:text-white text-right">Rs. {item.price * item.qty}</td>
+                                                    <td className="py-3 px-4 text-right">
+                                                        <button className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => removeItem(idx)}>
+                                                            <span className="material-symbols-outlined text-lg">delete</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Right: Cart */}
-                    <div className="col-span-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-sm flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                            <h2 className="text-lg font-bold">Current Sale</h2>
-                            {customer ? (
-                                <div className="flex items-center gap-2">
-                                    <div className="text-right">
-                                        <p className="text-sm font-bold text-primary-600 leading-none">{customer.name}</p>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase">{customer.tier} TIER • {customer.phone}</p>
+                    {/* RIGHT COLUMN: INVENTORY & POS SUMMARY */}
+                    <div className="col-span-5 flex flex-col gap-4 overflow-hidden">
+                        <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm flex-1 flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+                            <div className="p-3 border-b border-slate-200 dark:border-slate-700 space-y-3 shrink-0">
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Search items..." 
+                                            value={searchQuery}
+                                            onChange={e => setSearchQuery(e.target.value)}
+                                            className="w-full pl-9 pr-3 py-2 text-sm bg-slate-100 dark:bg-slate-900 border-none rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-shadow" 
+                                        />
                                     </div>
-                                    <button onClick={() => setCustomer(null)} className="text-slate-400 hover:text-red-500"><span className="material-symbols-outlined text-lg">close</span></button>
+                                    <button onClick={() => setShowCustomModal(true)} className="px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors whitespace-nowrap" title="Add Custom Item">
+                                        <span className="material-symbols-outlined text-lg">add_circle</span>
+                                    </button>
                                 </div>
-                            ) : (
-                                <button onClick={() => setShowCustomerModal(true)} className="flex items-center gap-1 text-primary-600 text-sm font-medium hover:underline">
-                                    <span className="material-symbols-outlined text-lg">person_add</span> Add Customer
-                                </button>
-                            )}
+                                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                                    {['All', 'Oils', 'Tires', 'Batteries', 'Filters', 'Services'].map(cat => (
+                                        <button 
+                                            key={cat} 
+                                            onClick={() => setActiveCategory(cat)}
+                                            className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-primary-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                                        >
+                                            {cat}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div className="flex-1 overflow-y-auto p-3">
+                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {filteredProducts.map(prod => (
+                                        <div key={prod.id} onClick={() => addToCart(prod)} className="p-2 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 cursor-pointer transition-all group flex flex-col">
+                                            <div className="aspect-square rounded shadow-sm bg-slate-100 dark:bg-slate-800 mb-2 overflow-hidden relative">
+                                                <img src={prod.img} alt={prod.name} className="w-full h-full object-cover" />
+                                                {prod.stock !== null && prod.stock <= 5 && (
+                                                    <span className="absolute top-1 right-1 bg-red-400 text-white text-[10px] font-bold px-1 py-0.5 rounded shadow-sm">Low</span>
+                                                )}
+                                            </div>
+                                            <h4 className="font-bold text-xs text-slate-900 dark:text-white leading-tight mb-1 line-clamp-2 flex-1">{prod.name}</h4>
+                                            <div className="flex justify-between items-end mt-auto pt-1 border-t border-transparent group-hover:border-primary-100 dark:group-hover:border-primary-800">
+                                                <span className="text-primary-600 dark:text-primary-400 font-black text-sm">Rs.{prod.price}</span>
+                                                <span className="text-[10px] uppercase font-bold text-slate-400">{prod.stock ? `${prod.stock} instock` : 'Service'}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {filteredProducts.length === 0 && (
+                                        <div className="col-span-full py-8 text-center text-slate-400 text-sm font-medium">No items found.</div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                            {cart.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-slate-400">
-                                    <span className="material-symbols-outlined text-4xl mb-2">shopping_cart_off</span>
-                                    <p className="text-sm">Cart is empty</p>
+                        <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 shrink-0 flex flex-col gap-3">
+                            <div className="space-y-1.5">
+                                <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                    <span>Subtotal</span>
+                                    <span className="text-slate-900 dark:text-white">Rs. {subtotal.toFixed(2)}</span>
                                 </div>
-                            ) : (
-                                cart.map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800/50">
-                                        <div className="w-12 h-12 rounded bg-slate-200 shrink-0 overflow-hidden">
-                                            <img src={item.img} className="w-full h-full object-cover" alt={item.name} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-sm truncate text-slate-900 dark:text-white">{item.name}</p>
-                                            <p className="text-xs text-slate-500">Rs. {item.price}</p>
-                                        </div>
-                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 px-1 py-0.5">
-                                            <button className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-300" onClick={() => updateQty(idx, -1)}>-</button>
-                                            <button className="text-sm font-bold w-8 text-center text-slate-900 dark:text-white hover:text-primary-500 underline decoration-dashed underline-offset-4" onClick={() => openKeypad(idx)}>{item.qty}</button>
-                                            <button className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-300" onClick={() => updateQty(idx, 1)}>+</button>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-bold text-sm text-slate-900 dark:text-white">Rs. {item.price * item.qty}</p>
-                                            <button className="text-slate-400 hover:text-red-500 p-1" onClick={() => removeItem(idx)}><span className="material-symbols-outlined text-lg">delete</span></button>
-                                        </div>
+                                <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                    <div className="flex items-center gap-1">
+                                        <span>Discount</span>
+                                        <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">
+                                            {discountType === 'pct' ? `${manualDiscount}%` : `Rs. ${manualDiscount}`}
+                                        </span>
                                     </div>
-                                ))
-                            )}
-                        </div>
-
-                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 space-y-2">
-                            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
-                                <span>Subtotal</span>
-                                <span className="font-medium text-slate-900 dark:text-white">Rs. {subtotal.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 group">
-                                <div className="flex items-center gap-1">
-                                    <span>Discount ({discountType === 'pct' ? `${manualDiscount}%` : `Rs. {manualDiscount}`})</span>
+                                    <span className="text-green-600 dark:text-green-400">- Rs. {discountAmount.toFixed(2)}</span>
                                 </div>
-                                <span className="font-bold text-green-600">- Rs. {discountAmount.toFixed(2)}</span>
+                                <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                    <span>Tax (18%)</span>
+                                    <span className="text-slate-900 dark:text-white">Rs. {tax.toFixed(2)}</span>
+                                </div>
                             </div>
-                            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
-                                <span>Tax (18%)</span>
-                                <span className="font-medium text-slate-900 dark:text-white">Rs. {tax.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between text-lg font-bold text-slate-900 dark:text-white border-t border-slate-200 dark:border-slate-700 pt-3 mt-2">
-                                <span>Total</span>
-                                <span>Rs. {total.toFixed(2)}</span>
+                            
+                            <div className="flex justify-between items-end border-t border-slate-200 dark:border-slate-700 pt-3">
+                                <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Total Due</span>
+                                <span className="text-3xl font-black text-slate-900 dark:text-white leading-none">Rs. {total.toFixed(2)}</span>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-2 pt-4">
+                            <div className="grid grid-cols-3 gap-2 pt-2">
                                 <button
                                     onClick={handleHold}
                                     disabled={cart.length === 0}
-                                    className="py-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-sm font-bold hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 disabled:opacity-50"
+                                    className="py-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 disabled:opacity-50 transition-colors"
                                 >Hold</button>
                                 <button
                                     onClick={() => setDiscountKeypadOpen(true)}
-                                    className="py-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-sm font-bold hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300"
+                                    className="py-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
                                 >Discount</button>
                                 <button
-                                    className="py-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-sm font-bold hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300"
+                                    className="py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-lg text-sm font-bold text-red-600 dark:text-red-400 transition-colors"
                                     onClick={() => { setCart([]); setCustomer(null); setManualDiscount(0); }}
                                 >Clear</button>
                             </div>
+                            
                             <button
                                 onClick={() => setShowCheckoutModal(true)}
                                 disabled={cart.length === 0}
-                                className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-bold text-lg shadow-lg flex items-center justify-center gap-2 mt-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none mt-1"
                             >
-                                <span className="material-symbols-outlined">payment</span> Complete Sale
+                                <span className="material-symbols-outlined">payments</span> 
+                                Complete Sale
                             </button>
                         </div>
                     </div>
@@ -303,18 +406,17 @@ export default function POS() {
                 isOpen={keypadOpen}
                 onClose={() => setKeypadOpen(false)}
                 onEnter={handleKeypadEnter}
-                title={activeCartIndex !== null ? `Set Qty for ${cart[activeCartIndex]?.name}` : "Enter Quantity"}
+                title={activeCartIndex !== null ? `Qty for ${cart[activeCartIndex]?.name}` : "Quantity"}
             />
 
-            {/* Discount Modal with Type Switch */}
             {discountKeypadOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
                     <div className="bg-white dark:bg-[#1e293b] w-full max-w-xs rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                         <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b dark:border-slate-700 flex justify-between items-center">
                             <h3 className="font-bold">Set Discount</h3>
                             <div className="flex bg-slate-200 dark:bg-slate-900 rounded p-1">
                                 <button onClick={() => setDiscountType('pct')} className={`px-3 py-1 text-xs font-bold rounded ${discountType === 'pct' ? 'bg-white dark:bg-slate-700 shadow text-primary-600' : 'text-slate-500'}`}>%</button>
-                                <button onClick={() => setDiscountType('amt')} className={`px-3 py-1 text-xs font-bold rounded ${discountType === 'amt' ? 'bg-white dark:bg-slate-700 shadow text-primary-600' : 'text-slate-500'}`}>Cash (Rs. )</button>
+                                <button onClick={() => setDiscountType('amt')} className={`px-3 py-1 text-xs font-bold rounded ${discountType === 'amt' ? 'bg-white dark:bg-slate-700 shadow text-primary-600' : 'text-slate-500'}`}>Rs.</button>
                             </div>
                         </div>
                         <KeypadModal
@@ -327,12 +429,6 @@ export default function POS() {
                     </div>
                 </div>
             )}
-
-            <CustomerSelectionModal
-                isOpen={showCustomerModal}
-                onClose={() => setShowCustomerModal(false)}
-                onSelect={(c) => { setCustomer(c); setShowCustomerModal(false); }}
-            />
 
             <RecallModal
                 isOpen={showRecallModal}
@@ -347,6 +443,62 @@ export default function POS() {
                 customer={customer}
                 onComplete={handleCompleteSale}
             />
+
+            {showCustomModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+                    <div className="bg-white dark:bg-[#1e293b] w-full max-w-sm rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-white">Custom Item</h3>
+                            <button onClick={() => setShowCustomModal(false)} className="text-slate-400 hover:text-red-500 transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="p-4 space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Item Name</label>
+                                <input
+                                    type="text"
+                                    value={customItem.name}
+                                    onChange={(e) => setCustomItem({ ...customItem, name: e.target.value })}
+                                    className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                    placeholder="e.g. Emergency Towing"
+                                    autoFocus
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Price (Rs.)</label>
+                                <input
+                                    type="number"
+                                    value={customItem.price}
+                                    onChange={(e) => setCustomItem({ ...customItem, price: e.target.value })}
+                                    className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                    placeholder="0.00"
+                                    min="0"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Category</label>
+                                <select
+                                    value={customItem.category}
+                                    onChange={(e) => setCustomItem({ ...customItem, category: e.target.value })}
+                                    className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                                >
+                                    <option value="Services">Services</option>
+                                    <option value="Misc">Misc</option>
+                                    <option value="Oils">Oils</option>
+                                    <option value="Filters">Filters</option>
+                                    <option value="Tires">Tires</option>
+                                    <option value="Batteries">Batteries</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+                            <button onClick={() => setShowCustomModal(false)} className="px-5 py-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-bold transition-colors">Cancel</button>
+                            <button onClick={handleAddCustomItem} className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-bold transition-colors shadow-sm">Add Item</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

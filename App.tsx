@@ -175,6 +175,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <SidebarItem icon="account_balance_wallet" label="Cash Flow & Budget" path="/vendor/cash-flow" active={path === '/vendor/cash-flow'} />
               <SidebarItem icon="payments" label="Financials" path="/vendor/financials" active={path === '/vendor/financials'} />
               <SidebarItem icon="campaign" label="Marketing" path="/vendor/marketing" active={path === '/vendor/marketing'} />
+              <SidebarItem icon="settings_suggest" label="Subscription" path="/subscription" active={path === '/subscription'} />
             </>
           ) : (
             <>
@@ -195,6 +196,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <SidebarItem icon="money_off" label="Expenses" path="/expenses" active={path === '/expenses'} />
               <SidebarItem icon="receipt" label="Invoices" path="/invoices" active={path === '/invoices'} />
               <SidebarItem icon="bar_chart" label="Reports" path="/reports" active={path === '/reports'} />
+              <SidebarItem icon="settings_suggest" label="Subscription" path="/subscription" active={path === '/subscription'} />
             </>
           )}
         </nav>

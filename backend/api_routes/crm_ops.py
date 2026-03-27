@@ -68,3 +68,18 @@ def update_crm_settings(settings: dict, enterprise_id: int = 1, db: Session = De
         
     db.commit()
     return {"status": "success"}
+
+@router.get("/customers", response_model=List[schemas.Customer])
+def get_customers(enterprise_id: int = None, db: Session = Depends(get_db)):
+    query = db.query(models.Customer)
+    if enterprise_id:
+        query = query.filter(models.Customer.enterprise_id == enterprise_id)
+    return query.order_by(models.Customer.name.asc()).all()
+
+@router.post("/customers", response_model=schemas.Customer)
+def create_customer(customer: schemas.CustomerBase, enterprise_id: int = 1, db: Session = Depends(get_db)):
+    db_customer = models.Customer(**customer.model_dump(), enterprise_id=enterprise_id)
+    db.add(db_customer)
+    db.commit()
+    db.refresh(db_customer)
+    return db_customer

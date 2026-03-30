@@ -5,19 +5,7 @@ import { aiBackend } from '../services/ai';
 import { db } from '../services/db';
 import { useToast } from '../App';
 
-const MOCK_CUSTOMERS = [
-    {
-        id: 1,
-        firstName: 'John',
-        lastName: 'Doe',
-        phone: '9876543210',
-        email: 'john.doe@example.com',
-        address: '123 Maple Street, Springfield',
-        vehicles: [
-            { id: 101, make: 'Toyota', model: 'Camry', year: '2021', reg: 'MH-01-AB-1234', fuel: 'Petrol', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=200' }
-        ]
-    }
-];
+// Remove MOCK_CUSTOMERS
 
 export default function CreateJob() {
     const navigate = useNavigate();
@@ -30,9 +18,24 @@ export default function CreateJob() {
     const [complaint, setComplaint] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-    const [searchResults, setSearchResults] = useState<typeof MOCK_CUSTOMERS>([]);
-    const [customerForm, setCustomerForm] = useState({ firstName: '', lastName: '', phone: '', email: '', address: '' });
+    const [dbCustomers, setDbCustomers] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [customerForm, setCustomerForm] = useState({ name: '', phone: '', email: '' });
     const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+
+    React.useEffect(() => {
+        const loadCusts = async () => {
+             const authUser = db.getAuthUser();
+             const entId = authUser?.enterprise_id || 1;
+             try {
+                 const res = await db.getCustomers(entId);
+                 setDbCustomers(res);
+             } catch(e) {
+                 console.error(e);
+             }
+        };
+        loadCusts();
+    }, []);
 
     const handleAiAnalysis = async () => {
         if (!complaint) return showToast('info', 'Please enter a complaint first');
@@ -52,8 +55,15 @@ export default function CreateJob() {
 
     const selectCustomer = (customer: any) => {
         setSelectedCustomer(customer);
-        setCustomerForm({ firstName: customer.firstName, lastName: customer.lastName, phone: customer.phone, email: customer.email, address: customer.address });
+        setCustomerForm({ name: customer.name, phone: customer.phone, email: customer.email || '' });
         setSearchResults([]);
+        if (customer.vehicle_history && Object.keys(customer.vehicle_history).length > 0) {
+             setSelectedVehicle({
+                 make: customer.vehicle_history.make || '',
+                 model: customer.vehicle_history.model || '',
+                 reg: customer.vehicle_history.plate || ''
+             });
+        }
     };
 
     return (
@@ -84,15 +94,35 @@ export default function CreateJob() {
                     {activeStep === 1 && (
                         <div className="space-y-4 animate-fade-in">
                             <h3 className="font-bold border-b pb-2">Customer Info</h3>
-                            <input type="text" placeholder="Search customer..." className="w-full p-2.5 rounded-lg border dark:border-slate-600 dark:bg-slate-800" onChange={(e) => {
-                                const results = MOCK_CUSTOMERS.filter(c => c.phone.includes(e.target.value));
-                                setSearchResults(e.target.value ? results : []);
+                            <input type="text" placeholder="Search customer by name or phone..." className="w-full p-2.5 rounded-lg border dark:border-slate-600 dark:bg-slate-800" onChange={(e) => {
+                                const val = e.target.value.toLowerCase();
+                                if(!val) { setSearchResults([]); return; }
+                                const results = dbCustomers.filter(c => c.phone.includes(val) || c.name.toLowerCase().includes(val));
+                                setSearchResults(results);
                             }} />
-                            {searchResults.map(c => <div key={c.id} onClick={() => selectCustomer(c)} className="p-2 hover:bg-slate-100 cursor-pointer rounded border dark:border-slate-700">{c.firstName} - {c.phone}</div>)}
-                            <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="First Name" value={customerForm.firstName} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600" readOnly />
-                                <input type="text" placeholder="Phone" value={customerForm.phone} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600" readOnly />
-                            </div>
+                            {searchResults.length > 0 && <div className="border dark:border-slate-700 rounded-lg overflow-hidden my-2">
+                                {searchResults.map(c => <div key={c.id} onClick={() => selectCustomer(c)} className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer border-b last:border-0 border-slate-100 dark:border-slate-700 font-medium">{c.name} - {c.phone}</div>)}
+                            </div>}
+                            
+                            {!selectedCustomer && searchResults.length === 0 && (
+                                <div className="text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-dashed border-slate-300 dark:border-slate-600">
+                                    <p className="mb-2">Customer not found? Enter details to create a new one.</p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <input type="text" placeholder="Full Name *" value={customerForm.name} onChange={e => setCustomerForm({...customerForm, name: e.target.value})} className="p-2.5 border rounded-lg dark:bg-slate-900 dark:border-slate-700 text-slate-900 dark:text-white" />
+                                        <input type="tel" placeholder="Phone *" value={customerForm.phone} onChange={e => setCustomerForm({...customerForm, phone: e.target.value})} className="p-2.5 border rounded-lg dark:bg-slate-900 dark:border-slate-700 text-slate-900 dark:text-white" />
+                                    </div>
+                                </div>
+                            )}
+
+                            {selectedCustomer && (
+                                <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800 p-4 rounded-lg flex justify-between items-center">
+                                    <div>
+                                        <p className="font-bold text-slate-900 dark:text-white">{customerForm.name}</p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">{customerForm.phone}</p>
+                                    </div>
+                                    <button onClick={() => { setSelectedCustomer(null); setCustomerForm({name:'', phone:'', email:''}); }} className="text-slate-400 hover:text-red-500"><span className="material-symbols-outlined">close</span></button>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -100,12 +130,11 @@ export default function CreateJob() {
                         <div className="space-y-4 animate-fade-in">
                             <h3 className="font-bold border-b pb-2">Vehicle Details</h3>
                             <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="Registration No" className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600 uppercase font-mono" />
-                                <select className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600">
-                                    <option>Sedan</option>
-                                    <option>SUV</option>
-                                    <option>Hatchback</option>
-                                </select>
+                                <input type="text" placeholder="Registration No (e.g. MH-01-AB-1234)" value={selectedVehicle?.reg || ''} onChange={e => setSelectedVehicle({...selectedVehicle, reg: e.target.value.toUpperCase()})} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600 uppercase font-mono" />
+                                <div className="grid grid-cols-2 gap-2">
+                                    <input type="text" placeholder="Make (e.g. Toyota)" value={selectedVehicle?.make || ''} onChange={e => setSelectedVehicle({...selectedVehicle, make: e.target.value})} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600" />
+                                    <input type="text" placeholder="Model (e.g. Camry)" value={selectedVehicle?.model || ''} onChange={e => setSelectedVehicle({...selectedVehicle, model: e.target.value})} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600" />
+                                </div>
                             </div>
                         </div>
                     )}
@@ -167,14 +196,38 @@ export default function CreateJob() {
                     <div className="mt-8 flex justify-between">
                         <button onClick={() => setActiveStep(s => Math.max(1, s - 1))} className="px-6 py-2 rounded-lg text-slate-500 font-medium">Back</button>
                         <button data-testid="next-step" onClick={async () => {
-                            if (activeStep < 3) setActiveStep(s => s + 1);
+                            if (activeStep < 3) {
+                                if (activeStep === 1 && !selectedCustomer && (!customerForm.name || !customerForm.phone)) {
+                                    showToast('error', 'Please select or enter customer details');
+                                    return;
+                                }
+                                setActiveStep(s => s + 1);
+                            }
                             else {
+                                let finalCustomerId = selectedCustomer?.id;
+                                // Auto-create customer if manual entry
+                                if (!finalCustomerId && customerForm.name && customerForm.phone) {
+                                    try {
+                                        const newC = await db.saveCustomer({
+                                            name: customerForm.name,
+                                            phone: customerForm.phone,
+                                            email: customerForm.email || null,
+                                            vehicle_history: {
+                                                make: selectedVehicle?.make || '',
+                                                model: selectedVehicle?.model || '',
+                                                plate: selectedVehicle?.reg || ''
+                                            }
+                                        });
+                                        finalCustomerId = newC.id;
+                                    } catch(e) { console.error(e); }
+                                }
+
                                 await db.saveJob({
-                                    customerId: selectedCustomer?.id || 1,
-                                    vehicleInfo: selectedVehicle ? `${selectedVehicle.make} ${selectedVehicle.model} (${selectedVehicle.reg})` : "General Service",
+                                    customerId: finalCustomerId || 1,
+                                    vehicleInfo: selectedVehicle ? `${selectedVehicle.make || ''} ${selectedVehicle.model || ''} (${selectedVehicle.reg || ''})`.trim() : "General Service",
                                     complaint: complaint,
                                     status: 'Pending',
-                                    laborCost: aiInsights?.estimatedLaborHours ? aiInsights.estimatedLaborHours * 500 : 0 // Mock labor cost calculation
+                                    laborCost: aiInsights?.estimatedLaborHours ? aiInsights.estimatedLaborHours * 500 : 0
                                 });
                                 showToast('success', 'Job Card Created!');
                                 navigate('/jobs');

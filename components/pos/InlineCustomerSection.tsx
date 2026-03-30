@@ -1,23 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../../services/db';
 
 export const InlineCustomerSection = ({ onSelect, selectedCustomer, onClear }: { onSelect: (c: any) => void, selectedCustomer: any | null, onClear: () => void }) => {
-    const [view, setView] = useState<'list' | 'create'>('list');
     const [customers, setCustomers] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+    const resultsRef = useRef<HTMLDivElement>(null);
     
-    const [newCustomer, setNewCustomer] = useState({ 
+    const [formData, setFormData] = useState({ 
         name: '', 
         phone: '', 
         email: '',
-        vehicleMake: '',
-        vehicleModel: '',
         vehiclePlate: ''
     });
 
     useEffect(() => {
         loadCustomers();
+        const handleClickOutside = (event: MouseEvent) => {
+            if (resultsRef.current && !resultsRef.current.contains(event.target as Node)) {
+                setShowResults(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const loadCustomers = async () => {
@@ -34,27 +41,43 @@ export const InlineCustomerSection = ({ onSelect, selectedCustomer, onClear }: {
         }
     };
 
-    const handleCreate = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (newCustomer.name && newCustomer.phone) {
+    const handleNameChange = (val: string) => {
+        setFormData({ ...formData, name: val });
+        if (val.trim().length > 0) {
+            const filtered = customers.filter(c => 
+                c.name.toLowerCase().includes(val.toLowerCase()) || 
+                c.phone.includes(val)
+            );
+            setSearchResults(filtered);
+            setShowResults(true);
+        } else {
+            setSearchResults([]);
+            setShowResults(false);
+        }
+    };
+
+    const handleSelectExisting = (c: any) => {
+        onSelect({ ...c, tier: c.tier || 'Bronze' });
+        setFormData({ name: c.name, phone: c.phone, email: c.email || '', vehiclePlate: c.vehicle_history?.plate || '' });
+        setShowResults(false);
+    };
+
+    const handleCreate = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (formData.name && formData.phone) {
             setSaving(true);
             try {
                 const payload = {
-                    name: newCustomer.name,
-                    phone: newCustomer.phone,
-                    email: newCustomer.email || null,
+                    name: formData.name,
+                    phone: formData.phone,
+                    email: formData.email || null,
                     vehicle_history: {
-                        make: newCustomer.vehicleMake,
-                        model: newCustomer.vehicleModel,
-                        plate: newCustomer.vehiclePlate
+                        plate: formData.vehiclePlate
                     }
                 };
                 
                 const saved = await db.saveCustomer(payload);
-                onSelect({...saved, tier: 'Bronze'}); 
-                setNewCustomer({ name: '', phone: '', email: '', vehicleMake: '', vehicleModel: '', vehiclePlate: '' });
-                setView('list');
-                // Reload list to include new one if they clear selection
+                onSelect({ ...saved, tier: 'Bronze' }); 
                 loadCustomers();
             } catch (err) {
                 console.error("Failed to save customer", err);
@@ -74,7 +97,7 @@ export const InlineCustomerSection = ({ onSelect, selectedCustomer, onClear }: {
                         {selectedCustomer.phone} • <span className="uppercase text-primary-600 dark:text-primary-400 text-xs font-bold">{selectedCustomer.tier || 'Bronze'} TIER</span>
                     </p>
                 </div>
-                <button onClick={onClear} className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
+                <button onClick={() => { onClear(); setFormData({ name: '', phone: '', email: '', vehiclePlate: '' }); }} className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
                     <span className="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -82,90 +105,81 @@ export const InlineCustomerSection = ({ onSelect, selectedCustomer, onClear }: {
     }
 
     return (
-        <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col h-72 shrink-0">
-            <div className="p-3 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0">
-                <h3 className="font-bold text-slate-900 dark:text-white">Customer Details</h3>
-                {view === 'create' ? (
-                    <button onClick={() => setView('list')} className="text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors">Cancel</button>
-                ) : (
-                    <button onClick={() => setView('create')} className="text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">add</span> New
-                    </button>
-                )}
+        <div className="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-visible flex flex-col shrink-0">
+            <div className="p-3 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0 rounded-t-xl">
+                <h3 className="font-bold text-slate-900 dark:text-white text-sm">Customer Details</h3>
+                <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Type to Search or Add New</span>
             </div>
 
-            {view === 'list' ? (
-                <div className="p-2 overflow-y-auto flex-1">
-                    {loading ? (
-                        <div className="p-8 text-center text-slate-500 text-sm">Loading customers...</div>
-                    ) : customers.length === 0 ? (
-                        <div className="p-8 text-center text-slate-500 text-sm">No customers found.</div>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-2">
-                        {customers.map(c => (
-                            <button key={c.id} onClick={() => onSelect({...c, tier: 'Bronze'})} className="text-left p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700/50 hover:border-primary-200 dark:hover:border-primary-800 transition-all group">
-                                <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{c.name}</p>
-                                <p className="text-xs text-slate-500 truncate">{c.phone}</p>
+            <div className="p-3 relative">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="relative">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Full Name *</label>
+                        <input
+                            type="text"
+                            value={formData.name}
+                            onChange={e => handleNameChange(e.target.value)}
+                            onFocus={() => formData.name && setShowResults(true)}
+                            className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none font-medium"
+                            placeholder="Search or Enter Name"
+                        />
+                        {showResults && searchResults.length > 0 && (
+                            <div ref={resultsRef} className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-1">
+                                {searchResults.map(c => (
+                                    <button
+                                        key={c.id}
+                                        onClick={() => handleSelectExisting(c)}
+                                        className="w-full text-left p-3 hover:bg-primary-50 dark:hover:bg-primary-900/20 border-b border-slate-100 dark:border-slate-700 last:border-0 transition-colors"
+                                    >
+                                        <p className="font-bold text-sm text-slate-900 dark:text-white">{c.name}</p>
+                                        <p className="text-xs text-slate-500">{c.phone}</p>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Phone *</label>
+                        <input
+                            type="tel"
+                            value={formData.phone}
+                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none font-medium"
+                            placeholder="Mobile Number"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Email (Opt)</label>
+                        <input
+                            type="email"
+                            value={formData.email}
+                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none font-medium"
+                            placeholder="email@example.com"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Reg. Plate (Opt)</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={formData.vehiclePlate}
+                                onChange={e => setFormData({ ...formData, vehiclePlate: e.target.value.toUpperCase() })}
+                                className="flex-1 px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none uppercase font-mono font-medium"
+                                placeholder="AA-1234"
+                            />
+                            <button
+                                onClick={() => handleCreate()}
+                                disabled={saving || !formData.name || !formData.phone}
+                                className="bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-lg disabled:opacity-50 transition-colors flex items-center justify-center min-w-[40px]"
+                                title="Set Active"
+                            >
+                                <span className="material-symbols-outlined text-lg">{saving ? 'hourglass_top' : 'done_all'}</span>
                             </button>
-                        ))}
                         </div>
-                    )}
+                    </div>
                 </div>
-            ) : (
-                <form onSubmit={handleCreate} className="p-3 overflow-y-auto flex-1 flex flex-col">
-                    <div className="grid grid-cols-2 gap-3 mb-3">
-                        <div>
-                            <input
-                                type="text"
-                                autoFocus
-                                required
-                                value={newCustomer.name}
-                                onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none"
-                                placeholder="Name *"
-                            />
-                        </div>
-                        <div>
-                            <input
-                                type="tel"
-                                required
-                                value={newCustomer.phone}
-                                onChange={e => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none"
-                                placeholder="Phone *"
-                            />
-                        </div>
-                        <div>
-                            <input
-                                type="email"
-                                value={newCustomer.email}
-                                onChange={e => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none"
-                                placeholder="Email (Opt)"
-                            />
-                        </div>
-                        <div>
-                            <input
-                                type="text"
-                                value={newCustomer.vehiclePlate}
-                                onChange={e => setNewCustomer({ ...newCustomer, vehiclePlate: e.target.value.toUpperCase() })}
-                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none uppercase placeholder:normal-case font-mono"
-                                placeholder="Reg. Plate (Opt)"
-                            />
-                        </div>
-                    </div>
-                    
-                    <div className="mt-auto pt-2 border-t border-slate-100 dark:border-slate-800 shrink-0">
-                        <button
-                            type="submit"
-                            disabled={saving || !newCustomer.name || !newCustomer.phone}
-                            className="w-full py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-lg text-sm font-bold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                        >
-                            {saving ? 'Saving...' : 'Save & Select'}
-                        </button>
-                    </div>
-                </form>
-            )}
+            </div>
         </div>
     );
 };

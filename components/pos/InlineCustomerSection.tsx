@@ -112,8 +112,8 @@ export const InlineCustomerSection = ({ onSelect, selectedCustomer, onClear }: {
             </div>
 
             <div className="p-3 relative">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div className="md:col-span-3">
                         <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Full Name *</label>
                         <input
                             type="text"
@@ -121,7 +121,7 @@ export const InlineCustomerSection = ({ onSelect, selectedCustomer, onClear }: {
                             onChange={e => handleNameChange(e.target.value)}
                             onFocus={() => formData.name && setShowResults(true)}
                             className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none font-medium"
-                            placeholder="Search or Enter Name"
+                            placeholder="Find/Add Name"
                         />
                         {showResults && searchResults.length > 0 && (
                             <div ref={resultsRef} className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-1">
@@ -138,45 +138,45 @@ export const InlineCustomerSection = ({ onSelect, selectedCustomer, onClear }: {
                             </div>
                         )}
                     </div>
-                    <div>
+                    <div className="md:col-span-2">
                         <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Phone *</label>
                         <input
                             type="tel"
                             value={formData.phone}
                             onChange={e => setFormData({ ...formData, phone: e.target.value })}
                             className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none font-medium"
-                            placeholder="Mobile Number"
+                            placeholder="Phone"
                         />
                     </div>
-                    <div>
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Email (Opt)</label>
+                    <div className="md:col-span-3">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Email</label>
                         <input
                             type="email"
                             value={formData.email}
                             onChange={e => setFormData({ ...formData, email: e.target.value })}
                             className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none font-medium"
-                            placeholder="email@example.com"
+                            placeholder="Email (Optional)"
                         />
                     </div>
-                    <div>
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Reg. Plate (Opt)</label>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={formData.vehiclePlate}
-                                onChange={e => setFormData({ ...formData, vehiclePlate: e.target.value.toUpperCase() })}
-                                className="flex-1 px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none uppercase font-mono font-medium"
-                                placeholder="AA-1234"
-                            />
-                            <button
-                                onClick={() => handleCreate()}
-                                disabled={saving || !formData.name || !formData.phone}
-                                className="bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-lg disabled:opacity-50 transition-colors flex items-center justify-center min-w-[40px]"
-                                title="Set Active"
-                            >
-                                <span className="material-symbols-outlined text-lg">{saving ? 'hourglass_top' : 'done_all'}</span>
-                            </button>
-                        </div>
+                    <div className="md:col-span-2">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Reg. Plate</label>
+                        <input
+                            type="text"
+                            value={formData.vehiclePlate}
+                            onChange={e => setFormData({ ...formData, vehiclePlate: e.target.value.toUpperCase() })}
+                            className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-primary-500 outline-none uppercase font-mono font-medium"
+                            placeholder="Plate"
+                        />
+                    </div>
+                    <div className="md:col-span-2">
+                        <button
+                            onClick={() => handleCreate()}
+                            disabled={saving || !formData.name || !formData.phone}
+                            className="w-full bg-primary-600 hover:bg-primary-700 text-white h-[38px] rounded-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2 font-bold text-xs shadow-lg shadow-primary-500/10 active:scale-95"
+                        >
+                            <span className="material-symbols-outlined text-lg">{saving ? 'hourglass_top' : 'person_add'}</span>
+                            <span>{saving ? 'Saving...' : 'Set Active'}</span>
+                        </button>
                     </div>
                 </div>
             </div>

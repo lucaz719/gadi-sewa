@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 import models
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["AI Assistant"])
 
@@ -50,6 +53,7 @@ class AiActionRequest(BaseModel):
     action: str  # "create_job", "book_appointment", "search_inventory", "financial_summary", "service_reminder", "diagnose"
     params: Dict[str, Any] = {}
     user_role: str = "garage"
+    enterprise_id: Optional[int] = 1
 
 class AiActionResponse(BaseModel):
     success: bool
@@ -61,7 +65,7 @@ class AiActionResponse(BaseModel):
 # --- Helpers to gather context from DB ---
 
 def _get_business_snapshot(db: Session, enterprise_id: int = 1) -> dict:
-    """Gather a quick snapshot of current business state for AI context."""
+    """Gather a quick snapshot of current business state for AI context, scoped to enterprise."""
     jobs_total = db.query(func.count(models.Job.id)).scalar() or 0
     jobs_pending = db.query(func.count(models.Job.id)).filter(models.Job.status == "Pending").scalar() or 0
     jobs_in_progress = db.query(func.count(models.Job.id)).filter(models.Job.status == "In Progress").scalar() or 0
@@ -70,16 +74,21 @@ def _get_business_snapshot(db: Session, enterprise_id: int = 1) -> dict:
     inventory_items = db.query(func.count(models.InventoryItem.id)).scalar() or 0
     low_stock = db.query(func.count(models.InventoryItem.id)).filter(models.InventoryItem.stock <= 5).scalar() or 0
 
-    customers_total = db.query(func.count(models.Customer.id)).scalar() or 0
+    customers_total = db.query(func.count(models.Customer.id)).filter(
+        models.Customer.enterprise_id == enterprise_id
+    ).scalar() or 0
 
-    # Financial snapshot
-    transactions = db.query(models.Transaction).all()
+    # Financial snapshot scoped to enterprise
+    transactions = db.query(models.Transaction).filter(
+        models.Transaction.enterprise_id == enterprise_id
+    ).all()
     total_income = sum(t.amount for t in transactions if t.type == "Income")
     total_expense = sum(t.amount for t in transactions if t.type == "Expense")
 
-    # Overdue follow-ups
+    # Overdue follow-ups scoped to enterprise
     now = datetime.utcnow()
     overdue_customers = db.query(func.count(models.Customer.id)).filter(
+        models.Customer.enterprise_id == enterprise_id,
         models.Customer.next_service_date != None,
         models.Customer.next_service_date < now
     ).scalar() or 0
@@ -171,8 +180,8 @@ def chat_with_assistant(req: ChatRequest, db: Session = Depends(get_db)):
                 actions=actions if actions else None,
                 context_data=snapshot
             )
-        except Exception:
-            pass  # Fall through to smart rule-based fallback
+        except Exception as e:
+            logger.warning("Gemini chat failed, falling back to rule-based: %s", e)
 
     # --- Smart rule-based fallback (enhanced) ---
     return _rule_based_chat(req, snapshot, db)
@@ -349,21 +358,22 @@ def _rule_based_chat(req: ChatRequest, snapshot: dict, db: Session) -> ChatRespo
 @router.post("/execute-action", response_model=AiActionResponse)
 def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db)):
     """Execute an in-app action triggered by the AI assistant."""
+    eid = req.enterprise_id or 1
 
     if req.action == "create_job":
         return _action_create_job(req.params, db)
     elif req.action == "search_inventory":
         return _action_search_inventory(req.params, db)
     elif req.action == "financial_summary":
-        return _action_financial_summary(req.params, db)
+        return _action_financial_summary(req.params, db, eid)
     elif req.action == "service_reminder":
-        return _action_service_reminders(req.params, db)
+        return _action_service_reminders(req.params, db, eid)
     elif req.action == "diagnose":
         return _action_diagnose(req.params)
     elif req.action == "book_appointment":
         return _action_book_appointment(req.params, db)
     elif req.action == "daily_digest":
-        return _action_daily_digest(db)
+        return _action_daily_digest(db, eid)
     elif req.action == "smart_reorder":
         return _action_smart_reorder(db)
     else:
@@ -420,9 +430,11 @@ def _action_search_inventory(params: dict, db: Session) -> AiActionResponse:
     )
 
 
-def _action_financial_summary(params: dict, db: Session) -> AiActionResponse:
-    """Get AI-enhanced financial summary."""
-    transactions = db.query(models.Transaction).all()
+def _action_financial_summary(params: dict, db: Session, enterprise_id: int = 1) -> AiActionResponse:
+    """Get AI-enhanced financial summary scoped to enterprise."""
+    transactions = db.query(models.Transaction).filter(
+        models.Transaction.enterprise_id == enterprise_id
+    ).all()
     total_income = sum(t.amount for t in transactions if t.type == "Income")
     total_fixed = sum(t.amount for t in transactions if t.type == "Expense" and t.expense_type == "Fixed")
     total_variable = sum(t.amount for t in transactions if t.type == "Expense" and t.expense_type == "Variable")
@@ -452,17 +464,19 @@ def _action_financial_summary(params: dict, db: Session) -> AiActionResponse:
     )
 
 
-def _action_service_reminders(params: dict, db: Session) -> AiActionResponse:
-    """Get customers who are overdue or due soon for service."""
+def _action_service_reminders(params: dict, db: Session, enterprise_id: int = 1) -> AiActionResponse:
+    """Get customers who are overdue or due soon for service, scoped to enterprise."""
     now = datetime.utcnow()
     soon = now + timedelta(days=7)
 
     overdue = db.query(models.Customer).filter(
+        models.Customer.enterprise_id == enterprise_id,
         models.Customer.next_service_date != None,
         models.Customer.next_service_date < now
     ).all()
 
     upcoming = db.query(models.Customer).filter(
+        models.Customer.enterprise_id == enterprise_id,
         models.Customer.next_service_date != None,
         models.Customer.next_service_date >= now,
         models.Customer.next_service_date <= soon
@@ -517,8 +531,8 @@ Respond in JSON with:
                 data=diagnosis,
                 follow_up=["Create job with diagnosis", "Check parts availability", "Get price estimate"]
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Gemini diagnosis failed, using fallback: %s", e)
 
     # Fallback diagnosis
     return AiActionResponse(
@@ -565,9 +579,9 @@ def _action_book_appointment(params: dict, db: Session) -> AiActionResponse:
     )
 
 
-def _action_daily_digest(db: Session) -> AiActionResponse:
+def _action_daily_digest(db: Session, enterprise_id: int = 1) -> AiActionResponse:
     """Generate a daily business digest with AI insights."""
-    snapshot = _get_business_snapshot(db)
+    snapshot = _get_business_snapshot(db, enterprise_id)
     j = snapshot["jobs"]
     c = snapshot["customers"]
     f = snapshot["financials"]

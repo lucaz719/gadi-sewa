@@ -60,7 +60,8 @@ export default function AiAssistantWidget() {
                 const target = response.action.split(':')[1];
                 setTimeout(() => navigate(target), 1500);
             }
-        } catch {
+        } catch (err) {
+            console.error('AI chat error:', err);
             setMessages(prev => [...prev, { role: 'ai', text: 'I am having some trouble connecting. Please try again shortly.' }]);
         } finally {
             setLoading(false);
@@ -82,7 +83,8 @@ export default function AiAssistantWidget() {
                     followUp: result.follow_up
                 }
             }]);
-        } catch {
+        } catch (err) {
+            console.error('AI action execution error:', err);
             setMessages(prev => [...prev, { role: 'ai', text: 'Failed to execute action. Please try again.' }]);
         } finally {
             setExecutingAction(null);
@@ -263,7 +265,7 @@ export default function AiAssistantWidget() {
                                             suggestions: result.follow_up || [],
                                             actionResult: { success: result.success, message: result.message, data: result.data, followUp: result.follow_up }
                                         }]);
-                                    } catch { /* ignore */ }
+                                    } catch (err) { console.error('Daily digest error:', err); }
                                     setExecutingAction(null);
                                 }}
                                 className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"

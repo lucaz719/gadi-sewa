@@ -62,7 +62,8 @@ export default function AiAutomation() {
                 });
             }
             showToast('success', result.message);
-        } catch {
+        } catch (err) {
+            console.error('Automation action error:', err);
             showToast('error', 'Failed to run automation');
         } finally {
             setLoading(null);
@@ -229,19 +230,19 @@ export default function AiAutomation() {
                     </h2>
                     <div className="space-y-3">
                         {[
-                            { label: 'Service Reminders', icon: 'notifications', action: 'service_reminder', color: 'orange' },
-                            { label: 'Smart Reorder', icon: 'shopping_cart', action: 'smart_reorder', color: 'blue' },
-                            { label: 'Financial Insights', icon: 'trending_up', action: 'financial_summary', color: 'green' },
-                            { label: 'AI Diagnosis', icon: 'biotech', action: 'diagnose', color: 'purple' },
+                            { label: 'Service Reminders', icon: 'notifications', action: 'service_reminder', iconBg: 'bg-orange-100 dark:bg-orange-900/30', iconText: 'text-orange-600' },
+                            { label: 'Smart Reorder', icon: 'shopping_cart', action: 'smart_reorder', iconBg: 'bg-blue-100 dark:bg-blue-900/30', iconText: 'text-blue-600' },
+                            { label: 'Financial Insights', icon: 'trending_up', action: 'financial_summary', iconBg: 'bg-green-100 dark:bg-green-900/30', iconText: 'text-green-600' },
+                            { label: 'AI Diagnosis', icon: 'biotech', action: 'diagnose', iconBg: 'bg-purple-100 dark:bg-purple-900/30', iconText: 'text-purple-600' },
                         ].map(action => (
                             <button
                                 key={action.action}
                                 onClick={() => runAction(action.action)}
                                 disabled={loading === action.action}
-                                className={`w-full flex items-center gap-3 p-4 bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all text-left disabled:opacity-50`}
+                                className="w-full flex items-center gap-3 p-4 bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all text-left disabled:opacity-50"
                             >
-                                <div className={`w-10 h-10 rounded-lg bg-${action.color}-100 dark:bg-${action.color}-900/30 flex items-center justify-center`}>
-                                    <span className={`material-symbols-outlined text-${action.color}-600`}>{action.icon}</span>
+                                <div className={`w-10 h-10 rounded-lg ${action.iconBg} flex items-center justify-center`}>
+                                    <span className={`material-symbols-outlined ${action.iconText}`}>{action.icon}</span>
                                 </div>
                                 <div className="flex-1">
                                     <p className="font-bold text-sm text-slate-900 dark:text-white">{action.label}</p>

@@ -120,7 +120,7 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 |---|-----|----------|---------|
 | B1 | **Password hashing** | `backend/api_routes/auth.py` | ✅ FIXED — Now uses bcrypt via passlib. Legacy `hashed_` prefix still supported for migration. |
 | B2 | **Admin token hardcoded** | `backend/api_routes/auth.py` | ✅ FIXED — `ADMIN_ACCESS_TOKEN` must be set via env var, no fallback. App won't start without it. |
-| B3 | **No authorization on routes** | All backend routes | ✅ FIXED — Role-based access control via `require_role()` dependency on all `/admin/*` endpoints. |
+| B3 | **No authorization on routes** | All backend routes | ✅ FIXED — `get_current_user` on ALL routes + `require_role("admin")` on `/admin/*` endpoints. |
 | B4 | **Plaintext password returned in API** | `backend/api_routes/admin_ops.py` | ✅ FIXED — Passwords no longer returned in any API response. |
 | B5 | **Enterprise ID defaults to 1** | `backend/api_routes/crm_ops.py` | ✅ FIXED — `enterprise_id` now required (no default); returns 400 if missing. |
 
@@ -128,8 +128,8 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 
 | # | Bug | Location | Details |
 |---|-----|----------|---------|
-| B6 | **Inconsistent currency symbols** | Multiple pages | Mix of `₹` (Indian Rupee), `Rs.`, and `NPR` across UI. Should be consistent `NPR` or `रु`. |
-| B7 | **Indian vehicle registration format** | `JobList.tsx`, `CreateJob.tsx`, customer pages | Hardcoded `MH-01-AB-1234` (Maharashtra, India). Nepal uses `BA 1 Pa 1234` format. |
+| B6 | **Inconsistent currency symbols** | Multiple pages | ✅ FIXED — All `₹` and `Rs.` replaced with `NPR` across all frontend files and backend. |
+| B7 | **Indian vehicle registration format** | `JobList.tsx`, `CreateJob.tsx`, customer pages | ✅ FIXED — All `MH-XX-XX-XXXX` replaced with Nepal format `BA 1 Pa 1234`. |
 | B8 | **Mock data not synced with backend** | Customer portal pages | `CustomerDashboard.tsx`, `MyVehicles.tsx`, `FuelLog.tsx` use hardcoded arrays instead of API calls. |
 | B9 | **CRM follow-up rate is hardcoded** | `backend/api_routes/crm_ops.py` | ✅ FIXED — Now calculated from real data (customers with next_service_date / total). |
 | B10 | **No error handling on API failures** | Frontend pages | Dashboard and other pages don't show error states when API calls fail. Can result in blank screens. |
@@ -156,7 +156,7 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 | S2 | **SSH private keys in repo** | Server takeover | ✅ FIXED — `deployment_keys/` removed from tracking, added to `.gitignore` |
 | S3 | **SQLite database file in repo** | Data breach | ✅ FIXED — `*.db` files removed from tracking |
 | S4 | **Fake password hashing** | Account takeover | ✅ FIXED — Now uses bcrypt via passlib |
-| S5 | **No route authorization** | Privilege escalation | ✅ FIXED — `require_role("admin")` dependency on all `/admin/*` routes |
+| S5 | **No route authorization** | Privilege escalation | ✅ FIXED — `get_current_user` on ALL routes + `require_role("admin")` on `/admin/*` routes |
 | S6 | **Hardcoded admin token** | Admin impersonation | ✅ FIXED — Requires `ADMIN_ACCESS_TOKEN` env var, app won't start without it |
 | S7 | **No CSRF protection** | Cross-site forgery | ⚠️ N/A for API — JSON-based REST API with Bearer tokens is not vulnerable to CSRF |
 
@@ -167,7 +167,7 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 | S8 | No rate limiting | Brute-force login | ✅ FIXED — In-memory rate limiter: max 5 attempts per IP per 5 minutes |
 | S9 | No HTTPS enforcement | Data interception | ⚠️ Handled by hosting platform (Firebase/Render enforce HTTPS) |
 | S10 | Password returned in API response | Credential exposure | ✅ FIXED — No passwords in any API response |
-| S11 | No input length validation | DoS/buffer overflow | ⚠️ OPEN — String fields accept unlimited length |
+| S11 | No input length validation | DoS/buffer overflow | ✅ FIXED — All Pydantic schemas now have `max_length` constraints via `Field()`. Password min 8 chars. |
 | S12 | SQLite for multi-user production | Data corruption | ⚠️ OPEN — DATABASE_URL env var now supports PostgreSQL for production |
 
 ### 🟡 MEDIUM
@@ -188,9 +188,9 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 |------------|--------|----------|---------|
 | **Nepali Language (नेपाली)** | ❌ None | P0 | Entire UI is English-only. No i18n framework. Nepal has ~50% English literacy. Must support Nepali UI. |
 | **Bikram Sambat (BS) Calendar** | ❌ None | P0 | All dates use Gregorian. Nepal officially uses BS calendar (e.g., 2083 Baisakh 25). Need date picker + conversion library. |
-| **NPR Currency (रु)** | ⚠️ Inconsistent | P0 | Mixed `₹`/`Rs.`/`NPR`. Must standardize to `NPR` or `रु` with Nepali number formatting (1,00,000 not 100,000). |
+| **NPR Currency (रु)** | ✅ Fixed | P0 | All `₹`/`Rs.` replaced with `NPR`. Consistent across all frontend pages. |
 | **eSewa / Khalti / FonePay** | ⚠️ UI Only | P1 | Payment method dropdown exists but no actual API integration. These are the primary digital payment methods in Nepal. |
-| **Vehicle Registration (Nepal)** | ❌ Wrong Format | P1 | Uses Indian format `MH-01-AB-1234`. Nepal format: `BA 1 Pa 1234` or `Bagmati 01-001-Pa 1234`. |
+| **Vehicle Registration (Nepal)** | ✅ Fixed | P1 | All `MH-XX-XX-XXXX` replaced with Nepal format `BA 1 Pa 1234`. |
 | **Nepal Phone Format** | ⚠️ Partial | P2 | Some places show `98XXXXXXXX` (correct 10-digit) but no validation regex (`^(97|98)\d{8}$`). |
 | **Nepal Address Structure** | ❌ None | P2 | Nepal uses Province → District → Municipality → Ward. No structured address fields. |
 | **VAT / Tax (PAN/VAT)** | ❌ None | P1 | Nepal requires 13% VAT on services. No tax calculation in POS or invoices. Businesses need PAN/VAT number field. |

@@ -87,6 +87,14 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 - [x] Gemini-powered complaint analysis (suggests causes, repair steps, labor estimate)
 - [x] AI Assistant floating widget (chat interface)
 - [x] AI-generated parts catalog
+- [x] **AI Assistant with Gemini integration** — context-aware chat with live business data, falls back to smart rule-based responses
+- [x] **AI in-app action execution** — create jobs, book appointments, search inventory, get financial summaries, run diagnostics via chat
+- [x] **AI Automation Dashboard** — dedicated page (`/ai-automation`) for garage owners with automation rules, daily digest, smart reorder, service reminders
+- [x] **Daily Business Digest** — AI-generated daily summary with actionable insights from live data
+- [x] **Smart Inventory Reorder** — AI suggests reorder quantities and estimated costs for low-stock items
+- [x] **Service Follow-up Automation** — automatically identifies overdue and upcoming service customers
+- [x] **AI Vehicle Diagnosis** — Gemini-powered diagnostic analysis from chat or Create Job page
+- [x] **Quick action bar in AI widget** — one-tap buttons for common AI queries (jobs, stock, finance, diagnose)
 
 ### ❌ Not Implemented (UI Exists, Backend Missing)
 - [ ] Real payment gateway processing (eSewa, Khalti, FonePay — UI dropdown only)

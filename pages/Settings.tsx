@@ -50,7 +50,6 @@ export default function Settings() {
                       <div>
                          <label className="block text-sm font-bold text-slate-500 uppercase mb-1.5">Default Currency</label>
                          <select className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:ring-2 focus:ring-primary-500">
-                            <option value="NPR">Nepali Rupee (रु / NPR)</option>
                             <option value="NPR">Nepalese Rupee (NPR / रु)</option>
                             <option value="USD">US Dollar ($ / USD)</option>
                          </select>

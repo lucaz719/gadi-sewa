@@ -16,6 +16,7 @@ from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from database import get_db
 import models
+import os
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> models.User:
@@ -43,7 +44,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> models.
 
     # With mock tokens ('mock-jwt-token-{role}'), we extract the role.
     # In production this should verify a JWT and look up the user by sub claim.
-    if token.startswith("mock-jwt-token-"):
+    if not os.getenv("PRODUCTION") and token.startswith("mock-jwt-token-"):
         role = token.removeprefix("mock-jwt-token-")
         user = db.query(models.User).filter(
             models.User.role == role,

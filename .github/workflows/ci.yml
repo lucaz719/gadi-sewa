@@ -10,6 +10,8 @@ jobs:
   frontend-build:
     name: Frontend Build & Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -39,6 +41,8 @@ jobs:
   backend-check:
     name: Backend Lint & Validate
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: backend

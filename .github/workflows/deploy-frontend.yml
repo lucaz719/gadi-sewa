@@ -9,6 +9,8 @@ jobs:
   build-and-deploy:
     name: Build & Deploy to Firebase Hosting
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 

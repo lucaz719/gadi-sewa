@@ -11,6 +11,9 @@ jobs:
   build-and-deploy:
     name: Build & Deploy Backend
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     defaults:
       run:
         working-directory: backend

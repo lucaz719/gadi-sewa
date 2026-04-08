@@ -36,11 +36,21 @@ def get_crm_summary(enterprise_id: int = None, db: Session = Depends(get_db)):
     )
     upcoming_followups = upcoming_query.count()
     
+    # Calculate follow-up rate from real data
+    if total_customers > 0:
+        customers_with_followup = db.query(models.Customer).filter(
+            models.Customer.enterprise_id == enterprise_id,
+            models.Customer.next_service_date.isnot(None)
+        ).count()
+        followup_rate = round((customers_with_followup / total_customers) * 100, 1)
+    else:
+        followup_rate = 0.0
+    
     return {
         "total_customers": total_customers,
         "due_for_service": due_for_service,
         "upcoming_followups": upcoming_followups,
-        "followup_rate": 85.5 # Mocked for now
+        "followup_rate": followup_rate
     }
 
 @router.get("/followups", response_model=List[schemas.Customer])
@@ -56,7 +66,9 @@ def get_followups(enterprise_id: int = None, db: Session = Depends(get_db)):
     ).order_by(models.Customer.next_service_date.asc()).all()
 
 @router.post("/settings")
-def update_crm_settings(settings: dict, enterprise_id: int = 1, db: Session = Depends(get_db)):
+def update_crm_settings(settings: dict, enterprise_id: int = None, db: Session = Depends(get_db)):
+    if not enterprise_id:
+        raise HTTPException(status_code=400, detail="enterprise_id is required")
     db_ent = db.query(models.Enterprise).filter(models.Enterprise.id == enterprise_id).first()
     if not db_ent:
         raise HTTPException(status_code=404, detail="Enterprise not found")
@@ -77,7 +89,9 @@ def get_customers(enterprise_id: int = None, db: Session = Depends(get_db)):
     return query.order_by(models.Customer.name.asc()).all()
 
 @router.post("/customers", response_model=schemas.Customer)
-def create_customer(customer: schemas.CustomerBase, enterprise_id: int = 1, db: Session = Depends(get_db)):
+def create_customer(customer: schemas.CustomerBase, enterprise_id: int = None, db: Session = Depends(get_db)):
+    if not enterprise_id:
+        raise HTTPException(status_code=400, detail="enterprise_id is required")
     db_customer = models.Customer(**customer.model_dump(), enterprise_id=enterprise_id)
     db.add(db_customer)
     db.commit()

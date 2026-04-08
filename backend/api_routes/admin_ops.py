@@ -5,12 +5,13 @@ from database import get_db
 import models, schemas
 from services.admin_service import log_activity
 from api_routes.auth import hash_password
+from api_routes.dependencies import require_role
 
 router = APIRouter(prefix="/admin", tags=["Admin Operations"])
 
 # User Management
 @router.get("/users", response_model=List[schemas.User])
-def list_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 # Enterprise Registration/Approval
@@ -23,11 +24,11 @@ def register_interest(enterprise: schemas.PendingEnterpriseBase, db: Session = D
     return {"status": "success", "message": "interest registered", "id": db_pending.id}
 
 @router.get("/pending-registrations", response_model=List[schemas.PendingEnterprise])
-def get_pending_registrations(db: Session = Depends(get_db)):
+def get_pending_registrations(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.PendingEnterprise).filter(models.PendingEnterprise.status == "Pending").all()
 
 @router.post("/registrations/{reg_id}/approve")
-def approve_registration(reg_id: int, db: Session = Depends(get_db)):
+def approve_registration(reg_id: int, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     pending = db.query(models.PendingEnterprise).filter(models.PendingEnterprise.id == reg_id).first()
     if not pending:
         raise HTTPException(status_code=404, detail="Registration not found")
@@ -65,7 +66,7 @@ def approve_registration(reg_id: int, db: Session = Depends(get_db)):
     return {"status": "success", "enterprise_id": db_ent.id, "message": "Enterprise approved. Temporary password sent to owner email."}
 
 @router.post("/registrations/{reg_id}/reject")
-def reject_registration(reg_id: int, db: Session = Depends(get_db)):
+def reject_registration(reg_id: int, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     pending = db.query(models.PendingEnterprise).filter(models.PendingEnterprise.id == reg_id).first()
     if not pending:
         raise HTTPException(status_code=404, detail="Registration not found")
@@ -74,7 +75,7 @@ def reject_registration(reg_id: int, db: Session = Depends(get_db)):
     return {"status": "success"}
 
 @router.patch("/users/{user_id}/toggle-active")
-def toggle_user_active(user_id: int, db: Session = Depends(get_db)):
+def toggle_user_active(user_id: int, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -83,7 +84,7 @@ def toggle_user_active(user_id: int, db: Session = Depends(get_db)):
     return {"status": "success", "user_id": user_id, "is_active": user.is_active}
 
 @router.patch("/users/{user_id}/reset-password")
-def reset_user_password(user_id: int, body: dict, db: Session = Depends(get_db)):
+def reset_user_password(user_id: int, body: dict, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -95,11 +96,11 @@ def reset_user_password(user_id: int, body: dict, db: Session = Depends(get_db))
 
 # Enterprise Management
 @router.get("/enterprises", response_model=List[schemas.Enterprise])
-def list_enterprises(db: Session = Depends(get_db)):
+def list_enterprises(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.Enterprise).all()
 
 @router.post("/enterprises")
-def create_enterprise(enterprise: schemas.EnterpriseCreate, db: Session = Depends(get_db)):
+def create_enterprise(enterprise: schemas.EnterpriseCreate, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     # 1. Create the Enterprise record
     ent_data = enterprise.model_dump(exclude={"password"})
     db_ent = models.Enterprise(**ent_data)
@@ -145,7 +146,7 @@ def create_enterprise(enterprise: schemas.EnterpriseCreate, db: Session = Depend
 
 
 @router.patch("/enterprises/{ent_id}/status")
-def update_enterprise_status(ent_id: int, status_update: dict, db: Session = Depends(get_db)):
+def update_enterprise_status(ent_id: int, status_update: dict, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     ent = db.query(models.Enterprise).filter(models.Enterprise.id == ent_id).first()
     if not ent:
         raise HTTPException(status_code=404, detail="Enterprise not found")
@@ -155,7 +156,7 @@ def update_enterprise_status(ent_id: int, status_update: dict, db: Session = Dep
 
 # Voucher Management
 @router.post("/vouchers", response_model=schemas.Voucher)
-def create_voucher(voucher: schemas.VoucherBase, db: Session = Depends(get_db)):
+def create_voucher(voucher: schemas.VoucherBase, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     db_voucher = models.Voucher(**voucher.model_dump())
     db.add(db_voucher)
     db.commit()
@@ -163,11 +164,11 @@ def create_voucher(voucher: schemas.VoucherBase, db: Session = Depends(get_db)):
     return db_voucher
 
 @router.get("/vouchers", response_model=List[schemas.Voucher])
-def list_vouchers(db: Session = Depends(get_db)):
+def list_vouchers(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.Voucher).all()
 
 @router.patch("/vouchers/{voucher_id}/toggle-active")
-def toggle_voucher_active(voucher_id: int, db: Session = Depends(get_db)):
+def toggle_voucher_active(voucher_id: int, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     voucher = db.query(models.Voucher).filter(models.Voucher.id == voucher_id).first()
     if not voucher:
         raise HTTPException(status_code=404, detail="Voucher not found")
@@ -177,11 +178,11 @@ def toggle_voucher_active(voucher_id: int, db: Session = Depends(get_db)):
 
 # Global Catalog
 @router.get("/global-catalog", response_model=List[schemas.GlobalItem])
-def get_global_catalog(db: Session = Depends(get_db)):
+def get_global_catalog(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.GlobalItem).all()
 
 @router.post("/global-catalog", response_model=List[schemas.GlobalItem])
-def update_global_catalog(items: List[schemas.GlobalItemBase], db: Session = Depends(get_db)):
+def update_global_catalog(items: List[schemas.GlobalItemBase], db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     db.query(models.GlobalItem).delete()
     for item in items:
         db_item = models.GlobalItem(**item.model_dump())
@@ -191,11 +192,11 @@ def update_global_catalog(items: List[schemas.GlobalItemBase], db: Session = Dep
 
 # Plans Management
 @router.get("/plans", response_model=List[schemas.Plan])
-def list_plans(db: Session = Depends(get_db)):
+def list_plans(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.Plan).all()
 
 @router.post("/plans", response_model=schemas.Plan)
-def create_or_update_plan(plan: schemas.PlanBase, db: Session = Depends(get_db)):
+def create_or_update_plan(plan: schemas.PlanBase, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     db_plan = db.query(models.Plan).filter(models.Plan.id == plan.id).first()
     if db_plan:
         db_plan.name = plan.name
@@ -211,7 +212,7 @@ def create_or_update_plan(plan: schemas.PlanBase, db: Session = Depends(get_db))
     return db_plan
 
 @router.delete("/plans/{plan_id}")
-def delete_plan(plan_id: str, db: Session = Depends(get_db)):
+def delete_plan(plan_id: str, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     db_plan = db.query(models.Plan).filter(models.Plan.id == plan_id).first()
     if not db_plan:
         raise HTTPException(status_code=404, detail="Plan not found")
@@ -221,7 +222,7 @@ def delete_plan(plan_id: str, db: Session = Depends(get_db)):
     return {"status": "success", "deleted_id": plan_id}
 
 @router.patch("/enterprises/{ent_id}/plan")
-def update_enterprise_plan(ent_id: int, payload: dict, db: Session = Depends(get_db)):
+def update_enterprise_plan(ent_id: int, payload: dict, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     ent = db.query(models.Enterprise).filter(models.Enterprise.id == ent_id).first()
     if not ent:
         raise HTTPException(status_code=404, detail="Enterprise not found")
@@ -234,12 +235,12 @@ def update_enterprise_plan(ent_id: int, payload: dict, db: Session = Depends(get
 
 # Activity Logs
 @router.get("/logs", response_model=List[schemas.ActivityLog])
-def list_logs(limit: int = 100, db: Session = Depends(get_db)):
+def list_logs(limit: int = 100, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.ActivityLog).order_by(models.ActivityLog.timestamp.desc()).limit(limit).all()
 
 # Admin Stats
 @router.get("/stats", response_model=schemas.AdminStats)
-def get_admin_stats(db: Session = Depends(get_db)):
+def get_admin_stats(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     from services.admin_service import get_admin_stats
     stats = get_admin_stats(db)
     total_jobs = db.query(models.Job).count()
@@ -270,7 +271,7 @@ def get_admin_stats(db: Session = Depends(get_db)):
 
 # Growth Data
 @router.get("/growth-data")
-def get_growth_data(db: Session = Depends(get_db)):
+def get_growth_data(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     from sqlalchemy import extract
     months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
     result = []
@@ -288,7 +289,7 @@ def get_growth_data(db: Session = Depends(get_db)):
 
 # Revenue Analytics
 @router.get("/revenue-analytics")
-def get_revenue_analytics(db: Session = Depends(get_db)):
+def get_revenue_analytics(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     from sqlalchemy import func, extract
     total_revenue = db.query(func.sum(models.Transaction.amount)).filter(models.Transaction.type == "Income").scalar() or 0.0
     active_subs = db.query(models.Enterprise).filter(models.Enterprise.status == "Active").count()
@@ -334,7 +335,7 @@ def get_revenue_analytics(db: Session = Depends(get_db)):
 
 # Enterprise Detail
 @router.get("/enterprises/{ent_id}/detail")
-def get_enterprise_detail(ent_id: int, db: Session = Depends(get_db)):
+def get_enterprise_detail(ent_id: int, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     from sqlalchemy import func
     ent = db.query(models.Enterprise).filter(models.Enterprise.id == ent_id).first()
     if not ent:
@@ -373,7 +374,7 @@ def get_enterprise_detail(ent_id: int, db: Session = Depends(get_db)):
 
 # Platform Settings
 @router.get("/settings")
-def get_settings(db: Session = Depends(get_db)):
+def get_settings(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     settings = db.query(models.PlatformSettings).all()
     result = {}
     for s in settings:
@@ -387,7 +388,7 @@ def get_settings(db: Session = Depends(get_db)):
     return result
 
 @router.post("/settings")
-def save_settings(payload: schemas.PlatformSettingsUpdate, db: Session = Depends(get_db)):
+def save_settings(payload: schemas.PlatformSettingsUpdate, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     for key, value in payload.model_dump().items():
         existing = db.query(models.PlatformSettings).filter(models.PlatformSettings.key == key).first()
         if existing:
@@ -400,11 +401,11 @@ def save_settings(payload: schemas.PlatformSettingsUpdate, db: Session = Depends
 
 # Notifications
 @router.get("/notifications", response_model=List[schemas.NotificationOut])
-def list_notifications(db: Session = Depends(get_db)):
+def list_notifications(db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     return db.query(models.Notification).order_by(models.Notification.created_at.desc()).limit(50).all()
 
 @router.post("/notifications", response_model=schemas.NotificationOut)
-def create_notification(notif: schemas.NotificationBase, db: Session = Depends(get_db)):
+def create_notification(notif: schemas.NotificationBase, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     db_notif = models.Notification(**notif.model_dump())
     db.add(db_notif)
     db.commit()
@@ -413,7 +414,7 @@ def create_notification(notif: schemas.NotificationBase, db: Session = Depends(g
     return db_notif
 
 @router.patch("/notifications/{notif_id}/read")
-def mark_notification_read(notif_id: int, db: Session = Depends(get_db)):
+def mark_notification_read(notif_id: int, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     notif = db.query(models.Notification).filter(models.Notification.id == notif_id).first()
     if not notif:
         raise HTTPException(status_code=404, detail="Notification not found")

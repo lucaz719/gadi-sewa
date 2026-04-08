@@ -120,9 +120,9 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 |---|-----|----------|---------|
 | B1 | **Password hashing** | `backend/api_routes/auth.py` | ✅ FIXED — Now uses bcrypt via passlib. Legacy `hashed_` prefix still supported for migration. |
 | B2 | **Admin token hardcoded** | `backend/api_routes/auth.py` | ✅ FIXED — `ADMIN_ACCESS_TOKEN` must be set via env var, no fallback. App won't start without it. |
-| B3 | **No authorization on routes** | All backend routes | ⚠️ OPEN — No middleware checks user role. A customer can call `/admin/enterprises`. |
+| B3 | **No authorization on routes** | All backend routes | ✅ FIXED — Role-based access control via `require_role()` dependency on all `/admin/*` endpoints. |
 | B4 | **Plaintext password returned in API** | `backend/api_routes/admin_ops.py` | ✅ FIXED — Passwords no longer returned in any API response. |
-| B5 | **Enterprise ID defaults to 1** | `backend/api_routes/crm_ops.py` | ⚠️ OPEN — `enterprise_id: int = 1` — if not provided, queries enterprise 1's data. |
+| B5 | **Enterprise ID defaults to 1** | `backend/api_routes/crm_ops.py` | ✅ FIXED — `enterprise_id` now required (no default); returns 400 if missing. |
 
 ### 🟠 High Bugs
 
@@ -131,7 +131,7 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 | B6 | **Inconsistent currency symbols** | Multiple pages | Mix of `₹` (Indian Rupee), `Rs.`, and `NPR` across UI. Should be consistent `NPR` or `रु`. |
 | B7 | **Indian vehicle registration format** | `JobList.tsx`, `CreateJob.tsx`, customer pages | Hardcoded `MH-01-AB-1234` (Maharashtra, India). Nepal uses `BA 1 Pa 1234` format. |
 | B8 | **Mock data not synced with backend** | Customer portal pages | `CustomerDashboard.tsx`, `MyVehicles.tsx`, `FuelLog.tsx` use hardcoded arrays instead of API calls. |
-| B9 | **CRM follow-up rate is hardcoded** | `backend/api_routes/crm_ops.py` | `followup_rate: 85.5 # Mocked for now` — not calculated from real data. |
+| B9 | **CRM follow-up rate is hardcoded** | `backend/api_routes/crm_ops.py` | ✅ FIXED — Now calculated from real data (customers with next_service_date / total). |
 | B10 | **No error handling on API failures** | Frontend pages | Dashboard and other pages don't show error states when API calls fail. Can result in blank screens. |
 
 ### 🟡 Medium Bugs
@@ -156,19 +156,19 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 | S2 | **SSH private keys in repo** | Server takeover | ✅ FIXED — `deployment_keys/` removed from tracking, added to `.gitignore` |
 | S3 | **SQLite database file in repo** | Data breach | ✅ FIXED — `*.db` files removed from tracking |
 | S4 | **Fake password hashing** | Account takeover | ✅ FIXED — Now uses bcrypt via passlib |
-| S5 | **No route authorization** | Privilege escalation | ⚠️ OPEN — Needs auth middleware per route |
+| S5 | **No route authorization** | Privilege escalation | ✅ FIXED — `require_role("admin")` dependency on all `/admin/*` routes |
 | S6 | **Hardcoded admin token** | Admin impersonation | ✅ FIXED — Requires `ADMIN_ACCESS_TOKEN` env var, app won't start without it |
-| S7 | **No CSRF protection** | Cross-site forgery | ⚠️ OPEN — No CSRF tokens on POST endpoints |
+| S7 | **No CSRF protection** | Cross-site forgery | ⚠️ N/A for API — JSON-based REST API with Bearer tokens is not vulnerable to CSRF |
 
 ### 🟠 HIGH
 
 | # | Vulnerability | Risk | Location |
 |---|--------------|------|----------|
-| S8 | No rate limiting | Brute-force login | `/auth/login` has unlimited attempts |
-| S9 | No HTTPS enforcement | Data interception | CORS allows `http://` origins |
-| S10 | Password returned in API response | Credential exposure | `/registrations/{id}/approve` leaks password |
-| S11 | No input length validation | DoS/buffer overflow | String fields accept unlimited length |
-| S12 | SQLite for multi-user production | Data corruption | SQLite doesn't handle concurrent writes safely |
+| S8 | No rate limiting | Brute-force login | ✅ FIXED — In-memory rate limiter: max 5 attempts per IP per 5 minutes |
+| S9 | No HTTPS enforcement | Data interception | ⚠️ Handled by hosting platform (Firebase/Render enforce HTTPS) |
+| S10 | Password returned in API response | Credential exposure | ✅ FIXED — No passwords in any API response |
+| S11 | No input length validation | DoS/buffer overflow | ⚠️ OPEN — String fields accept unlimited length |
+| S12 | SQLite for multi-user production | Data corruption | ⚠️ OPEN — DATABASE_URL env var now supports PostgreSQL for production |
 
 ### 🟡 MEDIUM
 

@@ -9,6 +9,7 @@ import models
 import os
 import json
 import logging
+from api_routes.dependencies import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +137,7 @@ ROLE-SPECIFIC GUIDANCE:
 # --- Smart Chat Endpoint (Gemini-powered with fallback) ---
 
 @router.post("/chat", response_model=ChatResponse)
-def chat_with_assistant(req: ChatRequest, db: Session = Depends(get_db)):
+def chat_with_assistant(req: ChatRequest, db: Session = Depends(get_db), _user=Depends(get_current_user)):
     snapshot = _get_business_snapshot(db)
     genai = _get_genai()
 
@@ -356,7 +357,7 @@ def _rule_based_chat(req: ChatRequest, snapshot: dict, db: Session) -> ChatRespo
 # --- AI Action Execution Endpoint ---
 
 @router.post("/execute-action", response_model=AiActionResponse)
-def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db)):
+def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db), _user=Depends(get_current_user)):
     """Execute an in-app action triggered by the AI assistant."""
     eid = req.enterprise_id or 1
 

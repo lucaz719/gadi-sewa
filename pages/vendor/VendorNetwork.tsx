@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const garages = [
-  { id: 1, name: 'City Auto Works', location: 'Mumbai, MH', joined: '12 Jan 2023', volume: 'NPR 1.2L', orders: 45, status: 'Active', creditLimit: 50000, creditUsed: 12500, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=20' },
-  { id: 2, name: 'Quick Fix Mechanics', location: 'Pune, MH', joined: '05 Mar 2023', volume: 'NPR 85k', orders: 22, status: 'Active', creditLimit: 30000, creditUsed: 28000, overdue: 5000, avatar: 'https://i.pravatar.cc/150?u=21' },
-  { id: 3, name: 'Star Service Center', location: 'Delhi, DL', joined: '20 Sep 2023', volume: 'NPR 42k', orders: 15, status: 'Inactive', creditLimit: 25000, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=22' },
-  { id: 4, name: 'Luxury Cars Hub', location: 'Bangalore, KA', joined: '01 Oct 2024', volume: 'NPR 0', orders: 0, status: 'Pending', creditLimit: 0, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=23' },
+  { id: 1, name: 'City Auto Works', location: 'Kathmandu, Bagmati', joined: '12 Jan 2023', volume: 'NPR 1.2L', orders: 45, status: 'Active', creditLimit: 50000, creditUsed: 12500, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=20' },
+  { id: 2, name: 'Quick Fix Mechanics', location: 'Pokhara, Gandaki', joined: '05 Mar 2023', volume: 'NPR 85k', orders: 22, status: 'Active', creditLimit: 30000, creditUsed: 28000, overdue: 5000, avatar: 'https://i.pravatar.cc/150?u=21' },
+  { id: 3, name: 'Star Service Center', location: 'Lalitpur, Bagmati', joined: '20 Sep 2023', volume: 'NPR 42k', orders: 15, status: 'Inactive', creditLimit: 25000, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=22' },
+  { id: 4, name: 'Luxury Cars Hub', location: 'Biratnagar, Koshi', joined: '01 Oct 2024', volume: 'NPR 0', orders: 0, status: 'Pending', creditLimit: 0, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=23' },
 ];
 
 const requests = [

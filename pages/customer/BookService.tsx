@@ -107,9 +107,9 @@ export default function BookService() {
 
                    <div className="space-y-4">
                        {[
-                           { id: 101, name: 'City Auto Works', rating: 4.8, dist: '1.2 km', price: '$$', reviews: 120 },
-                           { id: 102, name: 'Quick Fix Mechanics', rating: 4.5, dist: '2.5 km', price: '$', reviews: 85 },
-                           { id: 103, name: 'Star Service Center', rating: 4.2, dist: '3.0 km', price: '$$$', reviews: 45 }
+                           { id: 101, name: 'City Auto Works', rating: 4.8, dist: '1.2 km', price: 'Budget', reviews: 120 },
+                           { id: 102, name: 'Quick Fix Mechanics', rating: 4.5, dist: '2.5 km', price: 'Standard', reviews: 85 },
+                           { id: 103, name: 'Star Service Center', rating: 4.2, dist: '3.0 km', price: 'Premium', reviews: 45 }
                        ].map(g => (
                            <div 
                                 key={g.id}

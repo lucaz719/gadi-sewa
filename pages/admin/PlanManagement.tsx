@@ -82,7 +82,7 @@ export default function PlanManagement() {
                         <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-b dark:border-slate-700 flex justify-between items-start">
                             <div>
                                 <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">{plan.name}</h3>
-                                <p className="text-2xl font-black text-red-600 mt-1">₹{plan.price.toLocaleString()}<span className="text-xs font-normal text-slate-400">/{plan.duration}</span></p>
+                                <p className="text-2xl font-black text-red-600 mt-1">NPR {plan.price.toLocaleString()}<span className="text-xs font-normal text-slate-400">/{plan.duration}</span></p>
                             </div>
                             <button onClick={() => handleDeletePlan(plan.id)} className="p-2 text-slate-400 hover:text-red-600 transition-colors">
                                 <span className="material-symbols-outlined">delete</span>
@@ -158,7 +158,7 @@ export default function PlanManagement() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Price (₹)</label>
+                                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Price (NPR)</label>
                                     <input required type="number" value={editingPlan.price} onChange={e => setEditingPlan({ ...editingPlan, price: parseFloat(e.target.value) || 0 })} className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-lg p-2.5 outline-none focus:border-red-500" placeholder="0" />
                                 </div>
                                 <div>
@@ -226,7 +226,7 @@ export default function PlanManagement() {
                                         >
                                             <div className="flex justify-between items-center">
                                                 <p className="font-bold text-sm">{p.name}</p>
-                                                <p className="text-xs font-black text-red-600">₹{p.price}</p>
+                                                <p className="text-xs font-black text-red-600">NPR {p.price}</p>
                                             </div>
                                         </button>
                                     ))}

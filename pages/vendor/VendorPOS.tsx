@@ -76,7 +76,7 @@ const RecallModal = ({ isOpen, onClose, onRecall }: { isOpen: boolean, onClose: 
                         heldCarts.map((h) => (
                             <div key={h.id} className="p-4 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center hover:border-purple-500 group transition-all">
                                 <div>
-                                    <p className="font-bold text-slate-900 dark:text-white">Rs. {h.total.toLocaleString()}</p>
+                                    <p className="font-bold text-slate-900 dark:text-white">NPR {h.total.toLocaleString()}</p>
                                     <p className="text-xs text-slate-500">{h.customer?.name || 'Quick Sale'} • {h.cart.length} items</p>
                                     <p className="text-[10px] text-slate-400 mt-1">{new Date(h.heldAt).toLocaleString()}</p>
                                 </div>
@@ -142,7 +142,7 @@ const CheckoutModal = ({ isOpen, onClose, total, onComplete, customer }: { isOpe
                 <div className="p-6 space-y-6 flex-1 overflow-y-auto">
                     <div className="text-center">
                         <p className="text-slate-500 text-xs font-black uppercase tracking-widest">Grand Total</p>
-                        <p className="text-4xl font-black text-slate-900 dark:text-white">Rs. {total.toLocaleString()}</p>
+                        <p className="text-4xl font-black text-slate-900 dark:text-white">NPR {total.toLocaleString()}</p>
                     </div>
 
                     <div className="space-y-4">
@@ -164,7 +164,7 @@ const CheckoutModal = ({ isOpen, onClose, total, onComplete, customer }: { isOpe
                         <div className="space-y-4 pt-4 border-t dark:border-slate-700">
                             <div className="flex justify-between items-center text-xs font-bold text-orange-600 uppercase">
                                 <span>Remaining Balance</span>
-                                <span>Rs. {(total - rcv).toLocaleString()}</span>
+                                <span>NPR {(total - rcv).toLocaleString()}</span>
                             </div>
                             <label className="block text-xs font-bold text-slate-500 uppercase">Part 2: Balance via</label>
                             <div className="grid grid-cols-3 gap-2">
@@ -190,7 +190,7 @@ const CheckoutModal = ({ isOpen, onClose, total, onComplete, customer }: { isOpe
 
                     <div className="flex justify-between items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-900/30">
                         <span className="font-bold text-green-700 dark:text-green-300 uppercase text-xs">Change to Return</span>
-                        <span className="text-2xl font-black text-green-600">Rs. {changeDue.toLocaleString()}</span>
+                        <span className="text-2xl font-black text-green-600">NPR {changeDue.toLocaleString()}</span>
                     </div>
                 </div>
                 <div className="p-4 border-t dark:border-slate-700">
@@ -329,7 +329,7 @@ export default function VendorPOS() {
                             </div>
                             <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 h-8">{prod.name}</h4>
                             <p className="text-[10px] text-slate-500 mt-1 uppercase font-bold">Stock: {prod.stock} Units</p>
-                            <p className="text-sm font-black text-purple-600">Rs. {prod.price.toLocaleString()}</p>
+                            <p className="text-sm font-black text-purple-600">NPR {prod.price.toLocaleString()}</p>
                          </div>
                       ))}
                    </div>
@@ -368,7 +368,7 @@ export default function VendorPOS() {
                             </div>
                             <div className="flex-1 min-w-0">
                                <p className="font-bold text-xs truncate text-slate-900 dark:text-white uppercase">{item.name}</p>
-                               <p className="text-[10px] text-slate-400">Unit: Rs. {item.price.toLocaleString()}</p>
+                               <p className="text-[10px] text-slate-400">Unit: NPR {item.price.toLocaleString()}</p>
                             </div>
                             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700 rounded-lg px-1 py-0.5">
                                <button onClick={() => { const n = [...cart]; n[idx].qty = Math.max(1, n[idx].qty-1); setCart(n); }} className="w-6 h-6 hover:bg-white rounded font-black">-</button>
@@ -376,7 +376,7 @@ export default function VendorPOS() {
                                <button onClick={() => { const n = [...cart]; n[idx].qty += 1; setCart(n); }} className="w-6 h-6 hover:bg-white rounded font-black">+</button>
                             </div>
                             <div className="text-right">
-                               <p className="font-black text-xs text-slate-900 dark:text-white">Rs. {(item.price * item.qty).toLocaleString()}</p>
+                               <p className="font-black text-xs text-slate-900 dark:text-white">NPR {(item.price * item.qty).toLocaleString()}</p>
                                <button onClick={() => setCart(cart.filter((_, i) => i !== idx))} className="text-slate-300 hover:text-red-500"><span className="material-symbols-outlined text-[16px]">delete</span></button>
                             </div>
                          </div>
@@ -387,19 +387,19 @@ export default function VendorPOS() {
                 <div className="p-4 border-t dark:border-slate-700 space-y-2">
                    <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
                       <span>Subtotal</span>
-                      <span className="text-slate-900 dark:text-white">Rs. {subtotal.toLocaleString()}</span>
+                      <span className="text-slate-900 dark:text-white">NPR {subtotal.toLocaleString()}</span>
                    </div>
                    <div className="flex justify-between text-xs font-bold group">
-                      <span className="text-slate-500 uppercase">Discounts ({discountType === 'pct' ? `${manualDiscount}%` : `Rs. ${manualDiscount}`})</span>
-                      <span className="text-green-600 font-black">- Rs. {discountVal.toLocaleString()}</span>
+                      <span className="text-slate-500 uppercase">Discounts ({discountType === 'pct' ? `${manualDiscount}%` : `NPR ${manualDiscount}`})</span>
+                      <span className="text-green-600 font-black">- NPR {discountVal.toLocaleString()}</span>
                    </div>
                    <div className="flex justify-between text-xs font-bold text-slate-500 uppercase">
                       <span>GST (18%)</span>
-                      <span className="text-slate-900 dark:text-white">Rs. {tax.toLocaleString()}</span>
+                      <span className="text-slate-900 dark:text-white">NPR {tax.toLocaleString()}</span>
                    </div>
                    <div className="flex justify-between text-xl font-black text-slate-900 dark:text-white border-t-2 border-dashed border-slate-200 dark:border-slate-700 pt-3 mt-2">
                       <span>NET TOTAL</span>
-                      <span className="text-purple-600">Rs. {total.toLocaleString()}</span>
+                      <span className="text-purple-600">NPR {total.toLocaleString()}</span>
                    </div>
                    
                    <div className="grid grid-cols-3 gap-2 pt-4">

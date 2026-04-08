@@ -41,8 +41,8 @@ export default function BookService() {
                    <h2 className="text-lg font-bold">Select Vehicle</h2>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        {[
-                           { id: 1, name: 'Toyota Camry', reg: 'MH-01-AB-1234', img: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=200' },
-                           { id: 2, name: 'Honda Activa 6G', reg: 'MH-02-XY-9988', img: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=200' }
+                           { id: 1, name: 'Toyota Camry', reg: 'BA 1 Pa 1234', img: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=200' },
+                           { id: 2, name: 'Honda Activa 6G', reg: 'BA 2 Cha 5678', img: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=200' }
                        ].map(v => (
                            <div 
                                 key={v.id} 
@@ -107,9 +107,9 @@ export default function BookService() {
 
                    <div className="space-y-4">
                        {[
-                           { id: 101, name: 'City Auto Works', rating: 4.8, dist: '1.2 km', price: '₹₹', reviews: 120 },
-                           { id: 102, name: 'Quick Fix Mechanics', rating: 4.5, dist: '2.5 km', price: '₹', reviews: 85 },
-                           { id: 103, name: 'Star Service Center', rating: 4.2, dist: '3.0 km', price: '₹₹₹', reviews: 45 }
+                           { id: 101, name: 'City Auto Works', rating: 4.8, dist: '1.2 km', price: '$$', reviews: 120 },
+                           { id: 102, name: 'Quick Fix Mechanics', rating: 4.5, dist: '2.5 km', price: '$', reviews: 85 },
+                           { id: 103, name: 'Star Service Center', rating: 4.2, dist: '3.0 km', price: '$$$', reviews: 45 }
                        ].map(g => (
                            <div 
                                 key={g.id}

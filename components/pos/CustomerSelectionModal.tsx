@@ -158,7 +158,7 @@ export const CustomerSelectionModal = ({ isOpen, onClose, onSelect }: { isOpen: 
                                             value={newCustomer.vehiclePlate}
                                             onChange={e => setNewCustomer({ ...newCustomer, vehiclePlate: e.target.value.toUpperCase() })}
                                             className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition-all uppercase placeholder:normal-case font-mono"
-                                            placeholder="e.g. MH-01-AB-1234"
+                                            placeholder="e.g. BA 1 Pa 1234"
                                         />
                                     </div>
                                     <div>

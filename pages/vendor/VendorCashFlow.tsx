@@ -130,16 +130,16 @@ export default function VendorCashFlow() {
        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-slate-700">
              <p className="text-sm font-medium text-slate-500">Total Inflow</p>
-             <p className="text-3xl font-bold mt-2 text-green-600">₹{totalInflow.toLocaleString()}</p>
+             <p className="text-3xl font-bold mt-2 text-green-600">NPR {totalInflow.toLocaleString()}</p>
           </div>
           <div className="bg-white dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-slate-700">
              <p className="text-sm font-medium text-slate-500">Total Outflow</p>
-             <p className="text-3xl font-bold mt-2 text-red-600">₹{totalOutflow.toLocaleString()}</p>
+             <p className="text-3xl font-bold mt-2 text-red-600">NPR {totalOutflow.toLocaleString()}</p>
           </div>
           <div className="bg-white dark:bg-[#1e293b] p-6 rounded-xl border border-slate-200 dark:border-slate-700">
              <p className="text-sm font-medium text-slate-500">Net Cash Flow</p>
              <p className={`text-3xl font-bold mt-2 ${netCashFlow >= 0 ? 'text-purple-600' : 'text-orange-600'}`}>
-                {netCashFlow >= 0 ? '+' : '-'} ₹{Math.abs(netCashFlow).toLocaleString()}
+                {netCashFlow >= 0 ? '+' : '-'} NPR {Math.abs(netCashFlow).toLocaleString()}
              </p>
           </div>
        </div>
@@ -202,7 +202,7 @@ export default function VendorCashFlow() {
                                       {t.isRecurring && <span className="flex items-center gap-1 text-purple-600 font-medium"><span className="material-symbols-outlined text-sm">repeat</span> {t.frequency}</span>}
                                   </td>
                                   <td className={`p-4 text-right font-bold ${t.type === 'inflow' ? 'text-green-600' : 'text-red-600'}`}>
-                                     {t.type === 'inflow' ? '+' : '-'} ₹{t.amount.toLocaleString()}
+                                     {t.type === 'inflow' ? '+' : '-'} NPR {t.amount.toLocaleString()}
                                   </td>
                                </tr>
                             ))}
@@ -230,8 +230,8 @@ export default function VendorCashFlow() {
                                   </span>
                                </div>
                                <div className="flex justify-between text-sm text-slate-500 mb-2">
-                                  <span>Spent: ₹{budget.spent.toLocaleString()}</span>
-                                  <span>Limit: ₹{budget.limit.toLocaleString()}</span>
+                                  <span>Spent: NPR {budget.spent.toLocaleString()}</span>
+                                  <span>Limit: NPR {budget.limit.toLocaleString()}</span>
                                 </div>
                                 <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                    <div className={`h-full ${color} transition-all duration-500`} style={{ width: `${percent}%` }}></div>
@@ -378,7 +378,7 @@ export default function VendorCashFlow() {
                    </div>
                    <form onSubmit={handleUpdateBudget} className="p-6 space-y-4">
                        <div>
-                           <label className="block text-sm font-medium mb-1">Monthly Limit (₹)</label>
+                           <label className="block text-sm font-medium mb-1">Monthly Limit (NPR)</label>
                            <input 
                               type="number" 
                               value={editingBudget.limit} 

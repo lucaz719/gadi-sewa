@@ -44,7 +44,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onDragStart }) => (
          {new Date(job.created_at).toLocaleDateString()}
        </div>
        <div className="flex items-center gap-2">
-           <span className="text-xs font-black text-green-600 tracking-tighter">Rs. {(job.total_amount || 0).toLocaleString()}</span>
+           <span className="text-xs font-black text-green-600 tracking-tighter">NPR {(job.total_amount || 0).toLocaleString()}</span>
        </div>
     </div>
   </Link>

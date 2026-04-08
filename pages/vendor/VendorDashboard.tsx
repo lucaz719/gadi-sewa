@@ -61,7 +61,7 @@ export default function VendorDashboard() {
         <StatCard 
           title="Today's Orders" 
           value="12" 
-          subtext={<span className="text-purple-600 font-medium">₹45,200 Revenue</span>}
+          subtext={<span className="text-purple-600 font-medium">NPR 45,200 Revenue</span>}
           icon="shopping_bag" 
           color="bg-purple-500" 
         />
@@ -74,7 +74,7 @@ export default function VendorDashboard() {
         />
         <StatCard 
           title="Revenue (Month)" 
-          value="₹4.2L" 
+          value="NPR 4.2L" 
           subtext={<span className="text-green-500 font-medium">+12.5% vs last month</span>}
           icon="payments" 
           color="bg-green-500" 
@@ -167,9 +167,9 @@ export default function VendorDashboard() {
              </div>
              <div className="space-y-4">
                 {[
-                  { id: 'ORD-8921', garage: 'City Auto Works', items: 'Brake Pads, Oil Filter', amount: '₹3,200', status: 'New', time: '10 mins ago' },
-                  { id: 'ORD-8920', garage: 'Quick Fix Mechanics', items: '5W-30 Oil (20L)', amount: '₹12,500', status: 'Processing', time: '1 hour ago' },
-                  { id: 'ORD-8919', garage: 'Star Service Center', items: 'Clutch Plate Kit', amount: '₹8,900', status: 'Shipped', time: '3 hours ago' },
+                  { id: 'ORD-8921', garage: 'City Auto Works', items: 'Brake Pads, Oil Filter', amount: 'NPR 3,200', status: 'New', time: '10 mins ago' },
+                  { id: 'ORD-8920', garage: 'Quick Fix Mechanics', items: '5W-30 Oil (20L)', amount: 'NPR 12,500', status: 'Processing', time: '1 hour ago' },
+                  { id: 'ORD-8919', garage: 'Star Service Center', items: 'Clutch Plate Kit', amount: 'NPR 8,900', status: 'Shipped', time: '3 hours ago' },
                 ].map(order => (
                    <div key={order.id} className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
                       <div className="flex items-center gap-3">

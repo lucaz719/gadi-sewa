@@ -60,7 +60,7 @@ test('Complete Garage Owner Journey', async t => {
 
     // Step 2: Vehicle Details
     console.log('   🚗 Entering Vehicle Details...');
-    await fillField('Registration No', 'MH-01-AB-1234');
+    await fillField('Registration No', 'BA 1 Pa 1234');
     await t.click(Selector('[data-testid="next-step"]'));
 
     // Step 3: Service & Issues

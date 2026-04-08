@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const jobs = [
-  { id: 'JOB-12345', customer: 'John Doe', vehicle: 'Toyota Camry', reg: 'MH-01-AB-1234', status: 'New', date: '24 Oct, 2024', amount: 'Rs. 4,500' },
-  { id: 'JOB-12346', customer: 'Jane Smith', vehicle: 'Honda Civic', reg: 'MH-02-XY-9876', status: 'In Progress', date: '24 Oct, 2024', amount: 'Rs. 12,000' },
-  { id: 'JOB-12347', customer: 'Mike Ross', vehicle: 'Ford Endeavour', reg: 'MH-04-QQ-1111', status: 'Waiting Parts', date: '23 Oct, 2024', amount: 'Rs. 25,000' },
-  { id: 'JOB-12348', customer: 'Rachel Zane', vehicle: 'Hyundai Creta', reg: 'MH-03-ZZ-2222', status: 'Ready', date: '22 Oct, 2024', amount: 'Rs. 8,500' },
+  { id: 'JOB-12345', customer: 'John Doe', vehicle: 'Toyota Camry', reg: 'BA 1 Pa 1234', status: 'New', date: '24 Oct, 2024', amount: 'NPR 4,500' },
+  { id: 'JOB-12346', customer: 'Jane Smith', vehicle: 'Honda Civic', reg: 'BA 2 Cha 5678', status: 'In Progress', date: '24 Oct, 2024', amount: 'NPR 12,000' },
+  { id: 'JOB-12347', customer: 'Mike Ross', vehicle: 'Ford Endeavour', reg: 'GA 1 Kha 2345', status: 'Waiting Parts', date: '23 Oct, 2024', amount: 'NPR 25,000' },
+  { id: 'JOB-12348', customer: 'Rachel Zane', vehicle: 'Hyundai Creta', reg: 'LU 3 Ga 7890', status: 'Ready', date: '22 Oct, 2024', amount: 'NPR 8,500' },
 ];
 
 export default function JobList() {

@@ -128,8 +128,8 @@ export default function VendorOrderDetail() {
                                        </div>
                                    </td>
                                    <td className="p-4 text-center">{item.qty}</td>
-                                   <td className="p-4 text-right">₹{item.price}</td>
-                                   <td className="p-4 text-right font-bold">₹{item.total}</td>
+                                   <td className="p-4 text-right">NPR {item.price}</td>
+                                   <td className="p-4 text-right font-bold">NPR {item.total}</td>
                                </tr>
                            ))}
                        </tbody>
@@ -143,10 +143,10 @@ export default function VendorOrderDetail() {
                                <p className="font-bold text-lg text-slate-900 dark:text-white pt-2">Total</p>
                            </div>
                            <div className="text-right space-y-2 font-medium">
-                               <p>₹{order.pricing.subtotal}</p>
-                               <p>₹{order.pricing.shipping}</p>
-                               <p>₹{order.pricing.tax}</p>
-                               <p className="font-bold text-lg text-purple-600 pt-2">₹{order.pricing.total}</p>
+                               <p>NPR {order.pricing.subtotal}</p>
+                               <p>NPR {order.pricing.shipping}</p>
+                               <p>NPR {order.pricing.tax}</p>
+                               <p className="font-bold text-lg text-purple-600 pt-2">NPR {order.pricing.total}</p>
                            </div>
                        </div>
                    </div>

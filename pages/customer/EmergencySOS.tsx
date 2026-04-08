@@ -78,11 +78,11 @@ export default function EmergencySOS() {
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-slate-500">Vehicle</span>
-                            <span className="font-bold">Recovery Van (MH-04-AA-1122)</span>
+                            <span className="font-bold">Recovery Van (BA 4 Ka 1122)</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-slate-500">Est. Cost</span>
-                            <span className="font-bold">₹500 - ₹800</span>
+                            <span className="font-bold">NPR 500 - NPR 800</span>
                         </div>
                         
                         <div className="pt-4 flex gap-3">

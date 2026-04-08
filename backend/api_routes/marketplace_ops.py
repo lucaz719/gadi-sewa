@@ -41,7 +41,7 @@ def place_marketplace_order(order: schemas.VendorOrderCreate, garage_id: int = Q
         user_name=f"Garage #{garage_id}",
         action="Created",
         entity="VendorOrder",
-        details=f"Placed order with Vendor #{order.vendor_id} for Rs. {order.total_amount}"
+        details=f"Placed order with Vendor #{order.vendor_id} for NPR {order.total_amount}"
     )
     db.add(new_log)
     
@@ -70,7 +70,7 @@ def update_order_status(order_id: int, update: schemas.VendorOrderStatusUpdate, 
         if user:
             new_points = models.GadiPoint(
                 user_id=user.id,
-                points=int(db_order.total_amount / 100), # 1 point per 100 Rs. spent
+                points=int(db_order.total_amount / 100), # 1 point per 100 NPR spent
                 action_type="Purchase"
             )
             db.add(new_points)

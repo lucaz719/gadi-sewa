@@ -42,3 +42,8 @@ workflow-screenshots/
 gadisewa-backend.zip
 gadisewa-deploy.zip
 
+# Security - never commit these
+deployment_keys/
+*.pem
+id_rsa*
+

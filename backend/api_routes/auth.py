@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import SessionLocal
+from passlib.context import CryptContext
 import models, schemas
 import os
 
 router = APIRouter(tags=["Authentication"])
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_db():
     db = SessionLocal()
@@ -13,20 +16,32 @@ def get_db():
     finally:
         db.close()
 
-# In a real app, use passlib for hashing. For this demo, we use a prefix.
-def verify_password(plain_password, hashed_password):
-    return f"hashed_{plain_password}" == hashed_password
 
-ADMIN_ACCESS_TOKEN = os.getenv("ADMIN_ACCESS_TOKEN", "GS-ADMIN-2026")
+def hash_password(password: str) -> str:
+    """Hash a password using bcrypt."""
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against its hash. Supports legacy hashed_ prefix for migration."""
+    # Support legacy fake-hashed passwords during migration
+    if hashed_password.startswith("hashed_"):
+        return f"hashed_{plain_password}" == hashed_password
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+ADMIN_ACCESS_TOKEN = os.getenv("ADMIN_ACCESS_TOKEN")
+if not ADMIN_ACCESS_TOKEN:
+    raise RuntimeError("ADMIN_ACCESS_TOKEN environment variable must be set")
 
 @router.post("/auth/login", response_model=schemas.Token)
 def login(request: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == request.email).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     
     if not verify_password(request.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     
     # Special check for admin role
     if user.role == "admin":

@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 from database import engine, Base
 import models
 from api_routes import (
@@ -17,9 +19,10 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="GadiSewa Backend API")
 
 # CORS Configuration
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"], # Configured for local vite dev server
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,3 +49,7 @@ app.include_router(marketplace_ops.router)
 @app.get("/")
 def read_root():
     return {"message": "Welcome to GadiSewa API"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "gadisewa-api"}

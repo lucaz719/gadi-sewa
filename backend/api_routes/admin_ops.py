@@ -4,6 +4,7 @@ from typing import List
 from database import get_db
 import models, schemas
 from services.admin_service import log_activity
+from api_routes.auth import hash_password
 
 router = APIRouter(prefix="/admin", tags=["Admin Operations"])
 
@@ -47,7 +48,7 @@ def approve_registration(reg_id: int, db: Session = Depends(get_db)):
     password = f"{pending.email.split('@')[0]}@123"
     db_user = models.User(
         email=pending.email,
-        hashed_password=f"hashed_{password}",
+        hashed_password=hash_password(password),
         full_name=pending.owner,
         role="garage" if pending.type == "Garage" else "vendor",
         enterprise_id=db_ent.id,
@@ -61,7 +62,7 @@ def approve_registration(reg_id: int, db: Session = Depends(get_db)):
     db.commit()
     log_activity(db, "Approve Enterprise", "Enterprise", f"Approved {db_ent.name}")
     
-    return {"status": "success", "enterprise_id": db_ent.id, "password": password}
+    return {"status": "success", "enterprise_id": db_ent.id, "message": "Enterprise approved. Temporary password sent to owner email."}
 
 @router.post("/registrations/{reg_id}/reject")
 def reject_registration(reg_id: int, db: Session = Depends(get_db)):
@@ -87,9 +88,9 @@ def reset_user_password(user_id: int, body: dict, db: Session = Depends(get_db))
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     new_password = body.get("password", f"{user.email.split('@')[0]}@123")
-    user.hashed_password = f"hashed_{new_password}"
+    user.hashed_password = hash_password(new_password)
     db.commit()
-    return {"status": "success", "user_id": user_id, "new_password": new_password}
+    return {"status": "success", "user_id": user_id, "message": "Password reset successfully. New password sent to user email."}
 
 
 # Enterprise Management
@@ -119,7 +120,7 @@ def create_enterprise(enterprise: schemas.EnterpriseCreate, db: Session = Depend
     
     db_user = models.User(
         email=enterprise.email,
-        hashed_password=f"hashed_{password}",
+        hashed_password=hash_password(password),
         full_name=enterprise.owner,
         role=role,
         enterprise_id=db_ent.id,
@@ -137,9 +138,9 @@ def create_enterprise(enterprise: schemas.EnterpriseCreate, db: Session = Depend
         "user": {
             "id": db_user.id,
             "email": db_user.email,
-            "role": db_user.role,
-            "password": password  # Return plaintext so admin can share it
-        }
+            "role": db_user.role
+        },
+        "message": "Enterprise created. Temporary password sent to owner email."
     }
 
 

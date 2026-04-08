@@ -118,11 +118,11 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 
 | # | Bug | Location | Details |
 |---|-----|----------|---------|
-| B1 | **Password "hashing" is fake** | `backend/api_routes/auth.py` | `verify_password()` checks `f"hashed_{plain}" == stored`. Passwords stored as `hashed_<plaintext>`. Not real hashing. |
-| B2 | **Admin token hardcoded** | `backend/api_routes/auth.py` | `ADMIN_ACCESS_TOKEN = "GS-ADMIN-2026"` fallback. Anyone can log in as admin. |
-| B3 | **No authorization on routes** | All backend routes | No middleware checks user role. A customer can call `/admin/enterprises` or `/admin/users/{id}/reset-password`. |
-| B4 | **Plaintext password returned in API** | `backend/api_routes/admin_ops.py` | `/registrations/{id}/approve` returns `"password": password` in JSON response. |
-| B5 | **Enterprise ID defaults to 1** | `backend/api_routes/crm_ops.py` | `enterprise_id: int = 1` — if not provided, queries enterprise 1's data. Multi-tenant data leak. |
+| B1 | **Password hashing** | `backend/api_routes/auth.py` | ✅ FIXED — Now uses bcrypt via passlib. Legacy `hashed_` prefix still supported for migration. |
+| B2 | **Admin token hardcoded** | `backend/api_routes/auth.py` | ✅ FIXED — `ADMIN_ACCESS_TOKEN` must be set via env var, no fallback. App won't start without it. |
+| B3 | **No authorization on routes** | All backend routes | ⚠️ OPEN — No middleware checks user role. A customer can call `/admin/enterprises`. |
+| B4 | **Plaintext password returned in API** | `backend/api_routes/admin_ops.py` | ✅ FIXED — Passwords no longer returned in any API response. |
+| B5 | **Enterprise ID defaults to 1** | `backend/api_routes/crm_ops.py` | ⚠️ OPEN — `enterprise_id: int = 1` — if not provided, queries enterprise 1's data. |
 
 ### 🟠 High Bugs
 
@@ -152,13 +152,13 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 
 | # | Vulnerability | Risk | Location |
 |---|--------------|------|----------|
-| S1 | **API Key exposed in repo** | API abuse, billing | `backend/.env` → `GEMINI_API_KEY=AIzaSy...` committed to Git |
-| S2 | **SSH private keys in repo** | Server takeover | `deployment_keys/id_rsa` — private key committed to GitHub |
-| S3 | **SQLite database file in repo** | Data breach | `gadisewa.db` and `backend/gadisewa.db` — all user data exposed |
-| S4 | **Fake password hashing** | Account takeover | `hashed_{plaintext}` — anyone with DB access reads all passwords |
-| S5 | **No route authorization** | Privilege escalation | Any authenticated user can call any API endpoint regardless of role |
-| S6 | **Hardcoded admin token** | Admin impersonation | `GS-ADMIN-2026` default token allows anyone to become admin |
-| S7 | **No CSRF protection** | Cross-site forgery | No CSRF tokens on any POST endpoint |
+| S1 | **API Key exposed in repo** | API abuse, billing | ✅ FIXED — `.env` removed from tracking, `.env.example` template created |
+| S2 | **SSH private keys in repo** | Server takeover | ✅ FIXED — `deployment_keys/` removed from tracking, added to `.gitignore` |
+| S3 | **SQLite database file in repo** | Data breach | ✅ FIXED — `*.db` files removed from tracking |
+| S4 | **Fake password hashing** | Account takeover | ✅ FIXED — Now uses bcrypt via passlib |
+| S5 | **No route authorization** | Privilege escalation | ⚠️ OPEN — Needs auth middleware per route |
+| S6 | **Hardcoded admin token** | Admin impersonation | ✅ FIXED — Requires `ADMIN_ACCESS_TOKEN` env var, app won't start without it |
+| S7 | **No CSRF protection** | Cross-site forgery | ⚠️ OPEN — No CSRF tokens on POST endpoints |
 
 ### 🟠 HIGH
 
@@ -230,7 +230,7 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 | **API Integration Tests** | 0% | ❌ None (test files exist but are stubs) |
 | **Security Tests** | 0% | ❌ None |
 | **Performance Tests** | 0% | ❌ None |
-| **CI/CD Pipeline** | N/A | ❌ No GitHub Actions or automated pipeline |
+| **CI/CD Pipeline** | ✅ | GitHub Actions: CI build, Firebase deploy (frontend), Docker/GHCR deploy (backend) |
 
 ---
 
@@ -238,18 +238,20 @@ GadiSewa is a multi-role SaaS platform for garage/vehicle service management tar
 
 | Requirement | Status | Notes |
 |------------|--------|-------|
-| Docker/containerization | ❌ | No Dockerfile or docker-compose |
-| Environment config (.env.example) | ❌ | Real `.env` committed with secrets |
+| Docker/containerization | ✅ | `backend/Dockerfile` created for FastAPI backend |
+| Environment config (.env.example) | ✅ | `backend/.env.example` created with all required vars |
 | Database migrations | ❌ | Using `create_all()`, no Alembic |
 | Production database | ❌ | SQLite only, need PostgreSQL |
-| Reverse proxy (Nginx) | ❌ | Not configured |
-| SSL/HTTPS | ❌ | Not configured |
-| Health check endpoint | ❌ | No `/health` route |
+| Reverse proxy (Nginx) | ❌ | Not configured (handled by hosting platform) |
+| SSL/HTTPS | ❌ | Not configured (handled by hosting platform) |
+| Health check endpoint | ✅ | `/health` route added to backend |
 | Logging / monitoring | ❌ | No structured logging, no Sentry |
 | Backup strategy | ❌ | No database backup automation |
 | Domain / DNS | ❌ | Not configured |
-| CDN for static assets | ❌ | Not configured |
-| CORS for production | ❌ | Only localhost origins allowed |
+| CDN for static assets | ✅ | Firebase Hosting provides CDN |
+| CORS for production | ✅ | Configurable via `ALLOWED_ORIGINS` env var |
+| CI/CD Pipeline | ✅ | GitHub Actions: CI, frontend deploy (Firebase), backend deploy (Docker/GHCR) |
+| Security fixes | ✅ | Bcrypt hashing, no plaintext passwords in responses, secrets removed from repo |
 
 ---
 

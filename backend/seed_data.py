@@ -53,12 +53,13 @@ def seed_users(db: Session):
     """Seed official system accounts only"""
     print("Seeding system users...")
     
-    # We use simple "hashed_" prefix to simulate hashing for this manual system setup
+    from api_routes.auth import hash_password
+    
     users = [
-        {"email": "admin@gadisewa.com", "hashed_password": "hashed_admin@123", "full_name": "System Administrator", "role": "admin"},
-        {"email": "garage@gadisewa.com", "hashed_password": "hashed_Test@123", "full_name": "Main Garage Owner", "role": "garage", "enterprise_id": 1},
-        {"email": "vendor@gadisewa.com", "hashed_password": "hashed_Test@123", "full_name": "Parts Vendor", "role": "vendor", "enterprise_id": 2},
-        {"email": "customer@gadisewa.com", "hashed_password": "hashed_Test@123", "full_name": "John Doe", "role": "customer"},
+        {"email": "admin@gadisewa.com", "hashed_password": hash_password("admin@123"), "full_name": "System Administrator", "role": "admin"},
+        {"email": "garage@gadisewa.com", "hashed_password": hash_password("Test@123"), "full_name": "Main Garage Owner", "role": "garage", "enterprise_id": 1},
+        {"email": "vendor@gadisewa.com", "hashed_password": hash_password("Test@123"), "full_name": "Parts Vendor", "role": "vendor", "enterprise_id": 2},
+        {"email": "customer@gadisewa.com", "hashed_password": hash_password("Test@123"), "full_name": "John Doe", "role": "customer"},
     ]
     
     for user_data in users:

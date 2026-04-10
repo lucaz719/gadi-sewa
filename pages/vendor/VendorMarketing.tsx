@@ -36,7 +36,7 @@ export default function VendorMarketing() {
                 </div>
                 <div className="bg-white/10 backdrop-blur rounded-lg p-3">
                    <p className="text-xs text-purple-200">Revenue</p>
-                   <p className="font-bold text-xl">₹1.5L</p>
+                   <p className="font-bold text-xl">NPR 1.5L</p>
                 </div>
              </div>
           </div>

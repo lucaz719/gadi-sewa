@@ -1,15 +1,15 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
 from datetime import datetime
 
 # Auth Schemas
 class UserBase(BaseModel):
     email: EmailStr
-    full_name: str
-    role: str
+    full_name: str = Field(..., min_length=1, max_length=200)
+    role: str = Field(..., min_length=1, max_length=50)
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(..., min_length=8, max_length=128)
 
 class User(UserBase):
     id: int
@@ -20,9 +20,9 @@ class User(UserBase):
         from_attributes = True
 
 class LoginRequest(BaseModel):
-    email: str
-    password: str
-    access_token: Optional[str] = None
+    email: str = Field(..., max_length=254)
+    password: str = Field(..., min_length=1, max_length=128)
+    access_token: Optional[str] = Field(None, max_length=500)
 
 class Token(BaseModel):
     access_token: str
@@ -31,14 +31,14 @@ class Token(BaseModel):
 
 # Enterprise Schemas
 class EnterpriseBase(BaseModel):
-    name: str
-    type: str
-    owner: str
-    email: str
-    plan_id: str
+    name: str = Field(..., min_length=1, max_length=200)
+    type: str = Field(..., min_length=1, max_length=50)
+    owner: str = Field(..., min_length=1, max_length=200)
+    email: str = Field(..., max_length=254)
+    plan_id: str = Field(..., max_length=100)
 
 class EnterpriseCreate(EnterpriseBase):
-    password: Optional[str] = None  # If None, auto-generate from email
+    password: Optional[str] = Field(None, min_length=8, max_length=128)
 
 class Enterprise(EnterpriseBase):
     id: int
@@ -54,15 +54,15 @@ class Enterprise(EnterpriseBase):
 # Job Schemas
 class JobBase(BaseModel):
     customer_id: int
-    vehicle_info: str
-    complaint: str
-    status: str = "Pending"
+    vehicle_info: str = Field(..., min_length=1, max_length=500)
+    complaint: str = Field(..., min_length=1, max_length=2000)
+    status: str = Field("Pending", max_length=50)
     labor_cost: float = 0.0
 
 class JobUpdate(BaseModel):
-    status: Optional[str] = None
+    status: Optional[str] = Field(None, max_length=50)
     labor_cost: Optional[float] = None
-    complaint: Optional[str] = None
+    complaint: Optional[str] = Field(None, max_length=2000)
 
 class Job(JobBase):
     id: int
@@ -73,13 +73,13 @@ class Job(JobBase):
 
 # Inventory Schemas
 class InventoryItemBase(BaseModel):
-    name: str
-    sku: str
-    category: str
-    vehicle_type: str
+    name: str = Field(..., min_length=1, max_length=200)
+    sku: str = Field(..., min_length=1, max_length=100)
+    category: str = Field(..., min_length=1, max_length=100)
+    vehicle_type: str = Field(..., min_length=1, max_length=100)
     stock: int
     price: float
-    unit: str
+    unit: str = Field(..., min_length=1, max_length=50)
 
 class InventoryItem(InventoryItemBase):
     id: int
@@ -88,11 +88,11 @@ class InventoryItem(InventoryItemBase):
 
 # Transaction Schemas
 class TransactionBase(BaseModel):
-    type: str # Income, Expense
-    expense_type: Optional[str] = None # Fixed, Variable
+    type: str = Field(..., min_length=1, max_length=50)  # Income, Expense
+    expense_type: Optional[str] = Field(None, max_length=50)  # Fixed, Variable
     amount: float
-    category: str
-    description: str
+    category: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(..., min_length=1, max_length=1000)
     enterprise_id: Optional[int] = None
 
 class Transaction(TransactionBase):
@@ -109,8 +109,8 @@ class FinancialSummary(BaseModel):
     transaction_count: int
 
 class VoucherBase(BaseModel):
-    code: str
-    discount_type: str
+    code: str = Field(..., min_length=1, max_length=100)
+    discount_type: str = Field(..., min_length=1, max_length=50)
     value: float
     min_spend: float = 0.0
     expires_at: datetime
@@ -123,11 +123,11 @@ class Voucher(VoucherBase):
         from_attributes = True
 
 class GlobalItemBase(BaseModel):
-    name: str
-    category: str
-    vehicle_type: str
-    vehicle_model: Optional[str] = None
-    unit: str = "Pcs"
+    name: str = Field(..., min_length=1, max_length=200)
+    category: str = Field(..., min_length=1, max_length=100)
+    vehicle_type: str = Field(..., min_length=1, max_length=100)
+    vehicle_model: Optional[str] = Field(None, max_length=200)
+    unit: str = Field("Pcs", max_length=50)
 
 class GlobalItem(GlobalItemBase):
     id: int
@@ -137,7 +137,7 @@ class GlobalItem(GlobalItemBase):
 
 # HeldCart Schemas
 class HeldCartBase(BaseModel):
-    customer_name: Optional[str] = None
+    customer_name: Optional[str] = Field(None, max_length=200)
     cart_data: dict
     total: float
 
@@ -151,7 +151,7 @@ class HeldCart(HeldCartBase):
 class GadiPointBase(BaseModel):
     user_id: int
     points: int
-    action_type: str
+    action_type: str = Field(..., min_length=1, max_length=50)
 
 class GadiPointCreate(GadiPointBase):
     pass
@@ -163,8 +163,8 @@ class GadiPoint(GadiPointBase):
         from_attributes = True
 
 class ReferralBase(BaseModel):
-    referral_code: str
-    status: str
+    referral_code: str = Field(..., min_length=1, max_length=50)
+    status: str = Field(..., min_length=1, max_length=50)
     reward_claimed: bool
 
 class Referral(ReferralBase):
@@ -177,24 +177,24 @@ class Referral(ReferralBase):
 
 class Achievement(BaseModel):
     id: int
-    name: str
-    description: str
-    icon: str
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(..., min_length=1, max_length=500)
+    icon: str = Field(..., min_length=1, max_length=100)
     point_threshold: int
     class Config:
         from_attributes = True
 
 class UserRewardSummary(BaseModel):
     total_points: int
-    level: str # Bronze, Silver, Gold, Platinum
+    level: str  # Bronze, Silver, Gold, Platinum
     referral_count: int
     achievements: List[Achievement]
 
 # CRM/Customer Schemas
 class CustomerBase(BaseModel):
-    name: str
-    email: Optional[str] = None
-    phone: str
+    name: str = Field(..., min_length=1, max_length=200)
+    email: Optional[str] = Field(None, max_length=254)
+    phone: str = Field(..., min_length=1, max_length=20)
     vehicle_history: Optional[dict] = None
 
 class Customer(CustomerBase):
@@ -213,10 +213,10 @@ class CRMSummary(BaseModel):
 
 class ActivityLogBase(BaseModel):
     user_id: Optional[int] = None
-    user_name: str
-    action: str
-    entity: str
-    details: str
+    user_name: str = Field(..., min_length=1, max_length=200)
+    action: str = Field(..., min_length=1, max_length=100)
+    entity: str = Field(..., min_length=1, max_length=100)
+    details: str = Field(..., min_length=1, max_length=2000)
 
 class ActivityLog(ActivityLogBase):
     id: int
@@ -225,11 +225,11 @@ class ActivityLog(ActivityLogBase):
         from_attributes = True
 
 class PlanBase(BaseModel):
-    id: str
-    name: str
+    id: str = Field(..., max_length=100)
+    name: str = Field(..., min_length=1, max_length=200)
     price: float
     features: List[str]
-    duration: str
+    duration: str = Field(..., min_length=1, max_length=50)
 
 class Plan(PlanBase):
     class Config:
@@ -244,14 +244,14 @@ class AdminStats(BaseModel):
     churn_rate: float
 
 class VendorProductBase(BaseModel):
-    name: str
-    sku: str
-    category: str
+    name: str = Field(..., min_length=1, max_length=200)
+    sku: str = Field(..., min_length=1, max_length=100)
+    category: str = Field(..., min_length=1, max_length=100)
     price: float
     retail_price: float
     stock: int
-    image_url: Optional[str] = None
-    description: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=1000)
+    description: Optional[str] = Field(None, max_length=2000)
 
 class VendorProductCreate(VendorProductBase):
     pass
@@ -265,7 +265,7 @@ class VendorProduct(VendorProductBase):
 
 class VendorOrderItem(BaseModel):
     product_id: int
-    name: str
+    name: str = Field(..., min_length=1, max_length=200)
     qty: int
     price: float
 
@@ -287,13 +287,13 @@ class VendorOrder(BaseModel):
         from_attributes = True
 
 class VendorOrderStatusUpdate(BaseModel):
-    status: str
+    status: str = Field(..., min_length=1, max_length=50)
 
 class NotificationBase(BaseModel):
-    title: str
-    message: str
-    target_role: str = "all"
-    priority: str = "info"
+    title: str = Field(..., min_length=1, max_length=200)
+    message: str = Field(..., min_length=1, max_length=2000)
+    target_role: str = Field("all", max_length=50)
+    priority: str = Field("info", max_length=50)
 
 class NotificationOut(NotificationBase):
     id: int
@@ -310,11 +310,11 @@ class PlatformSettingsUpdate(BaseModel):
 
 # New Phase 2 Schemas
 class StaffMemberBase(BaseModel):
-    name: str
-    role: str
-    phone: str
+    name: str = Field(..., min_length=1, max_length=200)
+    role: str = Field(..., min_length=1, max_length=100)
+    phone: str = Field(..., min_length=1, max_length=20)
     salary: float = 0.0
-    status: str = "Present"
+    status: str = Field("Present", max_length=50)
 
 class StaffMember(StaffMemberBase):
     id: int
@@ -325,12 +325,12 @@ class StaffMember(StaffMemberBase):
 
 class AppointmentBase(BaseModel):
     customer_id: int
-    vehicle_info: str
-    date: str
-    time: str
-    service_type: str
-    mechanic_name: Optional[str] = None
-    status: str = "Confirmed"
+    vehicle_info: str = Field(..., min_length=1, max_length=500)
+    date: str = Field(..., max_length=50)
+    time: str = Field(..., max_length=50)
+    service_type: str = Field(..., min_length=1, max_length=200)
+    mechanic_name: Optional[str] = Field(None, max_length=200)
+    status: str = Field("Confirmed", max_length=50)
 
 class Appointment(AppointmentBase):
     id: int
@@ -340,9 +340,9 @@ class Appointment(AppointmentBase):
         from_attributes = True
 
 class SupportTicketBase(BaseModel):
-    subject: str
-    message: str
-    priority: str = "Normal"
+    subject: str = Field(..., min_length=1, max_length=300)
+    message: str = Field(..., min_length=1, max_length=5000)
+    priority: str = Field("Normal", max_length=50)
 
 class SupportTicket(SupportTicketBase):
     id: int
@@ -354,11 +354,11 @@ class SupportTicket(SupportTicketBase):
 
 class EnterpriseInvoiceBase(BaseModel):
     enterprise_id: int
-    invoice_number: str
+    invoice_number: str = Field(..., min_length=1, max_length=100)
     amount: float
-    status: str = "Unpaid"
+    status: str = Field("Unpaid", max_length=50)
     due_date: datetime
-    billing_month: str
+    billing_month: str = Field(..., min_length=1, max_length=50)
 
 class EnterpriseInvoice(EnterpriseInvoiceBase):
     id: int
@@ -367,11 +367,11 @@ class EnterpriseInvoice(EnterpriseInvoiceBase):
         from_attributes = True
 
 class PendingEnterpriseBase(BaseModel):
-    name: str
-    type: str # Garage, Vendor
-    owner: str
-    email: str
-    plan_id: str
+    name: str = Field(..., min_length=1, max_length=200)
+    type: str = Field(..., min_length=1, max_length=50)  # Garage, Vendor
+    owner: str = Field(..., min_length=1, max_length=200)
+    email: str = Field(..., max_length=254)
+    plan_id: str = Field(..., max_length=100)
 
 class PendingEnterprise(PendingEnterpriseBase):
     id: int

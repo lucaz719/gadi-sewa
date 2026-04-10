@@ -64,7 +64,7 @@ export default function FuelLog() {
            <div className="space-y-4">
                <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
                    <p className="text-slate-500 text-sm">Total Spent (Oct)</p>
-                   <p className="text-2xl font-bold mt-1">₹8,620</p>
+                   <p className="text-2xl font-bold mt-1">NPR 8,620</p>
                </div>
                <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
                    <p className="text-slate-500 text-sm">Avg. Efficiency</p>
@@ -97,8 +97,8 @@ export default function FuelLog() {
                            <td className="p-4 font-bold">{log.vehicle}</td>
                            <td className="p-4 text-center font-mono text-slate-600 dark:text-slate-300">{log.odometer.toLocaleString()} km</td>
                            <td className="p-4 text-center">{log.volume} L</td>
-                           <td className="p-4 text-right">₹{log.price}</td>
-                           <td className="p-4 text-right font-bold">₹{log.total.toLocaleString()}</td>
+                           <td className="p-4 text-right">NPR {log.price}</td>
+                           <td className="p-4 text-right font-bold">NPR {log.total.toLocaleString()}</td>
                        </tr>
                    ))}
                </tbody>
@@ -137,7 +137,7 @@ export default function FuelLog() {
                                <input type="number" step="0.1" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" placeholder="0.0" />
                            </div>
                            <div>
-                               <label className="block text-sm font-medium mb-1">Total Cost (₹)</label>
+                               <label className="block text-sm font-medium mb-1">Total Cost (NPR)</label>
                                <input type="number" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" placeholder="0.00" />
                            </div>
                        </div>

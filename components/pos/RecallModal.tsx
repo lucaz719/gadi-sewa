@@ -27,7 +27,7 @@ export const RecallModal = ({ isOpen, onClose, onRecall }: { isOpen: boolean, on
                         heldCarts.map((h) => (
                             <div key={h.id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center hover:border-primary-500 transition-all group">
                                 <div>
-                                    <p className="font-bold text-slate-900 dark:text-white">₹{h.total.toFixed(2)}</p>
+                                    <p className="font-bold text-slate-900 dark:text-white">NPR {h.total.toFixed(2)}</p>
                                     <p className="text-xs text-slate-500">{h.customer?.name || 'Walk-in'} • {h.cart.length} items</p>
                                     <p className="text-[10px] text-slate-400 mt-1">{new Date(h.heldAt).toLocaleString()}</p>
                                 </div>

@@ -117,7 +117,7 @@ export default function VendorOrders() {
                          <td className="p-6 text-[10px] font-black text-slate-500 uppercase">{new Date(order.created_at).toLocaleDateString()}</td>
                          <td className="p-6 font-black text-slate-900 dark:text-white uppercase tracking-tighter">Enterprise #{order.garage_id}</td>
                          <td className="p-6 text-center font-bold text-slate-500">{order.items.length}</td>
-                         <td className="p-6 font-black text-slate-900 dark:text-white tracking-tighter">Rs. {order.total_amount.toLocaleString()}</td>
+                         <td className="p-6 font-black text-slate-900 dark:text-white tracking-tighter">NPR {order.total_amount.toLocaleString()}</td>
                          <td className="p-6">
                              <span className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest border shadow-sm ${
                                  order.status === 'New' ? 'bg-blue-100 text-blue-700 border-blue-200' :

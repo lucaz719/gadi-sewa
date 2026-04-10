@@ -130,7 +130,7 @@ export default function CreateJob() {
                         <div className="space-y-4 animate-fade-in">
                             <h3 className="font-bold border-b pb-2">Vehicle Details</h3>
                             <div className="grid grid-cols-2 gap-4">
-                                <input type="text" placeholder="Registration No (e.g. MH-01-AB-1234)" value={selectedVehicle?.reg || ''} onChange={e => setSelectedVehicle({...selectedVehicle, reg: e.target.value.toUpperCase()})} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600 uppercase font-mono" />
+                                <input type="text" placeholder="Registration No (e.g. BA 1 Pa 1234)" value={selectedVehicle?.reg || ''} onChange={e => setSelectedVehicle({...selectedVehicle, reg: e.target.value.toUpperCase()})} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600 uppercase font-mono" />
                                 <div className="grid grid-cols-2 gap-2">
                                     <input type="text" placeholder="Make (e.g. Toyota)" value={selectedVehicle?.make || ''} onChange={e => setSelectedVehicle({...selectedVehicle, make: e.target.value})} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600" />
                                     <input type="text" placeholder="Model (e.g. Camry)" value={selectedVehicle?.model || ''} onChange={e => setSelectedVehicle({...selectedVehicle, model: e.target.value})} className="p-2.5 border rounded-lg dark:bg-slate-800 dark:border-slate-600" />

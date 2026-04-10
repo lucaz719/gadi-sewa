@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const garages = [
-  { id: 1, name: 'City Auto Works', location: 'Mumbai, MH', joined: '12 Jan 2023', volume: '₹1.2L', orders: 45, status: 'Active', creditLimit: 50000, creditUsed: 12500, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=20' },
-  { id: 2, name: 'Quick Fix Mechanics', location: 'Pune, MH', joined: '05 Mar 2023', volume: '₹85k', orders: 22, status: 'Active', creditLimit: 30000, creditUsed: 28000, overdue: 5000, avatar: 'https://i.pravatar.cc/150?u=21' },
-  { id: 3, name: 'Star Service Center', location: 'Delhi, DL', joined: '20 Sep 2023', volume: '₹42k', orders: 15, status: 'Inactive', creditLimit: 25000, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=22' },
-  { id: 4, name: 'Luxury Cars Hub', location: 'Bangalore, KA', joined: '01 Oct 2024', volume: '₹0', orders: 0, status: 'Pending', creditLimit: 0, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=23' },
+  { id: 1, name: 'City Auto Works', location: 'Kathmandu, Bagmati', joined: '12 Jan 2023', volume: 'NPR 1.2L', orders: 45, status: 'Active', creditLimit: 50000, creditUsed: 12500, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=20' },
+  { id: 2, name: 'Quick Fix Mechanics', location: 'Pokhara, Gandaki', joined: '05 Mar 2023', volume: 'NPR 85k', orders: 22, status: 'Active', creditLimit: 30000, creditUsed: 28000, overdue: 5000, avatar: 'https://i.pravatar.cc/150?u=21' },
+  { id: 3, name: 'Star Service Center', location: 'Lalitpur, Bagmati', joined: '20 Sep 2023', volume: 'NPR 42k', orders: 15, status: 'Inactive', creditLimit: 25000, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=22' },
+  { id: 4, name: 'Luxury Cars Hub', location: 'Biratnagar, Koshi', joined: '01 Oct 2024', volume: 'NPR 0', orders: 0, status: 'Pending', creditLimit: 0, creditUsed: 0, overdue: 0, avatar: 'https://i.pravatar.cc/150?u=23' },
 ];
 
 const requests = [
@@ -60,7 +60,7 @@ export default function VendorNetwork() {
           </div>
           <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700">
              <p className="text-slate-500 text-sm font-medium">Credit Extended</p>
-             <p className="text-2xl font-bold mt-1">₹4.5L</p>
+             <p className="text-2xl font-bold mt-1">NPR 4.5L</p>
           </div>
        </div>
 
@@ -252,7 +252,7 @@ export default function VendorNetwork() {
                                   <td className="p-4 font-medium">
                                      <Link to={`/vendor/network/${g.id}`} className="hover:text-purple-600">{g.name}</Link>
                                   </td>
-                                  <td className="p-4 text-slate-500">₹{g.creditLimit.toLocaleString()}</td>
+                                  <td className="p-4 text-slate-500">NPR {g.creditLimit.toLocaleString()}</td>
                                   <td className="p-4">
                                      <div className="flex items-center gap-3">
                                         <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -260,11 +260,11 @@ export default function VendorNetwork() {
                                         </div>
                                         <span className="text-xs font-bold w-10 text-right">{usagePercent}%</span>
                                      </div>
-                                     <p className="text-xs text-slate-400 mt-1">Used: ₹{g.creditUsed.toLocaleString()}</p>
+                                     <p className="text-xs text-slate-400 mt-1">Used: NPR {g.creditUsed.toLocaleString()}</p>
                                   </td>
-                                  <td className="p-4 text-right font-medium">₹{(g.creditLimit - g.creditUsed).toLocaleString()}</td>
+                                  <td className="p-4 text-right font-medium">NPR {(g.creditLimit - g.creditUsed).toLocaleString()}</td>
                                   <td className={`p-4 text-right font-bold ${g.overdue > 0 ? 'text-red-500' : 'text-slate-400'}`}>
-                                     {g.overdue > 0 ? `₹${g.overdue.toLocaleString()}` : '-'}
+                                     {g.overdue > 0 ? `NPR ${g.overdue.toLocaleString()}` : '-'}
                                   </td>
                                   <td className="p-4 text-right">
                                      <button className="text-slate-400 hover:text-purple-600 font-medium text-xs border border-slate-200 dark:border-slate-600 rounded px-2 py-1">Manage</button>

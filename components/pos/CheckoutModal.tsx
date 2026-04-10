@@ -36,7 +36,7 @@ export const CheckoutModal = ({ isOpen, onClose, total, onComplete, customer }: 
                 <div className="p-6 space-y-6 flex-1 overflow-y-auto">
                     <div className="text-center">
                         <p className="text-slate-500 text-sm uppercase font-bold tracking-wider">Amount Due</p>
-                        <p className="text-4xl font-black text-slate-900 dark:text-white">Rs. {total.toFixed(2)}</p>
+                        <p className="text-4xl font-black text-slate-900 dark:text-white">NPR {total.toFixed(2)}</p>
                     </div>
 
                     {!isSplit ? (
@@ -81,7 +81,7 @@ export const CheckoutModal = ({ isOpen, onClose, total, onComplete, customer }: 
                                 />
                                 <div className="mt-2 flex justify-between text-xs font-bold text-orange-700 dark:text-orange-300 uppercase">
                                     <span>Remaining Due</span>
-                                    <span>Rs. {remainingDue.toFixed(2)}</span>
+                                    <span>NPR {remainingDue.toFixed(2)}</span>
                                 </div>
                             </div>
                             <div>
@@ -120,7 +120,7 @@ export const CheckoutModal = ({ isOpen, onClose, total, onComplete, customer }: 
 
                     <div className="flex justify-between items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-900/30">
                         <span className="font-bold text-green-700 dark:text-green-300">Change Due</span>
-                        <span className="text-2xl font-black text-green-600">Rs. {change.toFixed(2)}</span>
+                        <span className="text-2xl font-black text-green-600">NPR {change.toFixed(2)}</span>
                     </div>
                 </div>
                 <div className="p-4 border-t dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">

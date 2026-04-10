@@ -59,12 +59,12 @@ export default function Reports() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="p-6 bg-white dark:bg-[#1e293b] rounded-3xl border dark:border-slate-800 shadow-sm">
                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Labor Revenue</p>
-               <p className="text-2xl font-black text-red-600">Rs. {jobAnalytics?.labor_revenue?.toLocaleString()}</p>
+               <p className="text-2xl font-black text-red-600">NPR {jobAnalytics?.labor_revenue?.toLocaleString()}</p>
                <p className="text-[10px] text-green-500 font-bold mt-2">↑ 8.4% vs last month</p>
             </div>
             <div className="p-6 bg-white dark:bg-[#1e293b] rounded-3xl border dark:border-slate-800 shadow-sm">
                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Stock Valuation</p>
-               <p className="text-2xl font-black text-blue-600">Rs. {inventoryVal?.total_valuation?.toLocaleString()}</p>
+               <p className="text-2xl font-black text-blue-600">NPR {inventoryVal?.total_valuation?.toLocaleString()}</p>
                <p className="text-[10px] text-slate-400 font-bold mt-2">{inventoryVal?.total_units} units on hand</p>
             </div>
             <div className="p-6 bg-white dark:bg-[#1e293b] rounded-3xl border dark:border-slate-800 shadow-sm">
@@ -74,7 +74,7 @@ export default function Reports() {
             </div>
             <div className="p-6 bg-red-600 text-white rounded-3xl shadow-xl shadow-red-500/20">
                <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Net Profit</p>
-               <p className="text-2xl font-black">Rs. {financialTrends[financialTrends.length - 1]?.profit?.toLocaleString()}</p>
+               <p className="text-2xl font-black">NPR {financialTrends[financialTrends.length - 1]?.profit?.toLocaleString()}</p>
                <button className="mt-4 w-full py-2 bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/30 transition-all">Download P&L</button>
             </div>
          </div>

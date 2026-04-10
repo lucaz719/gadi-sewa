@@ -113,7 +113,7 @@ export default function Marketplace() {
                        </div>
                        <div>
                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Available Credit</p>
-                           <p className="font-black text-xl text-slate-900 dark:text-white tracking-tighter">Rs. {availableCredit.toLocaleString()}</p>
+                           <p className="font-black text-xl text-slate-900 dark:text-white tracking-tighter">NPR {availableCredit.toLocaleString()}</p>
                        </div>
                    </div>
                    
@@ -194,8 +194,8 @@ export default function Marketplace() {
                                 <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800">
                                     <div className="flex justify-between items-end mb-4">
                                         <div>
-                                            <p className="text-[10px] text-slate-400 line-through font-bold">MRP Rs. {product.retail_price.toLocaleString()}</p>
-                                            <p className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">Rs. {product.price.toLocaleString()}</p>
+                                            <p className="text-[10px] text-slate-400 line-through font-bold">MRP NPR {product.retail_price.toLocaleString()}</p>
+                                            <p className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">NPR {product.price.toLocaleString()}</p>
                                         </div>
                                         <span className="text-[10px] font-black text-green-600 bg-green-50 dark:bg-green-900/30 px-3 py-1 border border-green-100 dark:border-green-900/50 rounded-full uppercase tracking-widest">
                                             -{Math.round(((product.retail_price - product.price) / product.retail_price) * 100)}%
@@ -255,7 +255,7 @@ export default function Marketplace() {
                                                    <button onClick={() => updateQty(item.id, 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-400 transition-colors">+</button>
                                                </div>
                                                <div className="text-right">
-                                                   <p className="font-black text-slate-900 dark:text-white tracking-tighter">Rs. {(item.price * item.qty).toLocaleString()}</p>
+                                                   <p className="font-black text-slate-900 dark:text-white tracking-tighter">NPR {(item.price * item.qty).toLocaleString()}</p>
                                                    <button onClick={() => removeFromCart(item.id)} className="text-[10px] font-black text-red-500 hover:text-red-700 uppercase tracking-widest transition-colors">Discard</button>
                                                </div>
                                            </div>
@@ -270,11 +270,11 @@ export default function Marketplace() {
                                <div className="space-y-4 mb-8">
                                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                                        <span>Base Procurement</span>
-                                       <span className="text-slate-900 dark:text-white">Rs. {cartTotal.toLocaleString()}</span>
+                                       <span className="text-slate-900 dark:text-white">NPR {cartTotal.toLocaleString()}</span>
                                    </div>
                                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                                        <span>VAT (13%)</span>
-                                       <span className="text-slate-900 dark:text-white">Rs. {(cartTotal * 0.13).toLocaleString()}</span>
+                                       <span className="text-slate-900 dark:text-white">NPR {(cartTotal * 0.13).toLocaleString()}</span>
                                    </div>
                                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                                        <span>Logistics</span>
@@ -282,7 +282,7 @@ export default function Marketplace() {
                                    </div>
                                    <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800">
                                        <span className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">Total Payables</span>
-                                       <span className="text-2xl font-black text-primary-500 tracking-tighter">Rs. {(cartTotal * 1.13).toLocaleString()}</span>
+                                       <span className="text-2xl font-black text-primary-500 tracking-tighter">NPR {(cartTotal * 1.13).toLocaleString()}</span>
                                    </div>
                                </div>
                                

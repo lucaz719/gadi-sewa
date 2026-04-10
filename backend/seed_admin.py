@@ -29,9 +29,10 @@ def seed():
     admin_email = "admin@gadisewa.com"
     existing_admin = db.query(models.User).filter(models.User.email == admin_email).first()
     if not existing_admin:
+        from api_routes.auth import hash_password
         db.add(models.User(
             email=admin_email,
-            hashed_password="hashed_admin@123",
+            hashed_password=hash_password("admin@123"),
             full_name="GadiSewa Admin",
             role="admin",
             is_active=True

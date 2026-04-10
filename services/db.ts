@@ -182,6 +182,10 @@ export const db = {
     method: 'POST',
     body: JSON.stringify({ message, user_role: role, current_path: path })
   }),
+  executeAiAction: async (action: string, params: Record<string, any> = {}, userRole: string = 'garage') => db.fetchApi('/ai/execute-action', {
+    method: 'POST',
+    body: JSON.stringify({ action, params, user_role: userRole })
+  }),
 
   // Reports & Analytics
   getFinancialTrends: async (enterpriseId?: number) => db.fetchApi(`/reports/financial-trends${enterpriseId ? `?enterprise_id=${enterpriseId}` : ''}`),

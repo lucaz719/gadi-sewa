@@ -15,18 +15,18 @@ const revenueData = [
 ];
 
 const invoices = [
-  { id: 'INV-2024-001', date: '25 Oct 2024', garage: 'City Auto Works', amount: '₹12,500', due: '01 Nov 2024', status: 'Unpaid' },
-  { id: 'INV-2024-002', date: '24 Oct 2024', garage: 'Quick Fix Mechanics', amount: '₹8,200', due: '31 Oct 2024', status: 'Paid' },
-  { id: 'INV-2024-003', date: '22 Oct 2024', garage: 'Star Service Center', amount: '₹4,500', due: '29 Oct 2024', status: 'Overdue' },
-  { id: 'INV-2024-004', date: '20 Oct 2024', garage: 'Luxury Cars Hub', amount: '₹22,000', due: '27 Oct 2024', status: 'Paid' },
-  { id: 'INV-2024-005', date: '18 Oct 2024', garage: 'Mumbai Motors', amount: '₹15,750', due: '25 Oct 2024', status: 'Paid' },
+  { id: 'INV-2024-001', date: '25 Oct 2024', garage: 'City Auto Works', amount: 'NPR 12,500', due: '01 Nov 2024', status: 'Unpaid' },
+  { id: 'INV-2024-002', date: '24 Oct 2024', garage: 'Quick Fix Mechanics', amount: 'NPR 8,200', due: '31 Oct 2024', status: 'Paid' },
+  { id: 'INV-2024-003', date: '22 Oct 2024', garage: 'Star Service Center', amount: 'NPR 4,500', due: '29 Oct 2024', status: 'Overdue' },
+  { id: 'INV-2024-004', date: '20 Oct 2024', garage: 'Luxury Cars Hub', amount: 'NPR 22,000', due: '27 Oct 2024', status: 'Paid' },
+  { id: 'INV-2024-005', date: '18 Oct 2024', garage: 'Mumbai Motors', amount: 'NPR 15,750', due: '25 Oct 2024', status: 'Paid' },
 ];
 
 const payouts = [
-  { id: 'TXN-8821', date: '24 Oct 2024', period: '16 Oct - 22 Oct', amount: '₹42,500', status: 'Processed', method: 'Bank Transfer' },
-  { id: 'TXN-8820', date: '17 Oct 2024', period: '09 Oct - 15 Oct', amount: '₹38,200', status: 'Processed', method: 'Bank Transfer' },
-  { id: 'TXN-8819', date: '10 Oct 2024', period: '02 Oct - 08 Oct', amount: '₹45,000', status: 'Processed', method: 'Bank Transfer' },
-  { id: 'TXN-8818', date: 'Pending', period: '23 Oct - 29 Oct', amount: '₹18,500', status: 'Pending', method: 'Bank Transfer' },
+  { id: 'TXN-8821', date: '24 Oct 2024', period: '16 Oct - 22 Oct', amount: 'NPR 42,500', status: 'Processed', method: 'Bank Transfer' },
+  { id: 'TXN-8820', date: '17 Oct 2024', period: '09 Oct - 15 Oct', amount: 'NPR 38,200', status: 'Processed', method: 'Bank Transfer' },
+  { id: 'TXN-8819', date: '10 Oct 2024', period: '02 Oct - 08 Oct', amount: 'NPR 45,000', status: 'Processed', method: 'Bank Transfer' },
+  { id: 'TXN-8818', date: 'Pending', period: '23 Oct - 29 Oct', amount: 'NPR 18,500', status: 'Pending', method: 'Bank Transfer' },
 ];
 
 export default function VendorFinancials() {
@@ -56,7 +56,7 @@ export default function VendorFinancials() {
              <div className="flex justify-between items-start">
                 <div>
                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Revenue (YTD)</p>
-                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">₹7,01,700</p>
+                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">NPR 7,01,700</p>
                 </div>
                 <div className="p-2 bg-green-100 text-green-600 rounded-lg">
                    <span className="material-symbols-outlined">trending_up</span>
@@ -69,7 +69,7 @@ export default function VendorFinancials() {
              <div className="flex justify-between items-start">
                 <div>
                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Outstanding Invoices</p>
-                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">₹17,000</p>
+                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">NPR 17,000</p>
                 </div>
                 <div className="p-2 bg-orange-100 text-orange-600 rounded-lg">
                    <span className="material-symbols-outlined">pending_actions</span>
@@ -82,7 +82,7 @@ export default function VendorFinancials() {
              <div className="flex justify-between items-start">
                 <div>
                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Avg. Order Value</p>
-                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">₹8,500</p>
+                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">NPR 8,500</p>
                 </div>
                 <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
                    <span className="material-symbols-outlined">shopping_cart</span>
@@ -95,7 +95,7 @@ export default function VendorFinancials() {
              <div className="flex justify-between items-start">
                 <div>
                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Next Payout</p>
-                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">₹18,500</p>
+                   <p className="text-2xl font-bold mt-2 text-slate-900 dark:text-white">NPR 18,500</p>
                 </div>
                 <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
                    <span className="material-symbols-outlined">account_balance_wallet</span>
@@ -128,7 +128,7 @@ export default function VendorFinancials() {
                    <Tooltip 
                       contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} 
                       itemStyle={{ color: '#fff' }}
-                      formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                      formatter={(value: number) => [`NPR ${value.toLocaleString()}`, 'Revenue']}
                    />
                    <Area type="monotone" dataKey="value" stroke="#9333ea" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                 </AreaChart>

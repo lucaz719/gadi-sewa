@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 const initialVehicles = [
-    { id: 1, make: 'Toyota', model: 'Camry', year: '2021', reg: 'MH-01-AB-1234', type: 'Car', fuel: 'Petrol', insurance: 'Valid till Dec 2024', puc: 'Valid till Nov 2024', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=400' },
-    { id: 2, make: 'Honda', model: 'Activa 6G', year: '2022', reg: 'MH-02-XY-9988', type: 'Bike', fuel: 'Petrol', insurance: 'Expired', puc: 'Valid till Jan 2025', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=400' },
+    { id: 1, make: 'Toyota', model: 'Camry', year: '2021', reg: 'BA 1 Pa 1234', type: 'Car', fuel: 'Petrol', insurance: 'Valid till Dec 2024', puc: 'Valid till Nov 2024', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=400' },
+    { id: 2, make: 'Honda', model: 'Activa 6G', year: '2022', reg: 'BA 2 Cha 5678', type: 'Bike', fuel: 'Petrol', insurance: 'Expired', puc: 'Valid till Jan 2025', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=400' },
 ];
 
 export default function MyVehicles() {
@@ -31,7 +31,7 @@ export default function MyVehicles() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-1">Registration Number</label>
-                            <input type="text" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent uppercase font-mono" placeholder="MH-01-AB-1234" />
+                            <input type="text" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent uppercase font-mono" placeholder="BA 1 Pa 1234" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">Vehicle Type</label>

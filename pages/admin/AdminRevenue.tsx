@@ -42,8 +42,8 @@ export default function AdminRevenue() {
       {/* Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Revenue', val: `Rs. ${data.total_revenue.toLocaleString()}`, icon: 'payments', color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Monthly Recurring', val: `Rs. ${data.mrr.toLocaleString()}`, icon: 'trending_up', color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Total Revenue', val: `NPR ${data.total_revenue.toLocaleString()}`, icon: 'payments', color: 'text-green-600', bg: 'bg-green-50' },
+          { label: 'Monthly Recurring', val: `NPR ${data.mrr.toLocaleString()}`, icon: 'trending_up', color: 'text-blue-600', bg: 'bg-blue-50' },
           { label: 'Active Subscriptions', val: data.active_subscriptions, icon: 'verified', color: 'text-purple-600', bg: 'bg-purple-50' },
           { label: 'Garage : Vendor', val: `${Math.round(data.garage_revenue)}:${Math.round(data.vendor_revenue)}`, icon: 'pie_chart', color: 'text-orange-600', bg: 'bg-orange-50' },
         ].map((s, i) => (
@@ -72,7 +72,7 @@ export default function AdminRevenue() {
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
                 <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
-                <Line type="monotone" dataKey="revenue" name="Revenue (Rs.)" stroke="#dc2626" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="revenue" name="Revenue (NPR)" stroke="#dc2626" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -103,7 +103,7 @@ export default function AdminRevenue() {
               <th className="p-4 font-black text-slate-400 uppercase text-[10px]">Rank</th>
               <th className="p-4 font-black text-slate-400 uppercase text-[10px]">Enterprise</th>
               <th className="p-4 font-black text-slate-400 uppercase text-[10px]">Type</th>
-              <th className="p-4 font-black text-slate-400 uppercase text-[10px] text-right">Revenue (Rs.)</th>
+              <th className="p-4 font-black text-slate-400 uppercase text-[10px] text-right">Revenue (NPR)</th>
             </tr>
           </thead>
           <tbody className="divide-y dark:divide-slate-700">

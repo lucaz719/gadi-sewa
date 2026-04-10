@@ -32,7 +32,7 @@ export default function Invoices() {
           id: `INV-${t.id}`,
           date: new Date(t.created_at).toLocaleDateString(),
           customer: t.description.split(' - ')[1] || 'Retail Customer',
-          amount: `Rs. ${t.amount.toLocaleString()}`,
+          amount: `NPR ${t.amount.toLocaleString()}`,
           status: t.type === 'income' ? 'Paid' : 'Pending'
       })));
 
@@ -87,21 +87,21 @@ export default function Invoices() {
        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Receivables</p>
-                <p className="text-3xl font-black mt-2 text-slate-900 dark:text-white">Rs. {stats.receivables.toLocaleString()}</p>
+                <p className="text-3xl font-black mt-2 text-slate-900 dark:text-white">NPR {stats.receivables.toLocaleString()}</p>
                 <div className="mt-4 flex items-center gap-2 text-[10px] text-amber-600 font-bold uppercase">
                     <span className="material-symbols-outlined text-sm">schedule</span> Pending collection
                 </div>
             </div>
             <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue (MTD)</p>
-                <p className="text-3xl font-black mt-2 text-green-600">Rs. {stats.paid.toLocaleString()}</p>
+                <p className="text-3xl font-black mt-2 text-green-600">NPR {stats.paid.toLocaleString()}</p>
                 <div className="mt-4 flex items-center gap-2 text-[10px] text-green-600 font-bold uppercase">
                     <span className="material-symbols-outlined text-sm">trending_up</span> +12% vs last month
                 </div>
             </div>
             <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Risk Exposure</p>
-                <p className="text-3xl font-black mt-2 text-red-500">Rs. {stats.overdue.toLocaleString()}</p>
+                <p className="text-3xl font-black mt-2 text-red-500">NPR {stats.overdue.toLocaleString()}</p>
                 <div className="mt-4 flex items-center gap-2 text-[10px] text-red-500 font-bold uppercase">
                     <span className="material-symbols-outlined text-sm">warning</span> 3 Overdue accounts
                 </div>
@@ -207,7 +207,7 @@ export default function Invoices() {
                         <div className="flex justify-between items-center bg-primary-500 p-4 rounded-xl text-white shadow-lg overflow-hidden relative">
                             <div className="relative z-10">
                                 <p className="text-[10px] font-black uppercase opacity-80">Aggregate Total</p>
-                                <p className="text-2xl font-black">Rs. 0.00</p>
+                                <p className="text-2xl font-black">NPR 0.00</p>
                             </div>
                             <span className="material-symbols-outlined text-4xl opacity-10 absolute -right-2 top-0 rotate-12 scale-150">payments</span>
                         </div>

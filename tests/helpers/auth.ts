@@ -87,7 +87,7 @@ export async function navigateTo(pageName: string) {
     }
 
     // 3. Try to find specifically in Sidebar/Aside (most common navigation)
-    const sidebarLink = Selector('aside').find('a, button').withText(new RegExp(`^\\s*${pageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'i')).filterVisible();
+    const sidebarLink = Selector('aside').find('a, button').withText(new RegExp(pageName, 'i')).filterVisible();
 
     if (await sidebarLink.exists) {
         await t.click(sidebarLink);

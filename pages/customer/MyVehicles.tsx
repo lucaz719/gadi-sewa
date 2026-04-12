@@ -8,6 +8,33 @@ const initialVehicles = [
 export default function MyVehicles() {
     const [vehicles, setVehicles] = useState(initialVehicles);
     const [showForm, setShowForm] = useState(false);
+    
+    const [newVehicle, setNewVehicle] = useState({
+        reg: '',
+        type: 'Car',
+        make: '',
+        model: '',
+        year: '',
+        fuel: 'Petrol'
+    });
+
+    const handleSave = () => {
+        if (!newVehicle.reg || !newVehicle.make) return;
+        
+        const vehicle = {
+            id: Date.now(),
+            ...newVehicle,
+            insurance: 'Valid till Dec 2025',
+            puc: 'Valid till June 2025',
+            image: newVehicle.type === 'Bike' 
+                ? 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=400'
+                : 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=400'
+        };
+        
+        setVehicles([vehicle, ...vehicles]);
+        setShowForm(false);
+        setNewVehicle({ reg: '', type: 'Car', make: '', model: '', year: '', fuel: 'Petrol' });
+    };
 
     return (
         <div className="space-y-6">
@@ -31,31 +58,63 @@ export default function MyVehicles() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-1">Registration Number</label>
-                            <input type="text" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent uppercase font-mono" placeholder="MH-01-AB-1234" />
+                            <input 
+                                type="text" 
+                                value={newVehicle.reg}
+                                onChange={(e) => setNewVehicle({...newVehicle, reg: e.target.value})}
+                                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent uppercase font-mono" 
+                                placeholder="MH-01-AB-1234" 
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">Vehicle Type</label>
-                            <select className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent">
-                                <option>Car</option>
-                                <option>Bike/Scooter</option>
-                                <option>Other</option>
+                            <select 
+                                value={newVehicle.type}
+                                onChange={(e) => setNewVehicle({...newVehicle, type: e.target.value})}
+                                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent"
+                            >
+                                <option value="Car">Car</option>
+                                <option value="Bike">Bike/Scooter</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">Make</label>
-                            <input type="text" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" placeholder="e.g. Maruti Suzuki" />
+                            <input 
+                                type="text" 
+                                value={newVehicle.make}
+                                onChange={(e) => setNewVehicle({...newVehicle, make: e.target.value})}
+                                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" 
+                                placeholder="e.g. Maruti Suzuki" 
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">Model</label>
-                            <input type="text" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" placeholder="e.g. Swift" />
+                            <input 
+                                type="text" 
+                                value={newVehicle.model}
+                                onChange={(e) => setNewVehicle({...newVehicle, model: e.target.value})}
+                                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" 
+                                placeholder="e.g. Swift" 
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">Year</label>
-                            <input type="text" className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" placeholder="e.g. 2021" />
+                            <input 
+                                type="text" 
+                                value={newVehicle.year}
+                                onChange={(e) => setNewVehicle({...newVehicle, year: e.target.value})}
+                                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent" 
+                                placeholder="e.g. 2021" 
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">Fuel Type</label>
-                            <select className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent">
+                            <select 
+                                value={newVehicle.fuel}
+                                onChange={(e) => setNewVehicle({...newVehicle, fuel: e.target.value})}
+                                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent"
+                            >
                                 <option>Petrol</option>
                                 <option>Diesel</option>
                                 <option>EV</option>
@@ -65,7 +124,7 @@ export default function MyVehicles() {
                     </div>
                     <div className="flex justify-end gap-3 mt-6">
                         <button onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Cancel</button>
-                        <button className="px-6 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600">Save Vehicle</button>
+                        <button onClick={handleSave} className="px-6 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600">Save Vehicle</button>
                     </div>
                 </div>
             )}

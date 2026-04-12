@@ -20,7 +20,7 @@ export default function Login() {
     try {
       const response = await db.login({ email, password });
 
-      if (response.user.role === 'garage') navigate('/');
+      if (response.user.role === 'garage') navigate('/dashboard');
       else if (response.user.role === 'vendor') navigate('/vendor');
       else if (response.user.role === 'customer') navigate('/portal');
       else if (response.user.role === 'admin') navigate('/admin');

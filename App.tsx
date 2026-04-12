@@ -96,16 +96,17 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const path = location.pathname;
+  const normalizedPath = location.pathname.toLowerCase().replace(/\/$/, '') || '/';
   const { isDark, toggleTheme } = useContext(ThemeContext);
   const { showToast } = useToast();
-
-  const isPOS = path === '/pos' || path === '/vendor/pos';
-  const isRegistration = path === '/register';
-  const isLogin = path === '/login' || path === '/admin-portal';
-  const isVendor = path.startsWith('/vendor');
-  const isCustomer = path.startsWith('/portal');
-  const isAdmin = path.startsWith('/admin');
+  
+  const isPOS = normalizedPath === '/pos' || normalizedPath === '/vendor/pos';
+  const isRegistration = normalizedPath === '/register';
+  const isLogin = normalizedPath === '/login' || normalizedPath === '/admin-portal';
+  const isLanding = normalizedPath === '/';
+  const isVendor = normalizedPath.startsWith('/vendor');
+  const isCustomer = normalizedPath.startsWith('/portal');
+  const isAdmin = normalizedPath.startsWith('/admin');
 
   useEffect(() => {
     db.init();
@@ -117,7 +118,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     navigate('/login');
   };
 
-  if (isPOS || isRegistration || isLogin) {
+  if (isPOS || isRegistration || isLogin || isLanding) {
     return <>{children}</>;
   }
 
@@ -140,24 +141,24 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {isAdmin ? (
             <>
-              <SidebarItem icon="dashboard" label="Admin Home" path="/admin" active={path === '/admin'} />
-              <SidebarItem icon="bar_chart" label="Revenue" path="/admin/revenue" active={path === '/admin/revenue'} />
-              <SidebarItem icon="inventory" label="Global Catalog" path="/admin/global-catalog" active={path === '/admin/global-catalog'} />
-              <SidebarItem icon="confirmation_number" label="Voucher Center" path="/admin/vouchers" active={path === '/admin/vouchers'} />
-              <SidebarItem icon="payments" label="Plan Mgmt" path="/admin/plans" active={path === '/admin/plans'} />
-              <SidebarItem icon="group" label="Enterprise Users" path="/admin/users" active={path === '/admin/users'} />
-              <SidebarItem icon="campaign" label="Notifications" path="/admin/notifications" active={path === '/admin/notifications'} />
-              <SidebarItem icon="support_agent" label="Support Hub" path="/admin/support" active={path === '/admin/support'} />
-              <SidebarItem icon="history" label="System Logs" path="/admin/logs" active={path === '/admin/logs'} />
+              <SidebarItem icon="dashboard" label="Admin Home" path="/admin" active={normalizedPath === '/admin'} />
+              <SidebarItem icon="bar_chart" label="Revenue" path="/admin/revenue" active={normalizedPath === '/admin/revenue'} />
+              <SidebarItem icon="inventory" label="Global Catalog" path="/admin/global-catalog" active={normalizedPath === '/admin/global-catalog'} />
+              <SidebarItem icon="confirmation_number" label="Voucher Center" path="/admin/vouchers" active={normalizedPath === '/admin/vouchers'} />
+              <SidebarItem icon="payments" label="Plan Mgmt" path="/admin/plans" active={normalizedPath === '/admin/plans'} />
+              <SidebarItem icon="group" label="Enterprise Users" path="/admin/users" active={normalizedPath === '/admin/users'} />
+              <SidebarItem icon="campaign" label="Notifications" path="/admin/notifications" active={normalizedPath === '/admin/notifications'} />
+              <SidebarItem icon="support_agent" label="Support Hub" path="/admin/support" active={normalizedPath === '/admin/support'} />
+              <SidebarItem icon="history" label="System Logs" path="/admin/logs" active={normalizedPath === '/admin/logs'} />
             </>
           ) : isCustomer ? (
             <>
-              <SidebarItem icon="dashboard" label="Overview" path="/portal" active={path === '/portal'} />
-              <SidebarItem icon="directions_car" label="My Vehicles" path="/portal/vehicles" active={path === '/portal/vehicles'} />
-              <SidebarItem icon="calendar_add_on" label="Book Service" path="/portal/book" active={path === '/portal/book'} />
-              <SidebarItem icon="history" label="Service History" path="/portal/history" active={path === '/portal/history'} />
-              <SidebarItem icon="local_gas_station" label="Fuel Log" path="/portal/fuel" active={path === '/portal/fuel'} />
-              <SidebarItem icon="confirmation_number" label="Offers & Rewards" path="/portal/offers" active={path === '/portal/offers'} />
+              <SidebarItem icon="dashboard" label="Overview" path="/portal" active={normalizedPath === '/portal'} />
+              <SidebarItem icon="directions_car" label="My Vehicles" path="/portal/vehicles" active={normalizedPath === '/portal/vehicles'} />
+              <SidebarItem icon="calendar_add_on" label="Book Service" path="/portal/book" active={normalizedPath === '/portal/book'} />
+              <SidebarItem icon="history" label="Service History" path="/portal/history" active={normalizedPath === '/portal/history'} />
+              <SidebarItem icon="local_gas_station" label="Fuel Log" path="/portal/fuel" active={normalizedPath === '/portal/fuel'} />
+              <SidebarItem icon="confirmation_number" label="Offers & Rewards" path="/portal/offers" active={normalizedPath === '/portal/offers'} />
               <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <Link to="/portal/sos" className="flex items-center gap-3 px-3 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
                   <span className="material-symbols-outlined filled">sos</span>
@@ -167,36 +168,36 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </>
           ) : isVendor ? (
             <>
-              <SidebarItem icon="dashboard" label="Dashboard" path="/vendor" active={path === '/vendor'} />
+              <SidebarItem icon="dashboard" label="Dashboard" path="/vendor" active={normalizedPath === '/vendor'} />
               <SidebarItem icon="point_of_sale" label="Vendor POS" path="/vendor/pos" active={false} />
-              <SidebarItem icon="inventory_2" label="Product Catalog" path="/vendor/products" active={path.startsWith('/vendor/products')} />
-              <SidebarItem icon="shopping_cart" label="Orders" path="/vendor/orders" active={path.startsWith('/vendor/orders')} />
-              <SidebarItem icon="store" label="Garage Network" path="/vendor/network" active={path.startsWith('/vendor/network')} />
-              <SidebarItem icon="account_balance_wallet" label="Cash Flow & Budget" path="/vendor/cash-flow" active={path === '/vendor/cash-flow'} />
-              <SidebarItem icon="payments" label="Financials" path="/vendor/financials" active={path === '/vendor/financials'} />
-              <SidebarItem icon="campaign" label="Marketing" path="/vendor/marketing" active={path === '/vendor/marketing'} />
-              <SidebarItem icon="settings_suggest" label="Subscription" path="/subscription" active={path === '/subscription'} />
+              <SidebarItem icon="inventory_2" label="Product Catalog" path="/vendor/products" active={normalizedPath.startsWith('/vendor/products')} />
+              <SidebarItem icon="shopping_cart" label="Orders" path="/vendor/orders" active={normalizedPath.startsWith('/vendor/orders')} />
+              <SidebarItem icon="store" label="Garage Network" path="/vendor/network" active={normalizedPath.startsWith('/vendor/network')} />
+              <SidebarItem icon="account_balance_wallet" label="Cash Flow & Budget" path="/vendor/cash-flow" active={normalizedPath === '/vendor/cash-flow'} />
+              <SidebarItem icon="payments" label="Financials" path="/vendor/financials" active={normalizedPath === '/vendor/financials'} />
+              <SidebarItem icon="campaign" label="Marketing" path="/vendor/marketing" active={normalizedPath === '/vendor/marketing'} />
+              <SidebarItem icon="settings_suggest" label="Subscription" path="/subscription" active={normalizedPath === '/subscription'} />
             </>
           ) : (
             <>
-              <SidebarItem icon="dashboard" label="Dashboard" path="/" active={path === '/'} />
+              <SidebarItem icon="dashboard" label="Dashboard" path="/dashboard" active={normalizedPath === '/dashboard'} />
               <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Operations</div>
-              <SidebarItem icon="calendar_month" label="Job Board" path="/jobs" active={path === '/jobs' || path === '/jobs/new' || path === '/jobs/list'} />
-              <SidebarItem icon="schedule" label="Appointments" path="/appointments" active={path === '/appointments'} />
+              <SidebarItem icon="calendar_month" label="Job Board" path="/jobs" active={normalizedPath === '/jobs' || normalizedPath === '/jobs/new' || normalizedPath === '/jobs/list'} />
+              <SidebarItem icon="schedule" label="Appointments" path="/appointments" active={normalizedPath === '/appointments'} />
               <SidebarItem icon="point_of_sale" label="POS" path="/pos" active={false} />
               <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mt-2">Procurement</div>
-              <SidebarItem icon="storefront" label="Marketplace" path="/marketplace" active={path === '/marketplace'} />
-              <SidebarItem icon="inventory_2" label="My Inventory" path="/inventory" active={path === '/inventory'} />
+              <SidebarItem icon="storefront" label="Marketplace" path="/marketplace" active={normalizedPath === '/marketplace'} />
+              <SidebarItem icon="inventory_2" label="My Inventory" path="/inventory" active={normalizedPath === '/inventory'} />
               <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mt-2">Management</div>
-              <SidebarItem icon="group" label="Customers" path="/customers" active={path.startsWith('/customers')} />
-              <SidebarItem icon="badge" label="Staff & HR" path="/staff" active={path === '/staff'} />
+              <SidebarItem icon="group" label="Customers" path="/customers" active={normalizedPath.startsWith('/customers')} />
+              <SidebarItem icon="badge" label="Staff & HR" path="/staff" active={normalizedPath === '/staff'} />
               <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mt-2">Finance & Growth</div>
-              <SidebarItem icon="account_balance_wallet" label="Cash Flow & Budget" path="/cash-flow" active={path === '/cash-flow'} />
-              <SidebarItem icon="attach_money" label="Income" path="/financials" active={path === '/financials'} />
-              <SidebarItem icon="money_off" label="Expenses" path="/expenses" active={path === '/expenses'} />
-              <SidebarItem icon="receipt" label="Invoices" path="/invoices" active={path === '/invoices'} />
-              <SidebarItem icon="bar_chart" label="Reports" path="/reports" active={path === '/reports'} />
-              <SidebarItem icon="settings_suggest" label="Subscription" path="/subscription" active={path === '/subscription'} />
+              <SidebarItem icon="account_balance_wallet" label="Cash Flow & Budget" path="/cash-flow" active={normalizedPath === '/cash-flow'} />
+              <SidebarItem icon="attach_money" label="Income" path="/financials" active={normalizedPath === '/financials'} />
+              <SidebarItem icon="money_off" label="Expenses" path="/expenses" active={normalizedPath === '/expenses'} />
+              <SidebarItem icon="receipt" label="Invoices" path="/invoices" active={normalizedPath === '/invoices'} />
+              <SidebarItem icon="bar_chart" label="Reports" path="/reports" active={normalizedPath === '/reports'} />
+              <SidebarItem icon="settings_suggest" label="Subscription" path="/subscription" active={normalizedPath === '/subscription'} />
             </>
           )}
         </nav>
@@ -206,7 +207,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             icon="settings"
             label="Settings"
             path={isAdmin ? "/admin/settings" : isVendor ? "/vendor/settings" : "/settings"}
-            active={path.includes('/settings')}
+            active={normalizedPath.includes('/settings')}
           />
           <button
             onClick={handleLogout}
@@ -222,10 +223,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#16222d] flex items-center justify-between px-6 flex-shrink-0 transition-colors duration-200">
           <h2 className="text-xl font-bold capitalize">
-            {path === '/' ? 'Dashboard' :
-              path === '/admin' ? 'Admin Center' :
-                path === '/portal' ? 'My Garage' :
-                  path.split('/').pop()?.replace('-', ' ')}
+            {normalizedPath === '/dashboard' ? 'Dashboard' :
+              normalizedPath === '/admin' ? 'Admin Center' :
+                normalizedPath === '/portal' ? 'My Garage' :
+                  normalizedPath.split('/').pop()?.replace('-', ' ')}
           </h2>
           <div className="flex items-center gap-4">
             <button
@@ -286,7 +287,8 @@ export default function App() {
               <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+               <Route path="/" element={<Login />} />
+               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/jobs/list" element={<ProtectedRoute><JobList /></ProtectedRoute>} />
               <Route path="/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
               <Route path="/jobs/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />

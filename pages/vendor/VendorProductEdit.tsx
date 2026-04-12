@@ -184,7 +184,7 @@ export default function VendorProductEdit() {
                           <h3 className="font-bold mb-3 text-sm">Wholesale (B2B)</h3>
                           <div className="space-y-3">
                               <div>
-                                 <label className="block text-xs font-medium mb-1 text-slate-500">Unit Price (Rs. )</label>
+                                 <label className="block text-xs font-medium mb-1 text-slate-500">Unit Price (NPR )</label>
                                  <input 
                                     type="number" 
                                     value={formData.price_wholesale}
@@ -208,7 +208,7 @@ export default function VendorProductEdit() {
                           <h3 className="font-bold mb-3 text-sm">Retail (MRP)</h3>
                           <div className="space-y-3">
                               <div>
-                                 <label className="block text-xs font-medium mb-1 text-slate-500">MRP (Rs. )</label>
+                                 <label className="block text-xs font-medium mb-1 text-slate-500">MRP (NPR )</label>
                                  <input 
                                     type="number" 
                                     value={formData.price_retail}

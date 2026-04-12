@@ -66,6 +66,7 @@ import EmergencySOS from './pages/customer/EmergencySOS';
 import RewardsHub from './pages/RewardsHub';
 
 import AiAssistantWidget from './components/AiAssistantWidget';
+import AiAutomation from './pages/AiAutomation';
 
 import { db } from './services/db';
 
@@ -197,6 +198,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <SidebarItem icon="money_off" label="Expenses" path="/expenses" active={normalizedPath === '/expenses'} />
               <SidebarItem icon="receipt" label="Invoices" path="/invoices" active={normalizedPath === '/invoices'} />
               <SidebarItem icon="bar_chart" label="Reports" path="/reports" active={normalizedPath === '/reports'} />
+              <SidebarItem icon="auto_awesome" label="AI & Automation" path="/ai-automation" active={normalizedPath === '/ai-automation'} />
               <SidebarItem icon="settings_suggest" label="Subscription" path="/subscription" active={normalizedPath === '/subscription'} />
             </>
           )}
@@ -306,6 +308,7 @@ export default function App() {
               <Route path="/pos" element={<ProtectedRoute><POS /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+              <Route path="/ai-automation" element={<ProtectedRoute><AiAutomation /></ProtectedRoute>} />
 
               {/* Admin Pages */}
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />

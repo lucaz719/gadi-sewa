@@ -4,11 +4,12 @@ from typing import List
 from database import get_db
 import models, schemas
 from services.crm_service import update_customer_service_dates
+from api_routes.dependencies import get_current_user
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 @router.post("/", response_model=schemas.Job)
-def create_job(job: schemas.JobBase, db: Session = Depends(get_db)):
+def create_job(job: schemas.JobBase, db: Session = Depends(get_db), _user=Depends(get_current_user)):
     db_job = models.Job(**job.model_dump())
     db.add(db_job)
     db.commit()
@@ -16,11 +17,11 @@ def create_job(job: schemas.JobBase, db: Session = Depends(get_db)):
     return db_job
 
 @router.get("/", response_model=List[schemas.Job])
-def get_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), _user=Depends(get_current_user)):
     return db.query(models.Job).offset(skip).limit(limit).all()
 
 @router.patch("/{job_id}", response_model=schemas.Job)
-def update_job(job_id: int, job_update: schemas.JobUpdate, db: Session = Depends(get_db)):
+def update_job(job_id: int, job_update: schemas.JobUpdate, db: Session = Depends(get_db), _user=Depends(get_current_user)):
     db_job = db.query(models.Job).filter(models.Job.id == job_id).first()
     if not db_job:
         raise HTTPException(status_code=404, detail="Job not found")

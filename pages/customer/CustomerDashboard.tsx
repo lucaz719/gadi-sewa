@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const myVehicles = [
-  { id: 1, make: 'Toyota', model: 'Camry', year: '2021', reg: 'MH-01-AB-1234', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=400', nextService: '15 Nov 2024', status: 'Good' },
-  { id: 2, make: 'Honda', model: 'Activa 6G', year: '2022', reg: 'MH-02-XY-9988', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=400', nextService: 'Overdue', status: 'Needs Attention' },
+  { id: 1, make: 'Toyota', model: 'Camry', year: '2021', reg: 'BA 1 Pa 1234', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=400', nextService: '15 Nov 2024', status: 'Good' },
+  { id: 2, make: 'Honda', model: 'Activa 6G', year: '2022', reg: 'BA 2 Cha 5678', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=400', nextService: 'Overdue', status: 'Needs Attention' },
 ];
 
 export default function CustomerDashboard() {

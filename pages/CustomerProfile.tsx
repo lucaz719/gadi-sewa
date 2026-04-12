@@ -122,7 +122,7 @@ export default function CustomerProfile() {
                                    <img src="https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=150" className="w-20 h-20 object-cover rounded-lg" alt="Car" />
                                    <div>
                                        <h4 className="font-bold">Toyota Camry {v === 1 ? '2021' : '2018'}</h4>
-                                       <p className="text-sm text-slate-500">MH-01-AB-{1230 + v}</p>
+                                       <p className="text-sm text-slate-500">BA 1 Pa {1230 + v}</p>
                                        <p className="text-xs text-slate-400 mt-1">VIN: JN8...459{v}</p>
                                    </div>
                                </div>
@@ -147,13 +147,13 @@ export default function CustomerProfile() {
                                        <td className="p-3">24 Oct, 2024</td>
                                        <td className="p-3 font-medium">JOB-12345</td>
                                        <td className="p-3">Oil Change, General Service</td>
-                                       <td className="p-3 text-right">₹4,500</td>
+                                       <td className="p-3 text-right">NPR 4,500</td>
                                    </tr>
                                    <tr>
                                        <td className="p-3">15 Sep, 2024</td>
                                        <td className="p-3 font-medium">JOB-11200</td>
                                        <td className="p-3">Brake Pad Replacement</td>
-                                       <td className="p-3 text-right">₹2,800</td>
+                                       <td className="p-3 text-right">NPR 2,800</td>
                                    </tr>
                                </tbody>
                            </table>

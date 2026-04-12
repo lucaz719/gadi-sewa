@@ -103,7 +103,7 @@ export default function VendorProducts() {
                       </td>
                       <td className="p-4 font-mono text-xs text-slate-500">{product.sku}</td>
                       <td className="p-4">{product.category}</td>
-                      <td className="p-4 font-bold">₹{product.price}</td>
+                      <td className="p-4 font-bold">NPR {product.price}</td>
                       <td className="p-4">{product.stock} units</td>
                       <td className="p-4">
                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${

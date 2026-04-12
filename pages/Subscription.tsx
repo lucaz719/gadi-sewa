@@ -71,7 +71,7 @@ export default function Subscription() {
                    <div className="grid grid-cols-2 gap-8 mb-8">
                       <div>
                          <p className="text-primary-200/50 text-[10px] font-black uppercase tracking-widest mb-2">Commitment</p>
-                         <p className="font-black text-2xl tracking-tight">Rs. {enterprise?.plan?.price?.toLocaleString() || '0'}<span className="text-sm font-bold text-primary-200/40">/{enterprise?.plan?.duration?.toUpperCase() || 'MO'}</span></p>
+                         <p className="font-black text-2xl tracking-tight">NPR {enterprise?.plan?.price?.toLocaleString() || '0'}<span className="text-sm font-bold text-primary-200/40">/{enterprise?.plan?.duration?.toUpperCase() || 'MO'}</span></p>
                       </div>
                       <div>
                          <p className="text-primary-200/50 text-[10px] font-black uppercase tracking-widest mb-2">Cycle Reset</p>
@@ -153,7 +153,7 @@ export default function Subscription() {
                       <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                          <td className="p-6 text-[10px] font-black text-slate-500 uppercase">Current</td>
                          <td className="p-6 font-bold text-slate-900 dark:text-white">{currentPlan?.toUpperCase()} - Active Cycle</td>
-                         <td className="p-6 font-black text-slate-900 dark:text-white">Rs. {enterprise?.plan?.price?.toLocaleString() || '0'}</td>
+                         <td className="p-6 font-black text-slate-900 dark:text-white">NPR {enterprise?.plan?.price?.toLocaleString() || '0'}</td>
                          <td className="p-6 text-right"><button className="text-primary-600 font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-1 justify-end ml-auto"><span className="material-symbols-outlined text-sm">download</span> PDF</button></td>
                       </tr>
                    </tbody>
@@ -174,7 +174,7 @@ export default function Subscription() {
                             <span className="text-[10px] font-black bg-primary-600 text-white px-3 py-1 rounded-full shadow-lg">ACTIVE</span>
                           )}
                        </div>
-                       <p className="text-3xl font-black mb-1 tracking-tighter">Rs. {plan.price.toLocaleString()}<span className="text-sm font-bold text-slate-400">/{plan.duration === 'Monthly' ? 'MO' : 'LT'}</span></p>
+                       <p className="text-3xl font-black mb-1 tracking-tighter">NPR {plan.price.toLocaleString()}<span className="text-sm font-bold text-slate-400">/{plan.duration === 'Monthly' ? 'MO' : 'LT'}</span></p>
                        <p className="text-[10px] text-slate-500 font-medium mb-6 uppercase tracking-widest truncate">+{plan.features[0]}</p>
                        
                        {currentPlan !== plan.id ? (

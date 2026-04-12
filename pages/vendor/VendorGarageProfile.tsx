@@ -18,9 +18,9 @@ export default function VendorGarageProfile() {
       status: 'Active',
       stats: {
           totalOrders: 45,
-          totalSpent: '₹4,52,000',
-          avgOrderValue: '₹10,044',
-          outstanding: '₹12,500'
+          totalSpent: 'NPR 4,52,000',
+          avgOrderValue: 'NPR 10,044',
+          outstanding: 'NPR 12,500'
       },
       credit: {
           limit: 50000,
@@ -154,13 +154,13 @@ export default function VendorGarageProfile() {
                                
                                <div className="relative pt-2 pb-6">
                                    <div className="flex justify-between text-sm font-medium mb-2">
-                                       <span>Used: ₹{garage.credit.used.toLocaleString()}</span>
-                                       <span>Limit: ₹{garage.credit.limit.toLocaleString()}</span>
+                                       <span>Used: NPR {garage.credit.used.toLocaleString()}</span>
+                                       <span>Limit: NPR {garage.credit.limit.toLocaleString()}</span>
                                    </div>
                                    <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                        <div className="h-full bg-purple-600" style={{ width: `${(garage.credit.used / garage.credit.limit) * 100}%` }}></div>
                                    </div>
-                                   <p className="text-xs text-slate-500 mt-2">Available Credit: ₹{(garage.credit.limit - garage.credit.used).toLocaleString()}</p>
+                                   <p className="text-xs text-slate-500 mt-2">Available Credit: NPR {(garage.credit.limit - garage.credit.used).toLocaleString()}</p>
                                </div>
 
                                <div className="flex justify-between items-center pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -187,13 +187,13 @@ export default function VendorGarageProfile() {
                                        <tr>
                                            <td className="p-3">25 Oct 2024</td>
                                            <td className="p-3">Order #ORD-8921</td>
-                                           <td className="p-3 font-bold text-slate-900 dark:text-white">₹12,500</td>
+                                           <td className="p-3 font-bold text-slate-900 dark:text-white">NPR 12,500</td>
                                            <td className="p-3"><span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Unpaid</span></td>
                                        </tr>
                                        <tr>
                                            <td className="p-3">20 Oct 2024</td>
                                            <td className="p-3">Payment Received</td>
-                                           <td className="p-3 font-bold text-green-600">-₹8,000</td>
+                                           <td className="p-3 font-bold text-green-600">-NPR 8,000</td>
                                            <td className="p-3"><span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Completed</span></td>
                                        </tr>
                                    </tbody>

@@ -230,7 +230,7 @@ export default function POS() {
                                     <thead className="sticky top-0 bg-white dark:bg-[#1e293b] shadow-sm z-10">
                                         <tr className="border-b border-slate-200 dark:border-slate-700 font-mono">
                                             <th className="py-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-1/2">Item Description</th>
-                                            <th className="py-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-24">Rate (Rs.)</th>
+                                            <th className="py-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-24">Rate (NPR)</th>
                                             <th className="py-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-20 text-center">Qty</th>
                                             <th className="py-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-32 text-right">Total</th>
                                             <th className="py-2 px-4 w-10"></th>
@@ -272,7 +272,7 @@ export default function POS() {
                                                     />
                                                 </td>
                                                 <td className="py-1 px-4 text-sm font-bold text-slate-900 dark:text-white text-right font-mono">
-                                                   Rs.{(item.price * item.qty).toFixed(2)}
+                                                   NPR {(item.price * item.qty).toFixed(2)}
                                                 </td>
                                                 <td className="py-1 px-2 text-right">
                                                     <button className="text-slate-300 hover:text-red-500 transition-colors" onClick={() => removeItem(idx)}>
@@ -314,7 +314,7 @@ export default function POS() {
                                                 />
                                             </td>
                                             <td className="py-1 px-4 text-sm font-bold text-primary-700 dark:text-primary-400 text-right font-mono">
-                                               Rs.{(parseFloat(draftRow.price) * parseFloat(draftRow.qty) || 0).toFixed(2)}
+                                               NPR {(parseFloat(draftRow.price) * parseFloat(draftRow.qty) || 0).toFixed(2)}
                                             </td>
                                             <td className="py-1 px-2 text-right">
                                                 <button 
@@ -371,7 +371,7 @@ export default function POS() {
                                                 </div>
                                                 <h4 className="font-bold text-[11px] text-slate-900 dark:text-white leading-tight mb-1 line-clamp-1">{prod.name}</h4>
                                                 <div className="flex justify-between items-center mt-auto">
-                                                    <span className="text-primary-600 dark:text-primary-400 font-bold text-xs">Rs.{prod.price}</span>
+                                                    <span className="text-primary-600 dark:text-primary-400 font-bold text-xs">NPR {prod.price}</span>
                                                     <span className="text-[9px] uppercase font-bold text-slate-400">{prod.stock ? `${prod.stock} in` : 'Service'}</span>
                                                 </div>
                                             </div>
@@ -385,26 +385,26 @@ export default function POS() {
                             <div className="space-y-1.5">
                                 <div className="flex justify-between text-xs text-slate-500 font-bold uppercase tracking-wider">
                                     <span>Subtotal</span>
-                                    <span className="text-slate-900 dark:text-white">Rs. {subtotal.toFixed(2)}</span>
+                                    <span className="text-slate-900 dark:text-white">NPR {subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500 font-bold uppercase tracking-wider">
                                     <div className="flex items-center gap-1">
                                         <span>Discount</span>
                                         <button onClick={() => setDiscountKeypadOpen(true)} className="text-[10px] bg-primary-100 dark:bg-primary-900/30 text-primary-600 px-1.5 py-0.5 rounded hover:bg-primary-200 transition-colors">
-                                            {discountType === 'pct' ? `${manualDiscount}%` : `Rs. ${manualDiscount}`}
+                                            {discountType === 'pct' ? `${manualDiscount}%` : `NPR ${manualDiscount}`}
                                         </button>
                                     </div>
-                                    <span className="text-green-600 dark:text-green-400">- Rs. {discountAmount.toFixed(2)}</span>
+                                    <span className="text-green-600 dark:text-green-400">- NPR {discountAmount.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-xs text-slate-500 font-bold uppercase tracking-wider">
                                     <span>Gst Tax (18%)</span>
-                                    <span className="text-slate-900 dark:text-white">Rs. {tax.toFixed(2)}</span>
+                                    <span className="text-slate-900 dark:text-white">NPR {tax.toFixed(2)}</span>
                                 </div>
                             </div>
                             
                             <div className="flex justify-between items-end border-t border-slate-200 dark:border-slate-700 pt-3">
                                 <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Grand Total</span>
-                                <span className="text-4xl font-black text-slate-900 dark:text-white leading-none font-mono">Rs.{total.toFixed(0)}</span>
+                                <span className="text-4xl font-black text-slate-900 dark:text-white leading-none font-mono">NPR {total.toFixed(0)}</span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-2 pt-2">
@@ -453,7 +453,7 @@ export default function POS() {
                             <h3 className="font-bold">Set Discount</h3>
                             <div className="flex bg-slate-200 dark:bg-slate-900 rounded p-1">
                                 <button onClick={() => setDiscountType('pct')} className={`px-3 py-1 text-xs font-bold rounded ${discountType === 'pct' ? 'bg-white dark:bg-slate-700 shadow text-primary-600' : 'text-slate-500'}`}>%</button>
-                                <button onClick={() => setDiscountType('amt')} className={`px-3 py-1 text-xs font-bold rounded ${discountType === 'amt' ? 'bg-white dark:bg-slate-700 shadow text-primary-600' : 'text-slate-500'}`}>Rs.</button>
+                                <button onClick={() => setDiscountType('amt')} className={`px-3 py-1 text-xs font-bold rounded ${discountType === 'amt' ? 'bg-white dark:bg-slate-700 shadow text-primary-600' : 'text-slate-500'}`}>NPR</button>
                             </div>
                         </div>
                         <KeypadModal

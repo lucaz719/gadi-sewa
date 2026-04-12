@@ -76,7 +76,7 @@ export default function Staff() {
           </div>
           <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:scale-[1.02]">
              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Salary Liability</p>
-             <p className="text-3xl font-black mt-1 text-red-600">Rs. {staff.reduce((acc, s) => acc + (s.salary || 0), 0).toLocaleString()}</p>
+             <p className="text-3xl font-black mt-1 text-red-600">NPR {staff.reduce((acc, s) => acc + (s.salary || 0), 0).toLocaleString()}</p>
           </div>
           <div className="bg-white dark:bg-[#1e293b] p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:scale-[1.02]">
              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Team Composition</p>
@@ -147,7 +147,7 @@ export default function Staff() {
                              </select>
                           </td>
                           <td className="p-4 text-slate-600 dark:text-slate-400 font-mono text-xs">{person.phone}</td>
-                          <td className="p-4 text-slate-900 dark:text-slate-200 font-black text-xs">Rs. {(person.salary || 0).toLocaleString()}</td>
+                          <td className="p-4 text-slate-900 dark:text-slate-200 font-black text-xs">NPR {(person.salary || 0).toLocaleString()}</td>
                           <td className="p-4 text-slate-500 text-[10px] font-bold uppercase">{new Date(person.created_at).toLocaleDateString()}</td>
                           <td className="p-4 text-right">
                              <button onClick={() => db.deleteStaff(person.id).then(loadStaff)} className="w-8 h-8 rounded-lg flex items-center justify-center text-red-300 hover:bg-red-50 hover:text-red-500 transition-all ml-auto">
@@ -205,7 +205,7 @@ export default function Staff() {
                         <div>
                             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Monthly Package (NPR)</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs uppercase">Rs.</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs uppercase">NPR</span>
                                 <input type="number" required value={newStaff.salary} onChange={e => setNewStaff({...newStaff, salary: Number(e.target.value)})} className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 rounded-xl p-3 pl-10 outline-none focus:border-primary-500 transition-colors font-black" placeholder="0.00" />
                             </div>
                         </div>

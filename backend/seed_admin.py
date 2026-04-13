@@ -32,7 +32,7 @@ def seed():
         from api_routes.auth import hash_password
         db.add(models.User(
             email=admin_email,
-            hashed_password=hash_password("admin@123"),
+            hashed_password=hash_password("Admin@123"),
             full_name="GadiSewa Admin",
             role="admin",
             is_active=True

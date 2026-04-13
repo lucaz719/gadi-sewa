@@ -5,7 +5,7 @@ import os
 
 load_dotenv()
 
-from database import engine, Base
+from database import engine, Base, SessionLocal
 import models
 from api_routes import (
     jobs, inventory, ai, financials, pos, auth, 
@@ -15,6 +15,61 @@ from api_routes import (
 
 # Initialize database
 models.Base.metadata.create_all(bind=engine)
+
+
+def _seed_demo_users() -> None:
+    """Seed demo accounts on first startup so built-in credentials always work."""
+    from api_routes.auth import hash_password
+
+    demo_users = [
+        {
+            "email": "admin@gadisewa.com",
+            "hashed_password": hash_password("Admin@123"),
+            "full_name": "System Administrator",
+            "role": "admin",
+            "is_active": True,
+        },
+        {
+            "email": "garage@gadisewa.com",
+            "hashed_password": hash_password("Test@123"),
+            "full_name": "Main Garage Owner",
+            "role": "garage",
+            "is_active": True,
+        },
+        {
+            "email": "vendor@gadisewa.com",
+            "hashed_password": hash_password("Test@123"),
+            "full_name": "Parts Vendor",
+            "role": "vendor",
+            "is_active": True,
+        },
+        {
+            "email": "customer@gadisewa.com",
+            "hashed_password": hash_password("Test@123"),
+            "full_name": "John Doe",
+            "role": "customer",
+            "is_active": True,
+        },
+    ]
+
+    db = SessionLocal()
+    try:
+        for user_data in demo_users:
+            exists = db.query(models.User).filter(
+                models.User.email == user_data["email"]
+            ).first()
+            if not exists:
+                db.add(models.User(**user_data))
+                print(f"[SEED] Created demo user: {user_data['email']}")
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        print(f"[SEED] Warning: could not seed demo users: {exc}")
+    finally:
+        db.close()
+
+
+_seed_demo_users()
 
 app = FastAPI(title="GadiSewa Backend API")
 

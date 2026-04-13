@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../services/db';
 import { useToast } from '../App';
+import { FALLBACK_PART_IMAGE } from '../utils/imageFallbacks';
 
 const CATEGORIES = ['Engine Parts', 'Brakes', 'Lubricants', 'Electrical', 'Suspension', 'Tires', 'Body Parts', 'Other'];
 
@@ -295,7 +296,7 @@ export default function Inventory() {
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
-                        <img src={item.img} alt="" className="w-full h-full object-cover" />
+                        <img src={item.img || FALLBACK_PART_IMAGE} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PART_IMAGE; }} />
                       </div>
                       <div>
                         <p className="font-bold text-slate-900 dark:text-white">{item.name}</p>

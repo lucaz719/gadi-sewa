@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { FALLBACK_PART_IMAGE } from '../../utils/imageFallbacks';
 
 export default function VendorOrderDetail() {
   const { id } = useParams();
@@ -120,7 +121,7 @@ export default function VendorOrderDetail() {
                                <tr key={item.id}>
                                    <td className="p-4">
                                        <div className="flex items-center gap-3">
-                                           <img src={item.img} className="w-12 h-12 rounded-lg object-cover bg-slate-100" alt="" />
+                                           <img src={item.img || FALLBACK_PART_IMAGE} className="w-12 h-12 rounded-lg object-cover bg-slate-100" alt="" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PART_IMAGE; }} />
                                            <div>
                                                <p className="font-bold text-slate-900 dark:text-white">{item.name}</p>
                                                <p className="text-xs text-slate-500 font-mono">{item.sku}</p>

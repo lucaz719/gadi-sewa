@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FALLBACK_PART_IMAGE } from '../../utils/imageFallbacks';
 
 export default function BookService() {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export default function BookService() {
                                 onClick={() => setSelectedVehicle(v.id)}
                                 className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${selectedVehicle === v.id ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/10' : 'border-slate-200 dark:border-slate-700 hover:border-orange-300'}`}
                            >
-                               <img src={v.img || 'https://placehold.co/100x100/e2e8f0/94a3b8?text=Car'} className="w-16 h-16 rounded-lg object-cover bg-slate-200" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=Car'; }} />
+                               <img src={v.img || FALLBACK_PART_IMAGE} className="w-16 h-16 rounded-lg object-cover bg-slate-200" alt="" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PART_IMAGE; }} />
                                <div>
                                    <h3 className="font-bold text-slate-900 dark:text-white">{v.name}</h3>
                                    <p className="text-sm text-slate-500">{v.reg}</p>

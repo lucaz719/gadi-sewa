@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useToast } from '../../App';
+import { FALLBACK_PRODUCT_EDIT_IMAGE } from '../../utils/imageFallbacks';
 
 export default function VendorProductEdit() {
   const { id } = useParams();
@@ -295,7 +296,7 @@ export default function VendorProductEdit() {
                        
                        {!isNew && (
                            <div className="aspect-square relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 group">
-                               <img src="https://images.unsplash.com/photo-1635784183209-e8c690e250f2?w=300&h=300&fit=crop" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/300x300/e2e8f0/94a3b8?text=Product'; }} className="w-full h-full object-cover" alt="Product" />
+                               <img src="https://images.unsplash.com/photo-1635784183209-e8c690e250f2?w=300&h=300&fit=crop" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PRODUCT_EDIT_IMAGE; }} className="w-full h-full object-cover" alt="Product" />
                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                    <button className="p-2 bg-white rounded-full text-red-600 hover:bg-red-50"><span className="material-symbols-outlined text-lg">delete</span></button>
                                    <button className="p-2 bg-white rounded-full text-blue-600 hover:bg-blue-50"><span className="material-symbols-outlined text-lg">star</span></button>

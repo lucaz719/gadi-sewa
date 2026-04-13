@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FALLBACK_VEHICLE_IMAGE } from '../../utils/imageFallbacks';
 
 const initialVehicles = [
     { id: 1, make: 'Toyota', model: 'Camry', year: '2021', reg: 'BA 1 Pa 1234', type: 'Car', fuel: 'Petrol', insurance: 'Valid till Dec 2024', puc: 'Valid till Nov 2024', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=400' },
@@ -133,7 +134,7 @@ export default function MyVehicles() {
                 {vehicles.map(vehicle => (
                     <div key={vehicle.id} className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col md:flex-row">
                         <div className="w-full md:w-48 h-48 relative flex-shrink-0">
-                            <img src={vehicle.image || 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'; }} />
+                            <img src={vehicle.image || FALLBACK_VEHICLE_IMAGE} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_VEHICLE_IMAGE; }} />
                             <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur-sm">
                                 {vehicle.type}
                             </div>

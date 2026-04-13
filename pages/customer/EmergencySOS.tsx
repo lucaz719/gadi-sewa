@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FALLBACK_AVATAR_IMAGE } from '../../utils/imageFallbacks';
 
 export default function EmergencySOS() {
   const [finding, setFinding] = useState(false);
@@ -57,7 +58,7 @@ export default function EmergencySOS() {
             ) : (
                 <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl p-6 border border-slate-200 dark:border-slate-700 animate-slide-up">
                     <div className="flex items-center gap-4 border-b border-slate-100 dark:border-slate-700 pb-4 mb-4">
-                        <img src="https://i.pravatar.cc/150?u=5" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'; }} className="w-16 h-16 rounded-full border-2 border-green-500 p-0.5" alt="Mechanic" />
+                        <img src="https://i.pravatar.cc/150?u=5" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_AVATAR_IMAGE; }} className="w-16 h-16 rounded-full border-2 border-green-500 p-0.5" alt="Mechanic" />
                         <div>
                             <h3 className="font-bold text-lg">Mike Ross</h3>
                             <div className="flex items-center gap-1 text-sm text-slate-500">

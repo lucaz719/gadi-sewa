@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../../services/db';
 import { useToast } from '../../App';
+import { FALLBACK_PART_IMAGE } from '../../utils/imageFallbacks';
 
 const vendorProducts = [
   { id: 1, name: 'Brake Pads (Bulk Pack)', price: 15000, stock: 50, img: 'https://images.unsplash.com/photo-1600161599939-23d16036198c?w=150&h=150&fit=crop' },
@@ -325,7 +326,7 @@ export default function VendorPOS() {
                       {vendorProducts.map(prod => (
                          <div key={prod.id} onClick={() => addToCart(prod)} className="p-3 rounded-xl border border-transparent hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/10 cursor-pointer transition-all group bg-slate-50 dark:bg-slate-800/30">
                             <div className="aspect-square rounded-lg bg-white dark:bg-slate-800 mb-2 overflow-hidden border border-slate-100 dark:border-slate-700">
-                               <img src={prod.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} alt={prod.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
+                               <img src={prod.img || FALLBACK_PART_IMAGE} alt={prod.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PART_IMAGE; }} />
                             </div>
                             <h4 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 h-8">{prod.name}</h4>
                             <p className="text-[10px] text-slate-500 mt-1 uppercase font-bold">Stock: {prod.stock} Units</p>
@@ -364,7 +365,7 @@ export default function VendorPOS() {
                    ) : cart.map((item, idx) => (
                          <div key={idx} className="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm transition-all group">
                             <div className="w-10 h-10 rounded-lg bg-slate-100 shrink-0 overflow-hidden">
-                               <img src={item.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
+                               <img src={item.img || FALLBACK_PART_IMAGE} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PART_IMAGE; }} />
                             </div>
                             <div className="flex-1 min-w-0">
                                <p className="font-bold text-xs truncate text-slate-900 dark:text-white uppercase">{item.name}</p>

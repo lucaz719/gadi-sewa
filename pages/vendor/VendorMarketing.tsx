@@ -1,4 +1,5 @@
 import React from 'react';
+import { FALLBACK_CAMPAIGN_IMAGE } from '../../utils/imageFallbacks';
 
 const campaigns = [
   { id: 1, name: 'Diwali Mega Sale', type: 'Discount', status: 'Active', reach: '24 Garages', conversion: '12%', ends: '31 Oct 2024', img: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=400' },
@@ -48,7 +49,7 @@ export default function VendorMarketing() {
           {campaigns.map(camp => (
              <div key={camp.id} className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all group">
                 <div className="h-40 relative">
-                   <img src={camp.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Campaign'} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Campaign'; }} />
+                   <img src={camp.img || FALLBACK_CAMPAIGN_IMAGE} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_CAMPAIGN_IMAGE; }} />
                    <div className="absolute top-3 right-3">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
                          camp.status === 'Active' ? 'bg-green-500 text-white' : 

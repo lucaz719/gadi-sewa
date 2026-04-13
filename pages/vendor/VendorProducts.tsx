@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FALLBACK_PART_IMAGE } from '../../utils/imageFallbacks';
 
 const initialProducts = [
   { id: 1, name: 'Synthetic Engine Oil 5W-30', sku: 'OIL-SYN-530', category: 'Lubricants', price: 2500, stock: 450, status: 'Published', img: 'https://images.unsplash.com/photo-1635784183209-e8c690e250f2?w=100&h=100&fit=crop' },
@@ -97,7 +98,7 @@ export default function VendorProducts() {
                       <td className="p-4"><input type="checkbox" className="rounded"/></td>
                       <td className="p-4">
                          <div className="flex items-center gap-3">
-                            <img src={product.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} alt="" className="w-10 h-10 rounded-lg object-cover bg-slate-100" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
+                            <img src={product.img || FALLBACK_PART_IMAGE} alt="" className="w-10 h-10 rounded-lg object-cover bg-slate-100" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PART_IMAGE; }} />
                             <p className="font-bold text-slate-900 dark:text-white">{product.name}</p>
                          </div>
                       </td>

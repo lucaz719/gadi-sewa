@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { FALLBACK_AVATAR_IMAGE, FALLBACK_VEHICLE_IMAGE } from '../utils/imageFallbacks';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -47,7 +48,7 @@ export default function JobDetails() {
              <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
                 <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-slate-400">person</span> Customer</h3>
                 <div className="flex items-center gap-3">
-                    <img src={jobData.customer.avatar || 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'} className="w-10 h-10 rounded-full" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'; }} />
+                    <img src={jobData.customer.avatar || FALLBACK_AVATAR_IMAGE} className="w-10 h-10 rounded-full" alt="" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_AVATAR_IMAGE; }} />
                     <div>
                         <p className="font-bold text-sm">{jobData.customer.name}</p>
                         <p className="text-xs text-slate-500">{jobData.customer.phone}</p>
@@ -57,7 +58,7 @@ export default function JobDetails() {
 
              <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
                 <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-slate-400">directions_car</span> Vehicle</h3>
-                <img src={jobData.vehicle.image || 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'} className="w-full h-32 object-cover rounded-lg mb-2" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'; }} />
+                <img src={jobData.vehicle.image || FALLBACK_VEHICLE_IMAGE} className="w-full h-32 object-cover rounded-lg mb-2" alt="" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_VEHICLE_IMAGE; }} />
                 <p className="font-bold text-sm">{jobData.vehicle.model}</p>
                 <p className="text-xs font-mono bg-slate-100 dark:bg-slate-800 p-1 inline-block rounded">{jobData.vehicle.plate}</p>
              </div>

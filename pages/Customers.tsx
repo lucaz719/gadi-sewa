@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '../App';
+import { FALLBACK_AVATAR_IMAGE } from '../utils/imageFallbacks';
 
 const customersData = [
   { id: 1, name: 'Jane Doe', contact: '+1 (555) 123-4567', email: 'jane.doe@example.com', vehicles: 2, jobs: 8, lastVisit: '2023-10-15', tier: 'Gold', avatar: 'https://i.pravatar.cc/150?u=1' },
@@ -64,7 +65,7 @@ export default function Customers() {
                    <tr key={cust.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-4">
                          <Link to={`/customers/${cust.id}`} className="flex items-center gap-3 group">
-                            <img src={cust.avatar || 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'} alt="" className="w-10 h-10 rounded-full" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'; }} />
+                            <img src={cust.avatar || FALLBACK_AVATAR_IMAGE} alt="" className="w-10 h-10 rounded-full" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_AVATAR_IMAGE; }} />
                             <div>
                                <p className="font-bold text-slate-900 dark:text-white group-hover:text-primary-600 transition-colors">{cust.name}</p>
                                <p className="text-xs text-slate-500">{cust.email}</p>

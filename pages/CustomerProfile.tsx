@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { FALLBACK_CAR_IMAGE } from '../utils/imageFallbacks';
+import { FALLBACK_PROFILE_IMAGE } from '../utils/imageFallbacks';
 
 export default function CustomerProfile() {
   const { id } = useParams();
@@ -19,7 +21,7 @@ export default function CustomerProfile() {
            {/* Left Sidebar Info */}
            <div className="space-y-6">
                <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm flex flex-col items-center text-center">
-                   <img src="https://i.pravatar.cc/150?u=1" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=Profile'; }} className="w-24 h-24 rounded-full mb-4 border-4 border-slate-100 dark:border-slate-700" alt="Profile" />
+                   <img src="https://i.pravatar.cc/150?u=1" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PROFILE_IMAGE; }} className="w-24 h-24 rounded-full mb-4 border-4 border-slate-100 dark:border-slate-700" alt="Profile" />
                    <h2 className="text-xl font-bold">John Doe</h2>
                    <p className="text-slate-500 text-sm">Customer ID: CUST-1001</p>
                    
@@ -119,7 +121,7 @@ export default function CustomerProfile() {
                            </div>
                            {[1, 2].map(v => (
                                <div key={v} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 flex gap-4 items-center">
-                                   <img src="https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=150" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/150x150/e2e8f0/94a3b8?text=Car'; }} className="w-20 h-20 object-cover rounded-lg" alt="Car" />
+                                   <img src="https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=150" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_CAR_IMAGE; }} className="w-20 h-20 object-cover rounded-lg" alt="Car" />
                                    <div>
                                        <h4 className="font-bold">Toyota Camry {v === 1 ? '2021' : '2018'}</h4>
                                        <p className="text-sm text-slate-500">BA 1 Pa {1230 + v}</p>

@@ -367,7 +367,7 @@ export default function POS() {
                                         {filteredProducts.map(prod => (
                                             <div key={prod.id} onClick={() => addToCart(prod)} className="p-2 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 cursor-pointer transition-all group flex flex-col">
                                                 <div className="aspect-square rounded shadow-sm bg-slate-100 dark:bg-slate-800 mb-2 overflow-hidden relative">
-                                                    <img src={prod.img} alt={prod.name} className="w-full h-full object-cover" />
+                                                    <img src={prod.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} alt={prod.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
                                                 </div>
                                                 <h4 className="font-bold text-[11px] text-slate-900 dark:text-white leading-tight mb-1 line-clamp-1">{prod.name}</h4>
                                                 <div className="flex justify-between items-center mt-auto">

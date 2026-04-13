@@ -40,7 +40,7 @@ export default function VendorMarketing() {
                 </div>
              </div>
           </div>
-          <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&q=80&w=1000" className="absolute top-0 right-0 h-full w-1/2 object-cover opacity-20" alt="background" />
+          <img src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&q=80&w=1000" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} className="absolute top-0 right-0 h-full w-1/2 object-cover opacity-20" alt="background" />
        </div>
 
        {/* Campaign List */}
@@ -48,7 +48,7 @@ export default function VendorMarketing() {
           {campaigns.map(camp => (
              <div key={camp.id} className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all group">
                 <div className="h-40 relative">
-                   <img src={camp.img} className="w-full h-full object-cover" alt="" />
+                   <img src={camp.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Campaign'} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Campaign'; }} />
                    <div className="absolute top-3 right-3">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${
                          camp.status === 'Active' ? 'bg-green-500 text-white' : 

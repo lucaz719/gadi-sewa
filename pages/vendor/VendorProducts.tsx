@@ -97,7 +97,7 @@ export default function VendorProducts() {
                       <td className="p-4"><input type="checkbox" className="rounded"/></td>
                       <td className="p-4">
                          <div className="flex items-center gap-3">
-                            <img src={product.img} alt="" className="w-10 h-10 rounded-lg object-cover bg-slate-100" />
+                            <img src={product.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} alt="" className="w-10 h-10 rounded-lg object-cover bg-slate-100" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
                             <p className="font-bold text-slate-900 dark:text-white">{product.name}</p>
                          </div>
                       </td>

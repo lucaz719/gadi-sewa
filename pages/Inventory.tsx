@@ -295,7 +295,7 @@ export default function Inventory() {
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0">
-                        <img src={item.img} alt="" className="w-full h-full object-cover" />
+                        <img src={item.img || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
                       </div>
                       <div>
                         <p className="font-bold text-slate-900 dark:text-white">{item.name}</p>

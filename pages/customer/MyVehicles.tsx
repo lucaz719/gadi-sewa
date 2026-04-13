@@ -133,7 +133,7 @@ export default function MyVehicles() {
                 {vehicles.map(vehicle => (
                     <div key={vehicle.id} className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col md:flex-row">
                         <div className="w-full md:w-48 h-48 relative flex-shrink-0">
-                            <img src={vehicle.image} className="w-full h-full object-cover" alt="" />
+                            <img src={vehicle.image || 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'} className="w-full h-full object-cover" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'; }} />
                             <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur-sm">
                                 {vehicle.type}
                             </div>

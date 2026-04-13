@@ -134,7 +134,7 @@ export default function VendorNetwork() {
                             <tr key={garage.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                <td className="p-4">
                                   <Link to={`/vendor/network/${garage.id}`} className="flex items-center gap-3 group">
-                                     <img src={garage.avatar} alt="" className="w-10 h-10 rounded-full bg-slate-200" />
+                                     <img src={garage.avatar || 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'} alt="" className="w-10 h-10 rounded-full bg-slate-200" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'; }} />
                                      <div>
                                         <p className="font-bold text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors">{garage.name}</p>
                                         <p className="text-xs text-slate-500">ID: GAR-{garage.id + 100}</p>
@@ -182,7 +182,7 @@ export default function VendorNetwork() {
                       <div key={req.id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-5 hover:shadow-md transition-all bg-slate-50 dark:bg-slate-800/50">
                          <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                               <img src={req.avatar} className="w-12 h-12 rounded-full" alt="" />
+                               <img src={req.avatar || 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'} className="w-12 h-12 rounded-full" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'; }} />
                                <div>
                                   <h4 className="font-bold text-slate-900 dark:text-white">{req.name}</h4>
                                   <p className="text-xs text-slate-500">{req.location}</p>

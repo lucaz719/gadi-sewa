@@ -64,7 +64,7 @@ export default function Customers() {
                    <tr key={cust.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-4">
                          <Link to={`/customers/${cust.id}`} className="flex items-center gap-3 group">
-                            <img src={cust.avatar} alt="" className="w-10 h-10 rounded-full" />
+                            <img src={cust.avatar || 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'} alt="" className="w-10 h-10 rounded-full" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=User'; }} />
                             <div>
                                <p className="font-bold text-slate-900 dark:text-white group-hover:text-primary-600 transition-colors">{cust.name}</p>
                                <p className="text-xs text-slate-500">{cust.email}</p>

@@ -171,7 +171,7 @@ export default function Marketplace() {
                     {filteredProducts.map(product => (
                         <div key={product.id} className="bg-white dark:bg-[#1e293b] rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.1)] transition-all group flex flex-col h-full relative">
                             <div className="aspect-[4/3] relative overflow-hidden bg-slate-50 dark:bg-slate-800/50">
-                                <img src={product.image_url} alt={product.name} className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500" />
+                                <img src={product.image_url || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} alt={product.name} className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
                                 <div className="absolute top-4 left-4 bg-white dark:bg-slate-900 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-800 shadow-sm">
                                     Vendor #{product.vendor_id}
                                 </div>
@@ -243,7 +243,7 @@ export default function Marketplace() {
                                cart.map((item) => (
                                    <div key={item.id} className="flex gap-6 group">
                                        <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-3 shrink-0 shadow-inner overflow-hidden">
-                                           <img src={item.image_url} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" alt="" />
+                                           <img src={item.image_url || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/200x200/e2e8f0/94a3b8?text=Part'; }} />
                                        </div>
                                        <div className="flex-1 flex flex-col py-1">
                                            <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-tight mb-1">{item.name}</h4>

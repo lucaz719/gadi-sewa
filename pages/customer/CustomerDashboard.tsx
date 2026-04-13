@@ -40,7 +40,7 @@ export default function CustomerDashboard() {
                    {myVehicles.map(vehicle => (
                        <div key={vehicle.id} className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-all group">
                            <div className="h-40 relative overflow-hidden">
-                               <img src={vehicle.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={vehicle.model} />
+                               <img src={vehicle.image || 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={vehicle.model} onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Vehicle'; }} />
                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                                <div className="absolute bottom-3 left-3 text-white">
                                    <h3 className="font-bold text-lg">{vehicle.make} {vehicle.model}</h3>

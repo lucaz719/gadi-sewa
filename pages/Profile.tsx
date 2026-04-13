@@ -37,7 +37,7 @@ export default function Profile() {
                    <h2 className="text-xl font-bold border-b border-slate-200 dark:border-slate-700 pb-4">Personal Information</h2>
                    
                    <div className="flex items-center gap-6">
-                      <img src="https://i.pravatar.cc/150?u=1" className="w-20 h-20 rounded-full border-4 border-slate-100 dark:border-slate-700" alt="Profile" />
+                      <img src="https://i.pravatar.cc/150?u=1" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/e2e8f0/94a3b8?text=Profile'; }} className="w-20 h-20 rounded-full border-4 border-slate-100 dark:border-slate-700" alt="Profile" />
                       <div>
                          <button className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Change Photo</button>
                          <p className="text-xs text-slate-500 mt-2">JPG, GIF or PNG. Max size 800K</p>

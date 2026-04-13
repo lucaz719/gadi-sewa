@@ -4,7 +4,7 @@ print("Starting DB check...", flush=True)
 sys.path.insert(0, '/home/gadisewa/gadisewa_backend')
 os.chdir('/home/gadisewa/gadisewa_backend')
 
-from models import Base, User
+from models import Base, User, Enterprise
 from database import engine, SessionLocal
 from api_routes.auth import hash_password
 
@@ -14,11 +14,22 @@ print("Tables created.", flush=True)
 
 db = SessionLocal()
 
+# Ensure demo enterprises exist before creating linked users
+enterprise_defs = [
+    {"id": 1, "name": "GadiSewa Main Garage", "type": "Garage", "owner": "AG Owner", "email": "garage@gadisewa.com"},
+    {"id": 2, "name": "Babal Parts Supply", "type": "Vendor", "owner": "Babal Parts", "email": "vendor@gadisewa.com"},
+]
+for ent_data in enterprise_defs:
+    if not db.query(Enterprise).filter(Enterprise.id == ent_data["id"]).first():
+        db.add(Enterprise(**ent_data))
+        print(f"Seeded enterprise: {ent_data['name']}", flush=True)
+db.commit()
+
 # Seed all demo accounts if they are missing
 demo_users = [
     {"email": "admin@gadisewa.com", "hashed_password": hash_password("Admin@123"), "role": "admin", "full_name": "System Admin", "is_active": True},
-    {"email": "garage@gadisewa.com", "hashed_password": hash_password("Test@123"), "role": "garage", "full_name": "Main Garage Owner", "is_active": True},
-    {"email": "vendor@gadisewa.com", "hashed_password": hash_password("Test@123"), "role": "vendor", "full_name": "Parts Vendor", "is_active": True},
+    {"email": "garage@gadisewa.com", "hashed_password": hash_password("Test@123"), "role": "garage", "full_name": "Main Garage Owner", "is_active": True, "enterprise_id": 1},
+    {"email": "vendor@gadisewa.com", "hashed_password": hash_password("Test@123"), "role": "vendor", "full_name": "Parts Vendor", "is_active": True, "enterprise_id": 2},
     {"email": "customer@gadisewa.com", "hashed_password": hash_password("Test@123"), "role": "customer", "full_name": "John Doe", "is_active": True},
 ]
 

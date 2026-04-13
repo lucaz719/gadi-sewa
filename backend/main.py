@@ -21,39 +21,51 @@ def _seed_demo_users() -> None:
     """Seed demo accounts on first startup so built-in credentials always work."""
     from api_routes.auth import hash_password
 
-    demo_users = [
-        {
-            "email": "admin@gadisewa.com",
-            "hashed_password": hash_password("Admin@123"),
-            "full_name": "System Administrator",
-            "role": "admin",
-            "is_active": True,
-        },
-        {
-            "email": "garage@gadisewa.com",
-            "hashed_password": hash_password("Test@123"),
-            "full_name": "Main Garage Owner",
-            "role": "garage",
-            "is_active": True,
-        },
-        {
-            "email": "vendor@gadisewa.com",
-            "hashed_password": hash_password("Test@123"),
-            "full_name": "Parts Vendor",
-            "role": "vendor",
-            "is_active": True,
-        },
-        {
-            "email": "customer@gadisewa.com",
-            "hashed_password": hash_password("Test@123"),
-            "full_name": "John Doe",
-            "role": "customer",
-            "is_active": True,
-        },
-    ]
-
     db = SessionLocal()
     try:
+        # Ensure demo enterprises exist before creating linked users
+        enterprise_defs = [
+            {"id": 1, "name": "GadiSewa Main Garage", "type": "Garage", "owner": "AG Owner", "email": "garage@gadisewa.com"},
+            {"id": 2, "name": "Babal Parts Supply", "type": "Vendor", "owner": "Babal Parts", "email": "vendor@gadisewa.com"},
+        ]
+        for ent_data in enterprise_defs:
+            if not db.query(models.Enterprise).filter(models.Enterprise.id == ent_data["id"]).first():
+                db.add(models.Enterprise(**ent_data))
+        db.commit()
+
+        demo_users = [
+            {
+                "email": "admin@gadisewa.com",
+                "hashed_password": hash_password("Admin@123"),
+                "full_name": "System Administrator",
+                "role": "admin",
+                "is_active": True,
+            },
+            {
+                "email": "garage@gadisewa.com",
+                "hashed_password": hash_password("Test@123"),
+                "full_name": "Main Garage Owner",
+                "role": "garage",
+                "is_active": True,
+                "enterprise_id": 1,
+            },
+            {
+                "email": "vendor@gadisewa.com",
+                "hashed_password": hash_password("Test@123"),
+                "full_name": "Parts Vendor",
+                "role": "vendor",
+                "is_active": True,
+                "enterprise_id": 2,
+            },
+            {
+                "email": "customer@gadisewa.com",
+                "hashed_password": hash_password("Test@123"),
+                "full_name": "John Doe",
+                "role": "customer",
+                "is_active": True,
+            },
+        ]
+
         for user_data in demo_users:
             exists = db.query(models.User).filter(
                 models.User.email == user_data["email"]

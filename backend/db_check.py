@@ -6,6 +6,7 @@ os.chdir('/home/gadisewa/gadisewa_backend')
 
 from models import Base
 from database import engine, SessionLocal
+from api_routes.auth import hash_password
 
 print("Creating tables...", flush=True)
 Base.metadata.create_all(bind=engine)
@@ -20,7 +21,7 @@ if n == 0:
     print("Seeding admin user...", flush=True)
     admin = User(
         email="admin@gadisewa.com",
-        hashed_password="hashed_Admin@123",
+        hashed_password=hash_password("Admin@123"),
         role="admin",
         full_name="System Admin",
         is_active=True

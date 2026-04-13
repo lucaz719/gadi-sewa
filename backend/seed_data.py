@@ -56,7 +56,7 @@ def seed_users(db: Session):
     from api_routes.auth import hash_password
     
     users = [
-        {"email": "admin@gadisewa.com", "hashed_password": hash_password("admin@123"), "full_name": "System Administrator", "role": "admin"},
+        {"email": "admin@gadisewa.com", "hashed_password": hash_password("Admin@123"), "full_name": "System Administrator", "role": "admin"},
         {"email": "garage@gadisewa.com", "hashed_password": hash_password("Test@123"), "full_name": "Main Garage Owner", "role": "garage", "enterprise_id": 1},
         {"email": "vendor@gadisewa.com", "hashed_password": hash_password("Test@123"), "full_name": "Parts Vendor", "role": "vendor", "enterprise_id": 2},
         {"email": "customer@gadisewa.com", "hashed_password": hash_password("Test@123"), "full_name": "John Doe", "role": "customer"},

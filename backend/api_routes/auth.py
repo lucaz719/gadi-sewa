@@ -58,16 +58,18 @@ def get_db():
 
 
 def hash_password(password: str) -> str:
-    """Hash a password using bcrypt."""
-    return pwd_context.hash(password)
+    """Hash a password using bcrypt. Truncates to 72 bytes as per bcrypt limit."""
+    truncated = password[:72]
+    return pwd_context.hash(truncated)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash. Supports legacy hashed_ prefix for migration."""
+    """Verify a password against its hash. Truncates password to 72 bytes as per bcrypt limit."""
     # Support legacy fake-hashed passwords during migration
     if hashed_password.startswith("hashed_"):
         return f"hashed_{plain_password}" == hashed_password
-    return pwd_context.verify(plain_password, hashed_password)
+    truncated = plain_password[:72]
+    return pwd_context.verify(truncated, hashed_password)
 
 
 def create_access_token(user_id: int, role: str) -> str:

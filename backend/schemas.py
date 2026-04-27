@@ -17,7 +17,7 @@ class User(UserBase):
     is_active: bool
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class LoginRequest(BaseModel):
     email: str = Field(..., max_length=254)
@@ -48,7 +48,7 @@ class Enterprise(EnterpriseBase):
     auto_followup: bool
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 # Job Schemas
@@ -69,7 +69,7 @@ class Job(JobBase):
     created_at: datetime
     updated_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Inventory Schemas
 class InventoryItemBase(BaseModel):
@@ -84,7 +84,7 @@ class InventoryItemBase(BaseModel):
 class InventoryItem(InventoryItemBase):
     id: int
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Transaction Schemas
 class TransactionBase(BaseModel):
@@ -99,7 +99,7 @@ class Transaction(TransactionBase):
     id: str
     timestamp: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class FinancialSummary(BaseModel):
     total_income: float
@@ -120,7 +120,7 @@ class Voucher(VoucherBase):
     is_active: bool
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class GlobalItemBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
@@ -133,7 +133,7 @@ class GlobalItem(GlobalItemBase):
     id: int
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # HeldCart Schemas
 class HeldCartBase(BaseModel):
@@ -145,7 +145,7 @@ class HeldCart(HeldCartBase):
     id: int
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Gamification Schemas
 class GadiPointBase(BaseModel):
@@ -160,7 +160,7 @@ class GadiPoint(GadiPointBase):
     id: int
     timestamp: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class ReferralBase(BaseModel):
     referral_code: str = Field(..., min_length=1, max_length=50)
@@ -173,7 +173,7 @@ class Referral(ReferralBase):
     referred_id: Optional[int]
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class Achievement(BaseModel):
     id: int
@@ -182,7 +182,7 @@ class Achievement(BaseModel):
     icon: str = Field(..., min_length=1, max_length=100)
     point_threshold: int
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class UserRewardSummary(BaseModel):
     total_points: int
@@ -203,7 +203,7 @@ class Customer(CustomerBase):
     next_service_date: Optional[datetime] = None
     enterprise_id: Optional[int] = None
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class CRMSummary(BaseModel):
     total_customers: int
@@ -222,7 +222,7 @@ class ActivityLog(ActivityLogBase):
     id: int
     timestamp: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class PlanBase(BaseModel):
     id: str = Field(..., max_length=100)
@@ -233,7 +233,7 @@ class PlanBase(BaseModel):
 
 class Plan(PlanBase):
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class AdminStats(BaseModel):
     total_enterprises: int
@@ -261,7 +261,7 @@ class VendorProduct(VendorProductBase):
     vendor_id: int
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class VendorOrderItem(BaseModel):
     product_id: int
@@ -284,7 +284,7 @@ class VendorOrder(BaseModel):
     payment_status: str
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class VendorOrderStatusUpdate(BaseModel):
     status: str = Field(..., min_length=1, max_length=50)
@@ -300,7 +300,7 @@ class NotificationOut(NotificationBase):
     is_read: bool
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class PlatformSettingsUpdate(BaseModel):
     trial_period_days: int = 14
@@ -321,7 +321,7 @@ class StaffMember(StaffMemberBase):
     enterprise_id: int
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class AppointmentBase(BaseModel):
     customer_id: int
@@ -337,7 +337,7 @@ class Appointment(AppointmentBase):
     enterprise_id: int
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class SupportTicketBase(BaseModel):
     subject: str = Field(..., min_length=1, max_length=300)
@@ -350,7 +350,7 @@ class SupportTicket(SupportTicketBase):
     status: str
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class EnterpriseInvoiceBase(BaseModel):
     enterprise_id: int
@@ -364,7 +364,7 @@ class EnterpriseInvoice(EnterpriseInvoiceBase):
     id: int
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class PendingEnterpriseBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
@@ -378,5 +378,6 @@ class PendingEnterprise(PendingEnterpriseBase):
     status: str
     created_at: datetime
     class Config:
-        from_attributes = True
+        orm_mode = True
+
 

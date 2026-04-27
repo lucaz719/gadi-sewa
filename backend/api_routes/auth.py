@@ -4,6 +4,7 @@ from database import SessionLocal
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta, timezone
+from typing import Dict, List
 import models, schemas
 import os
 import time
@@ -19,7 +20,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
 # Simple in-memory rate limiter for login attempts
-_login_attempts: dict[str, list[float]] = defaultdict(list)
+_login_attempts: Dict[str, List[float]] = defaultdict(list)
 _login_lock = threading.Lock()
 _MAX_LOGIN_ATTEMPTS = 5
 _LOGIN_WINDOW_SECONDS = 300  # 5 minutes

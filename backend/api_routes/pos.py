@@ -17,7 +17,7 @@ def hold_cart(cart: schemas.HeldCartBase, db: Session = Depends(get_db), _user=D
     db.refresh(db_cart)
     return db_cart
 
-@router.get("/held-carts", response_model=list[schemas.HeldCart])
+@router.get("/held-carts", response_model=List[schemas.HeldCart])
 def get_held_carts(db: Session = Depends(get_db), _user=Depends(get_current_user)):
     """Retrieve all held carts"""
     return db.query(models.HeldCart).order_by(models.HeldCart.created_at.desc()).all()

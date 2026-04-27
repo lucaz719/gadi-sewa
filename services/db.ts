@@ -15,10 +15,13 @@ export const db = {
       },
     });
     if (!response.ok) {
-      let errorMessage = `Error: ${response.statusText}`;
+      let errorMessage = `Request failed (HTTP ${response.status})`;
       try {
         const errorData = await response.json();
-        errorMessage = errorData.detail || errorData.message || errorMessage;
+        const detail = errorData.detail || errorData.message;
+        if (detail) {
+          errorMessage = typeof detail === 'string' ? detail : JSON.stringify(detail);
+        }
       } catch { }
       throw new Error(errorMessage);
     }

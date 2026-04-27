@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from passlib.context import CryptContext
+from jose import jwt
+from datetime import datetime, timedelta, timezone
 import models, schemas
 import os
 import time
@@ -12,11 +14,23 @@ router = APIRouter(tags=["Authentication"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+
 # Simple in-memory rate limiter for login attempts
 _login_attempts: dict[str, list[float]] = defaultdict(list)
 _login_lock = threading.Lock()
 _MAX_LOGIN_ATTEMPTS = 5
 _LOGIN_WINDOW_SECONDS = 300  # 5 minutes
+
+
+def _get_client_ip(req: Request) -> str:
+    """Return the real client IP, respecting X-Forwarded-For from reverse proxies."""
+    forwarded_for = req.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return req.client.host if req.client else "unknown"
 
 
 def _check_rate_limit(client_ip: str) -> None:
@@ -56,13 +70,22 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
+def create_access_token(user_id: int, role: str) -> str:
+    """Create a signed JWT access token containing the user's ID and role."""
+    if not SECRET_KEY:
+        raise RuntimeError("SECRET_KEY environment variable must be set")
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": str(user_id), "role": role, "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
 ADMIN_ACCESS_TOKEN = os.getenv("ADMIN_ACCESS_TOKEN")
 if not ADMIN_ACCESS_TOKEN:
     raise RuntimeError("ADMIN_ACCESS_TOKEN environment variable must be set")
 
 @router.post("/auth/login", response_model=schemas.Token)
 def login(request: schemas.LoginRequest, req: Request, db: Session = Depends(get_db)):
-    client_ip = req.client.host if req.client else "unknown"
+    client_ip = _get_client_ip(req)
     _check_rate_limit(client_ip)
 
     user = db.query(models.User).filter(models.User.email == request.email).first()
@@ -80,9 +103,9 @@ def login(request: schemas.LoginRequest, req: Request, db: Session = Depends(get
                 detail="Valid Admin Access Token required for superadmin login"
             )
 
-    # Return a simple mock token for now
+    access_token = create_access_token(user.id, user.role)
     return {
-        "access_token": f"mock-jwt-token-{user.role}",
+        "access_token": access_token,
         "token_type": "bearer",
         "user": user
     }

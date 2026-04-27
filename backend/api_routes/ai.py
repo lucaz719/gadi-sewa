@@ -1,15 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
-import google.generativeai as genai
 import os
 from pydantic import BaseModel
 from typing import List, Optional
 from api_routes.dependencies import get_current_user
 
+try:
+    import google.generativeai as genai
+    GENAI_AVAILABLE = True
+except ImportError:
+    GENAI_AVAILABLE = False
+
 router = APIRouter(prefix="/ai", tags=["AI"])
 
 # Load API Key (In production, use a more secure way to load env vars)
 GENI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GENI_API_KEY:
+if GENI_API_KEY and GENAI_AVAILABLE:
     genai.configure(api_key=GENI_API_KEY)
 
 class ComplaintAnalysisRequest(BaseModel):

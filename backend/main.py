@@ -18,20 +18,18 @@ models.Base.metadata.create_all(bind=engine)
 
 
 def _seed_default_users() -> None:
-    """Seed default users when the database has no users (first run, non-production only)."""
+    """Seed default users when the database has no users (first run only)."""
     import logging
     from api_routes.auth import hash_password
 
-    # Skip seeding in production to avoid hardcoded credentials
-    if os.getenv("PRODUCTION"):
-        return
-
     db = SessionLocal()
     try:
+        # Always check if database is empty, regardless of PRODUCTION setting
+        # This ensures first-run setup works in all environments
         if db.query(models.User).count() > 0:
             return
 
-        logging.info("Empty database detected — seeding default users for development.")
+        logging.info("Empty database detected — seeding default users.")
 
         # Ensure required plans and enterprises exist first
         if not db.query(models.Plan).filter_by(id="PLAN-PRO").first():

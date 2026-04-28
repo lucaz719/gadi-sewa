@@ -1,0 +1,7 @@
+---
+deployment:
+  targets:
+    public_html:
+      type: static
+      files:
+        - dist/

@@ -16,6 +16,64 @@ from api_routes import (
 # Initialize database
 models.Base.metadata.create_all(bind=engine)
 
+
+def _seed_default_users() -> None:
+    """Seed default users when the database has no users (first run only)."""
+    import logging
+    from database import SessionLocal
+    from api_routes.auth import hash_password
+
+    db = SessionLocal()
+    try:
+        # Always check if database is empty, regardless of PRODUCTION setting
+        # This ensures first-run setup works in all environments
+        if db.query(models.User).count() > 0:
+            return
+
+        logging.info("Empty database detected — seeding default users.")
+
+        # Ensure required plans and enterprises exist first
+        if not db.query(models.Plan).filter_by(id="PLAN-PRO").first():
+            db.add(models.Plan(id="PLAN-PRO", name="Garage Pro", price=2999.0,
+                               features=["Unlimited Jobs", "5 Staff", "Marketplace"],
+                               duration="Monthly"))
+            db.add(models.Plan(id="PLAN-FREE", name="Free Tier", price=0.0,
+                               features=["3 Jobs/mo", "1 Staff"], duration="Lifetime"))
+            db.flush()
+
+        if not db.query(models.Enterprise).filter_by(id=1).first():
+            db.add(models.Enterprise(id=1, name="GadiSewa Main Garage", type="Garage",
+                                     owner="Garage Owner", email="garage@gadisewa.com",
+                                     plan_id="PLAN-PRO"))
+        if not db.query(models.Enterprise).filter_by(id=2).first():
+            db.add(models.Enterprise(id=2, name="Babal Parts Supply", type="Vendor",
+                                     owner="Vendor Owner", email="vendor@gadisewa.com",
+                                     plan_id="PLAN-PRO"))
+        db.flush()
+
+        default_users = [
+            {"email": "admin@gadisewa.com", "hashed_password": hash_password("admin@123"),
+             "full_name": "System Administrator", "role": "admin"},
+            {"email": "garage@gadisewa.com", "hashed_password": hash_password("Test@123"),
+             "full_name": "Main Garage Owner", "role": "garage", "enterprise_id": 1},
+            {"email": "vendor@gadisewa.com", "hashed_password": hash_password("Test@123"),
+             "full_name": "Parts Vendor", "role": "vendor", "enterprise_id": 2},
+            {"email": "customer@gadisewa.com", "hashed_password": hash_password("Test@123"),
+             "full_name": "John Doe", "role": "customer"},
+        ]
+        for user_data in default_users:
+            db.add(models.User(**user_data))
+        db.commit()
+        logging.info("Default users seeded successfully.")
+    except Exception as exc:
+        db.rollback()
+        logging.error("Failed to seed default users: %s", exc)
+    finally:
+        db.close()
+
+
+_seed_default_users()
+
 app = FastAPI(title="GadiSewa Backend API")
 
 # CORS Configuration

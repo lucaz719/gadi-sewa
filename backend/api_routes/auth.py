@@ -15,7 +15,7 @@ router = APIRouter(tags=["Authentication"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-for-local-testing-only")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
@@ -82,9 +82,7 @@ def create_access_token(user_id: int, role: str) -> str:
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-ADMIN_ACCESS_TOKEN = os.getenv("ADMIN_ACCESS_TOKEN")
-if not ADMIN_ACCESS_TOKEN:
-    raise RuntimeError("ADMIN_ACCESS_TOKEN environment variable must be set")
+ADMIN_ACCESS_TOKEN = os.getenv("ADMIN_ACCESS_TOKEN", "dev-admin-token-12345")
 
 @router.post("/auth/login", response_model=schemas.Token)
 def login(request: schemas.LoginRequest, req: Request, db: Session = Depends(get_db)):

@@ -80,5 +80,9 @@ def application(environ, start_response):
         start_response(response_status, response_headers)
         return response_body
     except Exception as e:
+        import traceback
+        error_msg = f"Internal Server Error: {str(e)}\n{traceback.format_exc()}"
+        import sys
+        print(error_msg, file=sys.stderr)
         start_response("500 Internal Server Error", [("Content-Type", "text/plain")])
-        return [f"Internal Server Error: {str(e)}".encode('utf-8')]
+        return [error_msg.encode('utf-8')]

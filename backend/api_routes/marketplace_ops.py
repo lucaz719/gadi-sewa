@@ -19,7 +19,7 @@ def get_vendor_products(vendor_id: int, db: Session = Depends(get_db), _user=Dep
 
 @router.post("/vendor/{vendor_id}/products", response_model=schemas.VendorProduct)
 def add_vendor_product(vendor_id: int, product: schemas.VendorProductCreate, db: Session = Depends(get_db), _user=Depends(get_current_user)):
-    db_product = models.VendorProduct(**product.dict(), vendor_id=vendor_id)
+    db_product = models.VendorProduct(**product.model_dump(), vendor_id=vendor_id)
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
@@ -31,7 +31,7 @@ def place_marketplace_order(order: schemas.VendorOrderCreate, garage_id: int = Q
     db_order = models.VendorOrder(
         vendor_id=order.vendor_id,
         garage_id=garage_id,
-        items=[item.dict() for item in order.items],
+        items=[item.model_dump() for item in order.items],
         total_amount=order.total_amount
     )
     db.add(db_order)

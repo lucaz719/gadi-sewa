@@ -5,3 +5,16 @@ deployment:
       type: static
       files:
         - dist/
+      pre_deployment_commands:
+        - npm install --legacy-peer-deps
+        - npm run build
+      post_deployment_commands:
+        - echo "Frontend deployment completed"
+    backend:
+      type: static
+      files:
+        - backend_deploy/
+      pre_deployment_commands:
+        - cd backend_deploy && pip install -r requirements.txt
+      post_deployment_commands:
+        - echo "Backend deployment completed"

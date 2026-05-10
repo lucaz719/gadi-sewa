@@ -63,7 +63,7 @@ jobs:
           chmod 700 ~/.ssh
           
           # Write SSH key with proper newline handling using heredoc
-          cat > ~/.ssh/deploy_key << 'SSHKEYEOF'
+          cat > ~/.ssh/deploy_key << SSHKEYEOF
           $SSH_PRIVATE_KEY
           SSHKEYEOF
           chmod 600 ~/.ssh/deploy_key

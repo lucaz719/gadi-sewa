@@ -29,10 +29,12 @@ jobs:
       - name: Deploy to server via rsync
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST || '209.42.27.143' }}
+          SERVER_USER: ${{ secrets.SERVER_USER || 'gadisewa' }}
           SERVER_PORT: ${{ secrets.SERVER_PORT || '22' }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          FRONTEND_DEPLOY_PATH: ${{ secrets.FRONTEND_DEPLOY_PATH || '/home/gadisewa/public_html' }}
+          BACKEND_DEPLOY_PATH: ${{ secrets.BACKEND_DEPLOY_PATH || '/home/gadisewa/backend' }}
+          RESTART_PATH: ${{ secrets.RESTART_PATH || '/home/gadisewa/tmp' }}
         run: |
           # Validate required secrets
           if [ -z "$SSH_PRIVATE_KEY" ]; then
@@ -47,8 +49,12 @@ jobs:
             echo "::error::SERVER_USER secret is not set"
             exit 1
           fi
-          if [ -z "$DEPLOY_PATH" ]; then
-            echo "::error::DEPLOY_PATH secret is not set"
+          if [ -z "$FRONTEND_DEPLOY_PATH" ]; then
+            echo "::error::FRONTEND_DEPLOY_PATH secret is not set"
+            exit 1
+          fi
+          if [ -z "$BACKEND_DEPLOY_PATH" ]; then
+            echo "::error::BACKEND_DEPLOY_PATH secret is not set"
             exit 1
           fi
 
@@ -67,14 +73,14 @@ jobs:
           SSH_OPTS="-i ~/.ssh/deploy_key -p $SERVER_PORT -o StrictHostKeyChecking=accept-new"
 
           # Deploy frontend (built files)
-          echo "Deploying frontend to $DEPLOY_PATH..."
+          echo "Deploying frontend to $FRONTEND_DEPLOY_PATH..."
           rsync -avz --delete \
             -e "ssh $SSH_OPTS" \
             dist/ \
-            "$SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/"
+            "$SERVER_USER@$SERVER_HOST:$FRONTEND_DEPLOY_PATH/"
 
-          # Deploy backend
-          echo "Deploying backend to $DEPLOY_PATH/backend..."
+          # Deploy backend from the host-ready package
+          echo "Deploying backend_deploy to $BACKEND_DEPLOY_PATH..."
           rsync -avz --delete \
             --exclude '__pycache__' \
             --exclude '*.pyc' \
@@ -83,20 +89,20 @@ jobs:
             --exclude '*.sqlite3' \
             --exclude 'venv/' \
             -e "ssh $SSH_OPTS" \
-            backend/ \
-            "$SERVER_USER@$SERVER_HOST:$DEPLOY_PATH/backend/"
+            backend_deploy/ \
+            "$SERVER_USER@$SERVER_HOST:$BACKEND_DEPLOY_PATH/"
 
           # Install/update backend dependencies on server
           echo "Installing backend dependencies on server..."
           ssh $SSH_OPTS \
             "$SERVER_USER@$SERVER_HOST" \
-            "cd $DEPLOY_PATH/backend && pip install -r requirements.txt --user --quiet"
+            "cd $BACKEND_DEPLOY_PATH && pip install -r requirements.txt --user --quiet"
 
           # Restart the application (touch restart.txt for Passenger)
           echo "Restarting application..."
           ssh $SSH_OPTS \
             "$SERVER_USER@$SERVER_HOST" \
-            "mkdir -p $DEPLOY_PATH/tmp && touch $DEPLOY_PATH/tmp/restart.txt"
+            "mkdir -p $RESTART_PATH && touch $RESTART_PATH/restart.txt"
 
           # Cleanup
           rm -f ~/.ssh/deploy_key

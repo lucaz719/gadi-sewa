@@ -6,6 +6,7 @@ import { KeypadModal } from '../components/pos/KeypadModal';
 import { RecallModal } from '../components/pos/RecallModal';
 import { CheckoutModal } from '../components/pos/CheckoutModal';
 import { InlineCustomerSection } from '../components/pos/InlineCustomerSection';
+import { FALLBACK_PART_IMAGE } from '../utils/imageFallbacks';
 
 export default function POS() {
     const { showToast } = useToast();
@@ -367,7 +368,7 @@ export default function POS() {
                                         {filteredProducts.map(prod => (
                                             <div key={prod.id} onClick={() => addToCart(prod)} className="p-2 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 cursor-pointer transition-all group flex flex-col">
                                                 <div className="aspect-square rounded shadow-sm bg-slate-100 dark:bg-slate-800 mb-2 overflow-hidden relative">
-                                                    <img src={prod.img} alt={prod.name} className="w-full h-full object-cover" />
+                                                    <img src={prod.img || FALLBACK_PART_IMAGE} alt={prod.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_PART_IMAGE; }} />
                                                 </div>
                                                 <h4 className="font-bold text-[11px] text-slate-900 dark:text-white leading-tight mb-1 line-clamp-1">{prod.name}</h4>
                                                 <div className="flex justify-between items-center mt-auto">

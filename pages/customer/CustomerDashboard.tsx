@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FALLBACK_VEHICLE_IMAGE } from '../../utils/imageFallbacks';
 
 const myVehicles = [
   { id: 1, make: 'Toyota', model: 'Camry', year: '2021', reg: 'BA 1 Pa 1234', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?auto=format&fit=crop&q=80&w=400', nextService: '15 Nov 2024', status: 'Good' },
@@ -40,7 +41,7 @@ export default function CustomerDashboard() {
                    {myVehicles.map(vehicle => (
                        <div key={vehicle.id} className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-all group">
                            <div className="h-40 relative overflow-hidden">
-                               <img src={vehicle.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={vehicle.model} />
+                               <img src={vehicle.image || FALLBACK_VEHICLE_IMAGE} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={vehicle.model} onError={(e) => { (e.target as HTMLImageElement).src = FALLBACK_VEHICLE_IMAGE; }} />
                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                                <div className="absolute bottom-3 left-3 text-white">
                                    <h3 className="font-bold text-lg">{vehicle.make} {vehicle.model}</h3>

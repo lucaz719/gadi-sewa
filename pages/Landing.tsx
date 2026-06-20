@@ -65,6 +65,7 @@ export default function Landing() {
                   src="https://images.unsplash.com/photo-1530046339160-ce3e5b0c7a2f?auto=format&fit=crop&q=80&w=2070" 
                   alt="Dashboard Preview" 
                   className="w-full h-auto opacity-90"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
              </div>
           </div>
@@ -159,7 +160,7 @@ export default function Landing() {
             </div>
             <div className="w-full lg:w-1/2 relative">
                <div className="aspect-[4/3] rounded-3xl bg-slate-200 dark:bg-slate-800 overflow-hidden shadow-2xl relative">
-                  <img src="https://images.unsplash.com/photo-1486006396193-47103bad89a7?auto=format&fit=crop&q=80&w=2000" alt="Features" className="w-full h-full object-cover" />
+                  <img src="https://images.unsplash.com/photo-1486006396193-47103bad89a7?auto=format&fit=crop&q=80&w=2000" alt="Features" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                   <div className="absolute bottom-6 left-6 right-6 p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white">
                      <p className="text-lg font-bold mb-1 italic">"GadiSewa transformed our workflow. We reduced paper usage by 90% and increased efficiency by 40%."</p>
                      <p className="text-xs font-black uppercase tracking-widest opacity-80">- AutoMatrix Solutions</p>

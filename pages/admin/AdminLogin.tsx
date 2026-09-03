@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../services/db';
+import { auth } from '../../services/auth';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -16,12 +17,18 @@ export default function AdminLogin() {
     setError('');
 
     try {
-      await db.login({
+      const response = await db.login({
         email: credentials.username,
         password: credentials.password,
         access_token: credentials.accessCode
       });
-      navigate('/admin');
+
+      if (response.user?.role !== 'admin') {
+        db.logout();
+        throw new Error('This account is not authorized for admin access.');
+      }
+
+      navigate(auth.getDefaultRouteForRole(response.user.role));
     } catch (err: any) {
       setError(err.message || 'Access Denied. Check credentials and token.');
     } finally {

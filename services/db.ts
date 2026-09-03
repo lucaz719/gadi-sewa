@@ -1,3 +1,4 @@
+import { auth } from './auth';
 
 // Database Service for GadiSewa - Connecting to Python Backend
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -5,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 export const db = {
   // Helpers
   async fetchApi(endpoint: string, options: RequestInit = {}) {
-    const token = localStorage.getItem('gadisewa_auth_token');
+    const token = auth.getAccessToken();
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers: {
@@ -14,6 +15,12 @@ export const db = {
         ...options.headers,
       },
     });
+    if (response.status === 401 || response.status === 403) {
+      auth.clearSession();
+      if (typeof window !== 'undefined') {
+        window.location.hash = '#/login';
+      }
+    }
     if (!response.ok) {
       let errorMessage = `Request failed (HTTP ${response.status})`;
       try {
@@ -35,16 +42,14 @@ export const db = {
       method: 'POST',
       body: JSON.stringify(credentials)
     });
-    localStorage.setItem('gadisewa_auth_token', data.access_token);
-    localStorage.setItem('gadisewa_auth_user', JSON.stringify(data.user));
+    auth.setSession(data);
     return data;
   },
   logout: () => {
-    localStorage.removeItem('gadisewa_auth_user');
-    localStorage.removeItem('gadisewa_auth_token');
+    auth.clearSession();
   },
-  getAuthUser: () => JSON.parse(localStorage.getItem('gadisewa_auth_user') || 'null'),
-  getAuthToken: () => localStorage.getItem('gadisewa_auth_token'),
+  getAuthUser: () => auth.getUser(),
+  getAuthToken: () => auth.getAccessToken(),
 
   // Plans
   getPlans: async () => db.fetchApi('/admin/plans'),

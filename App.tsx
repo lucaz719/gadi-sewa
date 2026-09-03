@@ -69,6 +69,7 @@ import AiAssistantWidget from './components/AiAssistantWidget';
 import AiAutomation from './pages/AiAutomation';
 
 import { db } from './services/db';
+import { auth, UserRole } from './services/auth';
 
 // --- Theme Context ---
 const ThemeContext = createContext({ isDark: false, toggleTheme: () => { } });
@@ -86,11 +87,28 @@ const SidebarItem = ({ icon, label, path, active }: { icon: string, label: strin
   </Link>
 );
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = db.getAuthToken();
-  if (!token) {
-    return <Navigate to="/login" replace />;
+const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: UserRole[] }) => {
+  const location = useLocation();
+  const session = auth.getSession();
+
+  if (!session) {
+    return <Navigate to={location.pathname.startsWith('/admin') ? '/admin-portal' : '/login'} replace />;
   }
+
+  if (!auth.isAllowedRole(session.user.role, allowedRoles)) {
+    return <Navigate to={auth.getDefaultRouteForRole(session.user.role)} replace />;
+  }
+
+  return children;
+};
+
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const session = auth.getSession();
+
+  if (session) {
+    return <Navigate to={auth.getDefaultRouteForRole(session.user.role)} replace />;
+  }
+
   return children;
 };
 
@@ -100,14 +118,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const normalizedPath = location.pathname.toLowerCase().replace(/\/$/, '') || '/';
   const { isDark, toggleTheme } = useContext(ThemeContext);
   const { showToast } = useToast();
+  const currentUser = db.getAuthUser();
   
   const isPOS = normalizedPath === '/pos' || normalizedPath === '/vendor/pos';
   const isRegistration = normalizedPath === '/register';
   const isLogin = normalizedPath === '/login' || normalizedPath === '/admin-portal';
   const isLanding = normalizedPath === '/';
-  const isVendor = normalizedPath.startsWith('/vendor');
-  const isCustomer = normalizedPath.startsWith('/portal');
-  const isAdmin = normalizedPath.startsWith('/admin');
+  const isVendor = currentUser?.role === 'vendor';
+  const isCustomer = currentUser?.role === 'customer';
+  const isAdmin = currentUser?.role === 'admin';
 
   useEffect(() => {
     db.init();
@@ -280,8 +299,8 @@ export default function App() {
         <HashRouter>
           <Layout>
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/admin-portal" element={<AdminLogin />} />
+              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+              <Route path="/admin-portal" element={<PublicRoute><AdminLogin /></PublicRoute>} />
               <Route path="/register" element={<Registration />} />
               <Route path="/help" element={<HelpSupport />} />
 
@@ -289,64 +308,64 @@ export default function App() {
               <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-               <Route path="/" element={<Login />} />
-               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/jobs/list" element={<ProtectedRoute><JobList /></ProtectedRoute>} />
-              <Route path="/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
-              <Route path="/jobs/:id" element={<ProtectedRoute><JobDetails /></ProtectedRoute>} />
-              <Route path="/jobs" element={<ProtectedRoute><JobBoard /></ProtectedRoute>} />
-              <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
-              <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
-              <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
-              <Route path="/customers/:id" element={<ProtectedRoute><CustomerProfile /></ProtectedRoute>} />
-              <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
-              <Route path="/staff" element={<ProtectedRoute><Staff /></ProtectedRoute>} />
-              <Route path="/cash-flow" element={<ProtectedRoute><CashFlow /></ProtectedRoute>} />
-              <Route path="/financials" element={<ProtectedRoute><Financials /></ProtectedRoute>} />
-              <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
-              <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
-              <Route path="/pos" element={<ProtectedRoute><POS /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-              <Route path="/ai-automation" element={<ProtectedRoute><AiAutomation /></ProtectedRoute>} />
+              <Route path="/" element={<Navigate to={auth.getDefaultRouteForRole(auth.getSession()?.user.role)} replace />} />
+              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['garage']}><Dashboard /></ProtectedRoute>} />
+              <Route path="/jobs/list" element={<ProtectedRoute allowedRoles={['garage']}><JobList /></ProtectedRoute>} />
+              <Route path="/jobs/new" element={<ProtectedRoute allowedRoles={['garage']}><CreateJob /></ProtectedRoute>} />
+              <Route path="/jobs/:id" element={<ProtectedRoute allowedRoles={['garage']}><JobDetails /></ProtectedRoute>} />
+              <Route path="/jobs" element={<ProtectedRoute allowedRoles={['garage']}><JobBoard /></ProtectedRoute>} />
+              <Route path="/appointments" element={<ProtectedRoute allowedRoles={['garage']}><Appointments /></ProtectedRoute>} />
+              <Route path="/inventory" element={<ProtectedRoute allowedRoles={['garage']}><Inventory /></ProtectedRoute>} />
+              <Route path="/marketplace" element={<ProtectedRoute allowedRoles={['garage']}><Marketplace /></ProtectedRoute>} />
+              <Route path="/customers/:id" element={<ProtectedRoute allowedRoles={['garage']}><CustomerProfile /></ProtectedRoute>} />
+              <Route path="/customers" element={<ProtectedRoute allowedRoles={['garage']}><Customers /></ProtectedRoute>} />
+              <Route path="/staff" element={<ProtectedRoute allowedRoles={['garage']}><Staff /></ProtectedRoute>} />
+              <Route path="/cash-flow" element={<ProtectedRoute allowedRoles={['garage']}><CashFlow /></ProtectedRoute>} />
+              <Route path="/financials" element={<ProtectedRoute allowedRoles={['garage']}><Financials /></ProtectedRoute>} />
+              <Route path="/expenses" element={<ProtectedRoute allowedRoles={['garage']}><Expenses /></ProtectedRoute>} />
+              <Route path="/invoices" element={<ProtectedRoute allowedRoles={['garage']}><Invoices /></ProtectedRoute>} />
+              <Route path="/pos" element={<ProtectedRoute allowedRoles={['garage']}><POS /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute allowedRoles={['garage']}><Settings /></ProtectedRoute>} />
+              <Route path="/reports" element={<ProtectedRoute allowedRoles={['garage']}><Reports /></ProtectedRoute>} />
+              <Route path="/ai-automation" element={<ProtectedRoute allowedRoles={['garage']}><AiAutomation /></ProtectedRoute>} />
 
               {/* Admin Pages */}
-              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/global-catalog" element={<ProtectedRoute><GlobalCatalog /></ProtectedRoute>} />
-              <Route path="/admin/plans" element={<ProtectedRoute><PlanManagement /></ProtectedRoute>} />
-              <Route path="/admin/vouchers" element={<ProtectedRoute><VoucherManagement /></ProtectedRoute>} />
-              <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-              <Route path="/admin/logs" element={<ProtectedRoute><ActivityLogs /></ProtectedRoute>} />
-              <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
-              <Route path="/admin/revenue" element={<ProtectedRoute><AdminRevenue /></ProtectedRoute>} />
-              <Route path="/admin/notifications" element={<ProtectedRoute><AdminNotifications /></ProtectedRoute>} />
-              <Route path="/admin/support" element={<ProtectedRoute><AdminSupport /></ProtectedRoute>} />
-              <Route path="/admin/enterprises/:id" element={<ProtectedRoute><EnterpriseDetail /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/global-catalog" element={<ProtectedRoute allowedRoles={['admin']}><GlobalCatalog /></ProtectedRoute>} />
+              <Route path="/admin/plans" element={<ProtectedRoute allowedRoles={['admin']}><PlanManagement /></ProtectedRoute>} />
+              <Route path="/admin/vouchers" element={<ProtectedRoute allowedRoles={['admin']}><VoucherManagement /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
+              <Route path="/admin/logs" element={<ProtectedRoute allowedRoles={['admin']}><ActivityLogs /></ProtectedRoute>} />
+              <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><AdminSettings /></ProtectedRoute>} />
+              <Route path="/admin/revenue" element={<ProtectedRoute allowedRoles={['admin']}><AdminRevenue /></ProtectedRoute>} />
+              <Route path="/admin/notifications" element={<ProtectedRoute allowedRoles={['admin']}><AdminNotifications /></ProtectedRoute>} />
+              <Route path="/admin/support" element={<ProtectedRoute allowedRoles={['admin']}><AdminSupport /></ProtectedRoute>} />
+              <Route path="/admin/enterprises/:id" element={<ProtectedRoute allowedRoles={['admin']}><EnterpriseDetail /></ProtectedRoute>} />
 
               {/* Vendor Pages */}
-              <Route path="/vendor/products" element={<ProtectedRoute><VendorProducts /></ProtectedRoute>} />
-              <Route path="/vendor/products/new" element={<ProtectedRoute><VendorProductEdit /></ProtectedRoute>} />
-              <Route path="/vendor/products/edit/:id" element={<ProtectedRoute><VendorProductEdit /></ProtectedRoute>} />
-              <Route path="/vendor/products/bulk-import" element={<ProtectedRoute><VendorBulkImport /></ProtectedRoute>} />
-              <Route path="/vendor/orders" element={<ProtectedRoute><VendorOrders /></ProtectedRoute>} />
-              <Route path="/vendor/orders/:id" element={<ProtectedRoute><VendorOrderDetail /></ProtectedRoute>} />
-              <Route path="/vendor/network" element={<ProtectedRoute><VendorNetwork /></ProtectedRoute>} />
-              <Route path="/vendor/network/:id" element={<ProtectedRoute><VendorGarageProfile /></ProtectedRoute>} />
-              <Route path="/vendor/financials" element={<ProtectedRoute><VendorFinancials /></ProtectedRoute>} />
-              <Route path="/vendor/marketing" element={<ProtectedRoute><VendorMarketing /></ProtectedRoute>} />
-              <Route path="/vendor/settings" element={<ProtectedRoute><VendorSettings /></ProtectedRoute>} />
-              <Route path="/vendor/pos" element={<ProtectedRoute><VendorPOS /></ProtectedRoute>} />
-              <Route path="/vendor/cash-flow" element={<ProtectedRoute><VendorCashFlow /></ProtectedRoute>} />
-              <Route path="/vendor" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
+              <Route path="/vendor/products" element={<ProtectedRoute allowedRoles={['vendor']}><VendorProducts /></ProtectedRoute>} />
+              <Route path="/vendor/products/new" element={<ProtectedRoute allowedRoles={['vendor']}><VendorProductEdit /></ProtectedRoute>} />
+              <Route path="/vendor/products/edit/:id" element={<ProtectedRoute allowedRoles={['vendor']}><VendorProductEdit /></ProtectedRoute>} />
+              <Route path="/vendor/products/bulk-import" element={<ProtectedRoute allowedRoles={['vendor']}><VendorBulkImport /></ProtectedRoute>} />
+              <Route path="/vendor/orders" element={<ProtectedRoute allowedRoles={['vendor']}><VendorOrders /></ProtectedRoute>} />
+              <Route path="/vendor/orders/:id" element={<ProtectedRoute allowedRoles={['vendor']}><VendorOrderDetail /></ProtectedRoute>} />
+              <Route path="/vendor/network" element={<ProtectedRoute allowedRoles={['vendor']}><VendorNetwork /></ProtectedRoute>} />
+              <Route path="/vendor/network/:id" element={<ProtectedRoute allowedRoles={['vendor']}><VendorGarageProfile /></ProtectedRoute>} />
+              <Route path="/vendor/financials" element={<ProtectedRoute allowedRoles={['vendor']}><VendorFinancials /></ProtectedRoute>} />
+              <Route path="/vendor/marketing" element={<ProtectedRoute allowedRoles={['vendor']}><VendorMarketing /></ProtectedRoute>} />
+              <Route path="/vendor/settings" element={<ProtectedRoute allowedRoles={['vendor']}><VendorSettings /></ProtectedRoute>} />
+              <Route path="/vendor/pos" element={<ProtectedRoute allowedRoles={['vendor']}><VendorPOS /></ProtectedRoute>} />
+              <Route path="/vendor/cash-flow" element={<ProtectedRoute allowedRoles={['vendor']}><VendorCashFlow /></ProtectedRoute>} />
+              <Route path="/vendor" element={<ProtectedRoute allowedRoles={['vendor']}><VendorDashboard /></ProtectedRoute>} />
 
               {/* Customer Pages */}
-              <Route path="/portal" element={<ProtectedRoute><CustomerDashboard /></ProtectedRoute>} />
-              <Route path="/portal/vehicles" element={<ProtectedRoute><MyVehicles /></ProtectedRoute>} />
-              <Route path="/portal/book" element={<ProtectedRoute><BookService /></ProtectedRoute>} />
-              <Route path="/portal/history" element={<ProtectedRoute><ServiceHistory /></ProtectedRoute>} />
-              <Route path="/portal/fuel" element={<ProtectedRoute><FuelLog /></ProtectedRoute>} />
-              <Route path="/portal/offers" element={<ProtectedRoute><RewardsHub /></ProtectedRoute>} />
-              <Route path="/portal/sos" element={<ProtectedRoute><EmergencySOS /></ProtectedRoute>} />
+              <Route path="/portal" element={<ProtectedRoute allowedRoles={['customer']}><CustomerDashboard /></ProtectedRoute>} />
+              <Route path="/portal/vehicles" element={<ProtectedRoute allowedRoles={['customer']}><MyVehicles /></ProtectedRoute>} />
+              <Route path="/portal/book" element={<ProtectedRoute allowedRoles={['customer']}><BookService /></ProtectedRoute>} />
+              <Route path="/portal/history" element={<ProtectedRoute allowedRoles={['customer']}><ServiceHistory /></ProtectedRoute>} />
+              <Route path="/portal/fuel" element={<ProtectedRoute allowedRoles={['customer']}><FuelLog /></ProtectedRoute>} />
+              <Route path="/portal/offers" element={<ProtectedRoute allowedRoles={['customer']}><RewardsHub /></ProtectedRoute>} />
+              <Route path="/portal/sos" element={<ProtectedRoute allowedRoles={['customer']}><EmergencySOS /></ProtectedRoute>} />
 
               <Route path="*" element={<Navigate to="/login" />} />
             </Routes>

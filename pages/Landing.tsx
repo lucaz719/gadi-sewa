@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../services/db';
+import { auth } from '../services/auth';
 
 export default function Landing() {
   const user = db.getAuthUser();
@@ -21,7 +22,7 @@ export default function Landing() {
              <a href="#pricing" className="hover:text-primary-600 transition-colors">Pricing</a>
           </div>
           {user ? (
-            <Link to={user.role === 'vendor' ? '/vendor' : user.role === 'customer' ? '/portal' : user.role === 'admin' ? '/admin' : '/'} className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-full font-bold text-sm shadow-xl shadow-primary-500/20 transition-all active:scale-95">
+            <Link to={auth.getDefaultRouteForRole(user.role)} className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-full font-bold text-sm shadow-xl shadow-primary-500/20 transition-all active:scale-95">
               Go to Dashboard
             </Link>
           ) : (

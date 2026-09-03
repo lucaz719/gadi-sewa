@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../services/db';
+import { auth } from '../services/auth';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,10 +21,12 @@ export default function Login() {
     try {
       const response = await db.login({ email, password });
 
-      if (response.user.role === 'garage') navigate('/dashboard');
-      else if (response.user.role === 'vendor') navigate('/vendor');
-      else if (response.user.role === 'customer') navigate('/portal');
-      else if (response.user.role === 'admin') navigate('/admin');
+      if (response.user?.role !== role) {
+        db.logout();
+        throw new Error(`This account does not have ${role} portal access.`);
+      }
+
+      navigate(auth.getDefaultRouteForRole(response.user.role));
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {

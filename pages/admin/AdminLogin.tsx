@@ -53,7 +53,7 @@ export default function AdminLogin() {
           )}
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4" autoComplete="on">
           <div>
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Admin ID</label>
             <input
@@ -61,6 +61,10 @@ export default function AdminLogin() {
               required
               value={credentials.username}
               onChange={e => setCredentials({ ...credentials, username: e.target.value })}
+              autoComplete="username"
+              spellCheck={false}
+              autoCorrect="off"
+              autoCapitalize="off"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white focus:border-red-500 outline-none transition-all placeholder:text-slate-700"
               placeholder="ADM-000-X"
             />
@@ -72,6 +76,10 @@ export default function AdminLogin() {
               required
               value={credentials.password}
               onChange={e => setCredentials({ ...credentials, password: e.target.value })}
+              autoComplete="current-password"
+              spellCheck={false}
+              autoCorrect="off"
+              autoCapitalize="off"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white focus:border-red-500 outline-none transition-all placeholder:text-slate-700"
               placeholder="••••••••"
             />
@@ -83,6 +91,10 @@ export default function AdminLogin() {
               required
               value={credentials.accessCode}
               onChange={e => setCredentials({ ...credentials, accessCode: e.target.value })}
+              autoComplete="one-time-code"
+              spellCheck={false}
+              autoCorrect="off"
+              autoCapitalize="off"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white focus:border-red-500 outline-none transition-all placeholder:text-slate-700"
               placeholder="OTP / HW Token"
             />

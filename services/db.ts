@@ -18,7 +18,8 @@ export const db = {
     if (response.status === 401 || response.status === 403) {
       auth.clearSession();
       if (typeof window !== 'undefined') {
-        window.location.hash = '#/login';
+        const currentHash = window.location.hash.toLowerCase();
+        window.location.hash = currentHash.startsWith('#/admin') ? '#/admin-portal' : '#/login';
       }
     }
     if (!response.ok) {

@@ -66,7 +66,7 @@ export default function Login() {
             <button onClick={() => setRole('customer')} className={`flex-1 py-2 px-3 text-xs font-bold rounded-md transition-all whitespace-nowrap ${role === 'customer' ? 'bg-white dark:bg-slate-700 shadow text-orange-600' : 'text-slate-500'}`}>Car Owner</button>
           </div>
 
-          <form className="space-y-6" onSubmit={handleLogin}>
+          <form className="space-y-6" onSubmit={handleLogin} autoComplete="on">
             {error && (
               <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 text-sm font-medium animate-shake">
                 {error}
@@ -79,6 +79,10 @@ export default function Login() {
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
+                autoComplete="username"
+                spellCheck={false}
+                autoCorrect="off"
+                autoCapitalize="off"
                 className="w-full px-4 py-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
@@ -89,6 +93,10 @@ export default function Login() {
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                autoComplete="current-password"
+                spellCheck={false}
+                autoCorrect="off"
+                autoCapitalize="off"
                 className="w-full px-4 py-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>

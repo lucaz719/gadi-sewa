@@ -179,7 +179,7 @@ def login(request: schemas.LoginRequest, req: Request, response: Response, db: S
 
 @router.get("/auth/session", response_model=schemas.AuthSession)
 def get_session(request: Request, response: Response, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
-    csrf_token = request.cookies.get("gadisewa_csrf_token") or create_csrf_token()
+    csrf_token = create_csrf_token()
     refresh_token_expires_at = utc_now()
     refresh_token = request.cookies.get(REFRESH_COOKIE_NAME)
     if refresh_token:
@@ -189,11 +189,7 @@ def get_session(request: Request, response: Response, db: Session = Depends(get_
         ).first()
         if refresh_session:
             refresh_token_expires_at = refresh_session.expires_at
-        response.set_cookie(
-            key="gadisewa_csrf_token",
-            value=csrf_token,
-            httponly=False,
-        )
+        response.set_cookie(key="gadisewa_csrf_token", value=csrf_token, httponly=False)
 
     access_expires_at = utc_now()
     token, _source = get_request_token(request)

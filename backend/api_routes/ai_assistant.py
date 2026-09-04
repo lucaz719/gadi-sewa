@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from pydantic import BaseModel
@@ -9,7 +9,7 @@ import models
 import os
 import json
 import logging
-from api_routes.dependencies import get_current_user
+from api_routes.dependencies import get_current_user, require_role, resolve_enterprise_access
 
 logger = logging.getLogger(__name__)
 
@@ -137,14 +137,16 @@ ROLE-SPECIFIC GUIDANCE:
 # --- Smart Chat Endpoint (Gemini-powered with fallback) ---
 
 @router.post("/chat", response_model=ChatResponse)
-def chat_with_assistant(req: ChatRequest, db: Session = Depends(get_db), _user=Depends(get_current_user)):
-    snapshot = _get_business_snapshot(db)
+def chat_with_assistant(req: ChatRequest, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    enterprise_id = user.enterprise_id or 1
+    snapshot = _get_business_snapshot(db, enterprise_id)
+    effective_req = req.model_copy(update={"user_role": user.role})
     genai = _get_genai()
 
     # Try Gemini-powered response first
     if genai:
         try:
-            system_prompt = _build_system_prompt(req.user_role, req.current_path, snapshot)
+            system_prompt = _build_system_prompt(user.role, req.current_path, snapshot)
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(
                 f"{system_prompt}\n\nUser message: {req.message}\n\nRespond ONLY with valid JSON."
@@ -185,7 +187,7 @@ def chat_with_assistant(req: ChatRequest, db: Session = Depends(get_db), _user=D
             logger.warning("Gemini chat failed, falling back to rule-based: %s", e)
 
     # --- Smart rule-based fallback (enhanced) ---
-    return _rule_based_chat(req, snapshot, db)
+    return _rule_based_chat(effective_req, snapshot, db)
 
 
 def _rule_based_chat(req: ChatRequest, snapshot: dict, db: Session) -> ChatResponse:
@@ -357,12 +359,19 @@ def _rule_based_chat(req: ChatRequest, snapshot: dict, db: Session) -> ChatRespo
 # --- AI Action Execution Endpoint ---
 
 @router.post("/execute-action", response_model=AiActionResponse)
-def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db), user=Depends(get_current_user)):
     """Execute an in-app action triggered by the AI assistant."""
-    eid = req.enterprise_id or 1
+    if req.action in {"create_job", "financial_summary", "service_reminder", "daily_digest"} and user.role not in {"garage", "admin"}:
+        raise HTTPException(status_code=403, detail="This action is not allowed for your role")
+    if req.action == "search_inventory" and user.role not in {"garage", "vendor", "admin"}:
+        raise HTTPException(status_code=403, detail="This action is not allowed for your role")
+    if req.action == "book_appointment" and user.role not in {"customer", "garage", "admin"}:
+        raise HTTPException(status_code=403, detail="This action is not allowed for your role")
+
+    eid = resolve_enterprise_access(user, req.enterprise_id) if user.role in {"garage", "vendor", "admin"} else (user.enterprise_id or req.enterprise_id or 1)
 
     if req.action == "create_job":
-        return _action_create_job(req.params, db)
+        return _action_create_job(req.params, db, eid)
     elif req.action == "search_inventory":
         return _action_search_inventory(req.params, db)
     elif req.action == "financial_summary":
@@ -372,7 +381,7 @@ def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db), _user
     elif req.action == "diagnose":
         return _action_diagnose(req.params)
     elif req.action == "book_appointment":
-        return _action_book_appointment(req.params, db)
+        return _action_book_appointment(req.params, db, eid)
     elif req.action == "daily_digest":
         return _action_daily_digest(db, eid)
     elif req.action == "smart_reorder":
@@ -385,11 +394,19 @@ def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db), _user
         )
 
 
-def _action_create_job(params: dict, db: Session) -> AiActionResponse:
+def _action_create_job(params: dict, db: Session, enterprise_id: int) -> AiActionResponse:
     """Create a job card via AI."""
     customer_id = params.get("customer_id", 1)
     vehicle_info = params.get("vehicle_info", "General Service")
     complaint = params.get("complaint", "AI-generated job card")
+
+    customer = db.query(models.Customer).filter(models.Customer.id == customer_id).first()
+    if not customer or customer.enterprise_id != enterprise_id:
+        return AiActionResponse(
+            success=False,
+            message="Customer is not available for your enterprise.",
+            follow_up=["Choose a different customer", "Open customers list"],
+        )
 
     job = models.Job(
         customer_id=customer_id,
@@ -550,15 +567,13 @@ Respond in JSON with:
     )
 
 
-def _action_book_appointment(params: dict, db: Session) -> AiActionResponse:
+def _action_book_appointment(params: dict, db: Session, enterprise_id: int) -> AiActionResponse:
     """Book a service appointment via AI."""
     customer_id = params.get("customer_id", 1)
     vehicle_info = params.get("vehicle_info", "General Vehicle")
     service_type = params.get("service_type", "General Service")
     date = params.get("date", (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d"))
     time = params.get("time", "10:00 AM")
-    enterprise_id = params.get("enterprise_id", 1)
-
     appointment = models.Appointment(
         customer_id=customer_id,
         vehicle_info=vehicle_info,

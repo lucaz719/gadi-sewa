@@ -24,7 +24,7 @@ export default function AdminLogin() {
       });
 
       if (response.user?.role !== 'admin') {
-        db.logout();
+        await db.logout();
         throw new Error('This account is not authorized for admin access.');
       }
 

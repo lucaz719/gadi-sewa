@@ -22,7 +22,7 @@ export default function Login() {
       const response = await db.login({ email, password });
 
       if (response.user?.role !== role) {
-        db.logout();
+        await db.logout();
         throw new Error(`This account does not have ${role} portal access.`);
       }
 

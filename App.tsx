@@ -69,7 +69,7 @@ import AiAssistantWidget from './components/AiAssistantWidget';
 import AiAutomation from './pages/AiAutomation';
 
 import { db } from './services/db';
-import { auth, UserRole } from './services/auth';
+import { auth, AUTH_CHANGE_EVENT, AuthUser, UserRole } from './services/auth';
 
 // --- Theme Context ---
 const ThemeContext = createContext({ isDark: false, toggleTheme: () => { } });
@@ -112,14 +112,12 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const Layout: React.FC<{ children: React.ReactNode; currentUser: AuthUser | null }> = ({ children, currentUser }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const normalizedPath = location.pathname.toLowerCase().replace(/\/$/, '') || '/';
   const { isDark, toggleTheme } = useContext(ThemeContext);
   const { showToast } = useToast();
-  const currentUser = db.getAuthUser();
-  
   const isPOS = normalizedPath === '/pos' || normalizedPath === '/vendor/pos';
   const isRegistration = normalizedPath === '/register';
   const isLogin = normalizedPath === '/login' || normalizedPath === '/admin-portal';
@@ -132,8 +130,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     db.init();
   }, []);
 
-  const handleLogout = () => {
-    db.logout();
+  const handleLogout = async () => {
+    await db.logout();
     showToast('info', 'Logged out successfully');
     navigate('/login');
   };
@@ -274,6 +272,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 export default function App() {
   const [isDark, setIsDark] = useState(false);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
+  const [authReady, setAuthReady] = useState(false);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(auth.getUser());
 
   useEffect(() => {
     if (isDark) {
@@ -282,6 +282,40 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [isDark]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncAuthUser = () => {
+      if (isMounted) {
+        setAuthUser(auth.getUser());
+      }
+    };
+
+    const initializeAuth = async () => {
+      try {
+        if (!auth.getSession()) {
+          await db.restoreSession();
+        } else if (auth.needsRefresh()) {
+          await db.refreshSession();
+        }
+      } catch {
+        auth.clearSession();
+      } finally {
+        if (isMounted) {
+          syncAuthUser();
+          setAuthReady(true);
+        }
+      }
+    };
+
+    initializeAuth();
+    window.addEventListener(AUTH_CHANGE_EVENT, syncAuthUser);
+    return () => {
+      isMounted = false;
+      window.removeEventListener(AUTH_CHANGE_EVENT, syncAuthUser);
+    };
+  }, []);
 
   const toggleTheme = () => setIsDark(!isDark);
 
@@ -293,11 +327,22 @@ export default function App() {
     }, 4000);
   };
 
+  if (!authReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#101a22] text-slate-600 dark:text-slate-300">
+        <div className="flex items-center gap-3 text-sm font-semibold">
+          <span className="w-5 h-5 border-2 border-slate-300 border-t-primary-600 rounded-full animate-spin"></span>
+          Restoring secure session...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>
       <ToastContext.Provider value={{ showToast }}>
         <HashRouter>
-          <Layout>
+          <Layout currentUser={authUser}>
             <Routes>
               <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
               <Route path="/admin-portal" element={<PublicRoute><AdminLogin /></PublicRoute>} />
@@ -308,7 +353,7 @@ export default function App() {
               <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-              <Route path="/" element={<Navigate to={auth.getDefaultRouteForRole(auth.getSession()?.user.role)} replace />} />
+              <Route path="/" element={<Navigate to={auth.getDefaultRouteForRole(authUser?.role)} replace />} />
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['garage']}><Dashboard /></ProtectedRoute>} />
               <Route path="/jobs/list" element={<ProtectedRoute allowedRoles={['garage']}><JobList /></ProtectedRoute>} />
               <Route path="/jobs/new" element={<ProtectedRoute allowedRoles={['garage']}><CreateJob /></ProtectedRoute>} />

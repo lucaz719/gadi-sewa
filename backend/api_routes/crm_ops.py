@@ -4,19 +4,13 @@ from database import get_db
 import models, schemas
 from datetime import datetime, timedelta
 from typing import List
-from api_routes.dependencies import get_current_user
+from api_routes.dependencies import require_role, resolve_enterprise_access
 
 router = APIRouter(prefix="/crm", tags=["CRM"])
 
 @router.get("/summary", response_model=schemas.CRMSummary)
-def get_crm_summary(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
-    if not enterprise_id:
-        return {
-            "total_customers": 0,
-            "due_for_service": 0,
-            "upcoming_followups": 0,
-            "followup_rate": 0.0
-        }
+def get_crm_summary(enterprise_id: int = None, db: Session = Depends(get_db), user=Depends(require_role("garage", "admin"))):
+    enterprise_id = resolve_enterprise_access(user, enterprise_id)
         
     # Filter by enterprise_id
     total_customers = db.query(models.Customer).filter(models.Customer.enterprise_id == enterprise_id).count()
@@ -55,9 +49,8 @@ def get_crm_summary(enterprise_id: int = None, db: Session = Depends(get_db), _u
     }
 
 @router.get("/followups", response_model=List[schemas.Customer])
-def get_followups(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
-    if not enterprise_id:
-        return []
+def get_followups(enterprise_id: int = None, db: Session = Depends(get_db), user=Depends(require_role("garage", "admin"))):
+    enterprise_id = resolve_enterprise_access(user, enterprise_id)
         
     today = datetime.utcnow()
     # Return customers due for service soon
@@ -67,9 +60,8 @@ def get_followups(enterprise_id: int = None, db: Session = Depends(get_db), _use
     ).order_by(models.Customer.next_service_date.asc()).all()
 
 @router.post("/settings")
-def update_crm_settings(settings: dict, enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
-    if not enterprise_id:
-        raise HTTPException(status_code=400, detail="enterprise_id is required")
+def update_crm_settings(settings: dict, enterprise_id: int = None, db: Session = Depends(get_db), user=Depends(require_role("garage", "admin"))):
+    enterprise_id = resolve_enterprise_access(user, enterprise_id)
     db_ent = db.query(models.Enterprise).filter(models.Enterprise.id == enterprise_id).first()
     if not db_ent:
         raise HTTPException(status_code=404, detail="Enterprise not found")
@@ -83,16 +75,15 @@ def update_crm_settings(settings: dict, enterprise_id: int = None, db: Session =
     return {"status": "success"}
 
 @router.get("/customers", response_model=List[schemas.Customer])
-def get_customers(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def get_customers(enterprise_id: int = None, db: Session = Depends(get_db), user=Depends(require_role("garage", "admin"))):
+    enterprise_id = resolve_enterprise_access(user, enterprise_id)
     query = db.query(models.Customer)
-    if enterprise_id:
-        query = query.filter(models.Customer.enterprise_id == enterprise_id)
+    query = query.filter(models.Customer.enterprise_id == enterprise_id)
     return query.order_by(models.Customer.name.asc()).all()
 
 @router.post("/customers", response_model=schemas.Customer)
-def create_customer(customer: schemas.CustomerBase, enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
-    if not enterprise_id:
-        raise HTTPException(status_code=400, detail="enterprise_id is required")
+def create_customer(customer: schemas.CustomerBase, enterprise_id: int = None, db: Session = Depends(get_db), user=Depends(require_role("garage", "admin"))):
+    enterprise_id = resolve_enterprise_access(user, enterprise_id)
     db_customer = models.Customer(**customer.model_dump(), enterprise_id=enterprise_id)
     db.add(db_customer)
     db.commit()

@@ -4,12 +4,12 @@ from typing import List
 from database import get_db
 import models, schemas
 import json
-from api_routes.dependencies import get_current_user
+from api_routes.dependencies import require_role
 
 router = APIRouter(prefix="/pos", tags=["POS"])
 
 @router.post("/held-carts", response_model=schemas.HeldCart)
-def hold_cart(cart: schemas.HeldCartBase, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def hold_cart(cart: schemas.HeldCartBase, db: Session = Depends(get_db), _user=Depends(require_role("garage", "vendor", "admin"))):
     """Hold a cart for later recall"""
     db_cart = models.HeldCart(**cart.model_dump())
     db.add(db_cart)
@@ -18,12 +18,12 @@ def hold_cart(cart: schemas.HeldCartBase, db: Session = Depends(get_db), _user=D
     return db_cart
 
 @router.get("/held-carts", response_model=List[schemas.HeldCart])
-def get_held_carts(db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def get_held_carts(db: Session = Depends(get_db), _user=Depends(require_role("garage", "vendor", "admin"))):
     """Retrieve all held carts"""
     return db.query(models.HeldCart).order_by(models.HeldCart.created_at.desc()).all()
 
 @router.delete("/held-carts/{cart_id}")
-def remove_held_cart(cart_id: int, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def remove_held_cart(cart_id: int, db: Session = Depends(get_db), _user=Depends(require_role("garage", "vendor", "admin"))):
     """Remove a held cart"""
     db_cart = db.query(models.HeldCart).filter(models.HeldCart.id == cart_id).first()
     if not db_cart:

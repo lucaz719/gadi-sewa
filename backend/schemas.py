@@ -24,10 +24,11 @@ class LoginRequest(BaseModel):
     password: str = Field(..., min_length=1, max_length=128)
     access_token: Optional[str] = Field(None, max_length=500)
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+class AuthSession(BaseModel):
     user: User
+    csrf_token: str
+    expires_at: datetime
+    refresh_expires_at: datetime
 
 # Enterprise Schemas
 class EnterpriseBase(BaseModel):
@@ -379,5 +380,4 @@ class PendingEnterprise(PendingEnterpriseBase):
     created_at: datetime
     class Config:
         from_attributes = True
-
 

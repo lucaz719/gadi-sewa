@@ -153,6 +153,19 @@ class ActivityLog(Base):
     details = Column(String)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
+class RefreshSession(Base):
+    __tablename__ = "refresh_sessions"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    token_hash = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=False)
+    last_used_at = Column(DateTime, default=datetime.utcnow)
+    revoked_at = Column(DateTime, nullable=True)
+    replaced_by_token_hash = Column(String, nullable=True)
+    created_by_ip = Column(String, nullable=True)
+    user_agent = Column(String, nullable=True)
+
 class PlatformSettings(Base):
     __tablename__ = "platform_settings"
     id = Column(Integer, primary_key=True, index=True)

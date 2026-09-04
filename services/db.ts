@@ -2,26 +2,56 @@ import { auth } from './auth';
 
 // Database Service for GadiSewa - Connecting to Python Backend
 const API_URL = import.meta.env.VITE_API_URL || '/api';
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+let refreshPromise: Promise<any> | null = null;
+
+const redirectToLogin = () => {
+  if (typeof window !== 'undefined') {
+    const currentHash = window.location.hash.toLowerCase();
+    window.location.hash = currentHash.startsWith('#/admin') ? '#/admin-portal' : '#/login';
+  }
+};
 
 export const db = {
   // Helpers
-  async fetchApi(endpoint: string, options: RequestInit = {}) {
-    const token = auth.getAccessToken();
+  async fetchApi(endpoint: string, options: RequestInit = {}, retryOnAuthFailure = true) {
+    const headers = new Headers(options.headers || {});
+    const method = (options.method || 'GET').toUpperCase();
+    const csrfToken = auth.getCsrfToken();
+    const accessToken = auth.getAccessToken();
+
+    if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+      headers.set('Content-Type', 'application/json');
+    }
+    if (!SAFE_METHODS.has(method) && csrfToken) {
+      headers.set('X-CSRF-Token', csrfToken);
+    }
+    if (accessToken) {
+      headers.set('Authorization', ['Bearer', accessToken].join(' '));
+    }
+
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options.headers,
-      },
+      credentials: 'include',
+      headers,
     });
-    if (response.status === 401 || response.status === 403) {
-      auth.clearSession();
-      if (typeof window !== 'undefined') {
-        const currentHash = window.location.hash.toLowerCase();
-        window.location.hash = currentHash.startsWith('#/admin') ? '#/admin-portal' : '#/login';
+
+    if ((response.status === 401 || response.status === 403) && retryOnAuthFailure && !['/auth/login', '/auth/refresh', '/auth/logout', '/auth/session'].includes(endpoint)) {
+      try {
+        await db.refreshSession();
+        return db.fetchApi(endpoint, options, false);
+      } catch {
+        auth.clearSession();
+        redirectToLogin();
       }
     }
+
+    if ((response.status === 401 || response.status === 403) && !['/auth/login', '/auth/session'].includes(endpoint)) {
+      auth.clearSession();
+      redirectToLogin();
+    }
+
     if (!response.ok) {
       let errorMessage = `Request failed (HTTP ${response.status})`;
       try {
@@ -33,6 +63,11 @@ export const db = {
       } catch { }
       throw new Error(errorMessage);
     }
+
+    if (response.status === 204) {
+      return null;
+    }
+
     return response.json();
   },
 
@@ -42,12 +77,34 @@ export const db = {
     const data = await db.fetchApi('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
-    });
+    }, false);
     auth.setSession(data);
     return data;
   },
-  logout: () => {
-    auth.clearSession();
+  refreshSession: async () => {
+    if (!refreshPromise) {
+      refreshPromise = db.fetchApi('/auth/refresh', { method: 'POST' }, false)
+        .then(data => {
+          auth.setSession(data);
+          return data;
+        })
+        .finally(() => {
+          refreshPromise = null;
+        });
+    }
+    return refreshPromise;
+  },
+  restoreSession: async () => {
+    const data = await db.fetchApi('/auth/session', {}, false);
+    auth.setSession(data);
+    return data;
+  },
+  logout: async () => {
+    try {
+      await db.fetchApi('/auth/logout', { method: 'POST' }, false);
+    } finally {
+      auth.clearSession();
+    }
   },
   getAuthUser: () => auth.getUser(),
   getAuthToken: () => auth.getAccessToken(),
@@ -185,7 +242,7 @@ export const db = {
   generateReferral: async (userId: number) => db.fetchApi(`/gamification/referral/generate/${userId}`, { method: 'POST' }),
   addPoints: async (userId: number, points: number, action: string) => db.fetchApi('/gamification/points/add', {
     method: 'POST',
-    body: JSON.stringify({ user_id: userId, points, action })
+    body: JSON.stringify({ user_id: userId, points, action_type: action })
   }),
 
   // AI Assistant

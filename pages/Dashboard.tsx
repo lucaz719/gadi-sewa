@@ -16,12 +16,14 @@ const StatCard = ({ title, value, change, icon, color, link }: any) => (
         <span className={`material-symbols-outlined ${color.replace('bg-', 'text-')}`}>{icon}</span>
       </div>
     </div>
+    {change ? (
     <div className="mt-4 flex items-center text-sm">
       <span className={change.startsWith('+') ? 'text-green-500' : 'text-red-500'}>
         {change}
       </span>
       <span className="text-slate-400 ml-2">vs last month</span>
     </div>
+    ) : null}
   </Link>
 );
 
@@ -96,10 +98,10 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Customers" value={summary?.total_customers || 0} change="+12%" icon="group" color="bg-blue-500" link="/customers" />
-        <StatCard title="Due for Service" value={summary?.due_for_service || 0} change="-5%" icon="engineering" color="bg-red-500" link="/jobs" />
-        <StatCard title="Upcoming Followups" value={summary?.upcoming_followups || 0} change="+8%" icon="schedule" color="bg-orange-500" link="/appointments" />
-        <StatCard title="Monthly Growth" value={`${summary?.followup_rate || 0}%`} change="+2%" icon="trending_up" color="bg-green-500" link="/reports" />
+        <StatCard title="Total Customers" value={summary?.total_customers || 0} icon="group" color="bg-blue-500" link="/customers" />
+        <StatCard title="Due for Service" value={summary?.due_for_service || 0} icon="engineering" color="bg-red-500" link="/jobs" />
+        <StatCard title="Upcoming Followups" value={summary?.upcoming_followups || 0} icon="schedule" color="bg-orange-500" link="/appointments" />
+        <StatCard title="Monthly Growth" value={`${summary?.followup_rate || 0}%`} icon="trending_up" color="bg-green-500" link="/reports" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

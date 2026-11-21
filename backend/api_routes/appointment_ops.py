@@ -13,7 +13,10 @@ def list_appointments(enterprise_id: int, db: Session = Depends(get_db), _user=D
     return db.query(models.Appointment).filter(models.Appointment.enterprise_id == enterprise_id).all()
 
 @router.post("/", response_model=schemas.Appointment)
-def create_appointment(appointment: schemas.AppointmentBase, enterprise_id: int, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def create_appointment(appointment: schemas.AppointmentBase, enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(require_role("admin", "garage"))):
+    enterprise_id = scope_enterprise(_user, enterprise_id)
+    if not enterprise_id:
+        raise HTTPException(status_code=400, detail="enterprise_id is required")
     db_app = models.Appointment(**appointment.model_dump(), enterprise_id=enterprise_id)
     db.add(db_app)
     db.commit()

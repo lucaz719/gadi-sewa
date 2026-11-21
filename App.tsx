@@ -136,6 +136,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {isVendor ? 'Vendor Portal' : isCustomer ? 'Vehicle Owner' : isAdmin ? 'Administrator' : 'Main Garage'}
             </p>
+            <span className="inline-block mt-1 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-full">Demo · sample data</span>
           </div>
         </div>
 

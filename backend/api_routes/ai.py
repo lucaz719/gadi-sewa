@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 import os
 from pydantic import BaseModel
 from typing import List, Optional
-from api_routes.dependencies import get_current_user
+from api_routes.dependencies import get_current_user, require_role
 
 try:
     import google.generativeai as genai
@@ -22,7 +22,7 @@ class ComplaintAnalysisRequest(BaseModel):
     vehicleInfo: str
 
 @router.post("/analyze-complaint")
-async def analyze_complaint(request: ComplaintAnalysisRequest, _user=Depends(get_current_user)):
+async def analyze_complaint(request: ComplaintAnalysisRequest, _user=Depends(require_role("admin", "garage"))):
     if not GENI_API_KEY:
         raise HTTPException(status_code=500, detail="AI API Key not configured")
     
@@ -48,6 +48,6 @@ async def analyze_complaint(request: ComplaintAnalysisRequest, _user=Depends(get
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/parts-catalog")
-async def get_parts_catalog(_user=Depends(get_current_user)):
+async def get_parts_catalog(_user=Depends(require_role("admin", "garage"))):
     # Similar logic for fetching global parts list
     return {"message": "AI Catalog functionality to be implemented"}

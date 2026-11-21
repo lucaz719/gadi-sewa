@@ -4,18 +4,19 @@ from typing import List
 from database import get_db
 import models, schemas
 from datetime import datetime, timedelta
-from api_routes.dependencies import get_current_user
+from api_routes.dependencies import get_current_user, require_role, scope_enterprise
 
 router = APIRouter(prefix="/billing", tags=["Enterprise Billing"])
 
 @router.get("/invoices", response_model=List[schemas.EnterpriseInvoice])
-def list_enterprise_invoices(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def list_enterprise_invoices(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(require_role("admin", "garage"))):
+    enterprise_id = scope_enterprise(_user, enterprise_id)
     if enterprise_id:
         return db.query(models.EnterpriseInvoice).filter(models.EnterpriseInvoice.enterprise_id == enterprise_id).all()
     return db.query(models.EnterpriseInvoice).all()
 
 @router.post("/generate-invoice")
-def generate_monthly_invoice(enterprise_id: int, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def generate_monthly_invoice(enterprise_id: int, db: Session = Depends(get_db), _user=Depends(require_role("admin"))):
     ent = db.query(models.Enterprise).filter(models.Enterprise.id == enterprise_id).first()
     if not ent:
         raise HTTPException(status_code=404, detail="Enterprise not found")

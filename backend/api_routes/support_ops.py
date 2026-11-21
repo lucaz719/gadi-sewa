@@ -20,6 +20,8 @@ def list_tickets(enterprise_id: int = None, db: Session = Depends(get_db), _user
 @router.post("/tickets", response_model=schemas.SupportTicket)
 def create_ticket(ticket: schemas.SupportTicketBase, enterprise_id: int, db: Session = Depends(get_db), _user=Depends(get_current_user)):
     enterprise_id = scope_enterprise(_user, enterprise_id)
+    if not enterprise_id:
+        raise HTTPException(status_code=400, detail="An enterprise is required to open a support ticket")
     db_ticket = models.SupportTicket(**ticket.model_dump(), enterprise_id=enterprise_id)
     db.add(db_ticket)
     db.commit()

@@ -171,12 +171,12 @@ export default function Dashboard() {
                 <span className="material-symbols-outlined text-[120px]">verified_user</span>
               </div>
               <div>
-                <h3 className="font-black text-xl mb-1 uppercase tracking-tighter italic">CRM Automated Follow-up</h3>
-                <p className="text-xs text-red-100 opacity-80 leading-relaxed font-medium">System is automatically notifying customers via WhatsApp for upcoming service schedules based on local garage settings.</p>
+                <h3 className="font-black text-xl mb-1 uppercase tracking-tighter italic">CRM Follow-up Engine</h3>
+                <p className="text-xs text-red-100 opacity-80 leading-relaxed font-medium">Demo build: automated WhatsApp follow-ups are not connected. This panel illustrates the follow-up workflow with sample data only; no messages are sent.</p>
               </div>
               <div className="pt-4 flex items-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-white animate-pulse"></span>
-                <span className="text-[10px] font-bold tracking-widest opacity-90 uppercase">Engine Status: ACTIVE</span>
+                <span className="flex h-2 w-2 rounded-full bg-white"></span>
+                <span className="text-[10px] font-bold tracking-widest opacity-90 uppercase">Engine Status: Not connected in demo</span>
               </div>
             </div>
           </div>

@@ -96,7 +96,7 @@ export default function Invoices() {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue (MTD)</p>
                 <p className="text-3xl font-black mt-2 text-green-600">NPR {stats.paid.toLocaleString()}</p>
                 <div className="mt-4 flex items-center gap-2 text-[10px] text-green-600 font-bold uppercase">
-                    <span className="material-symbols-outlined text-sm">trending_up</span> +12% vs last month
+                    <span className="material-symbols-outlined text-sm">trending_up</span> Month to date
                 </div>
             </div>
             <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">

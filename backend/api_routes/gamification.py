@@ -6,7 +6,7 @@ import models, schemas
 from database import get_db
 import random
 import string
-from api_routes.dependencies import get_current_user
+from api_routes.dependencies import get_current_user, require_role, scope_enterprise
 
 router = APIRouter(prefix="/gamification", tags=["Gamification"])
 
@@ -15,6 +15,8 @@ def generate_referral_code(length=8):
 
 @router.get("/summary/{user_id}", response_model=schemas.UserRewardSummary)
 def get_user_rewards(user_id: int, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+    if _user.role not in ("admin", "garage") and _user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not allowed to view other users' rewards")
     # Calculate points
     total_points = db.query(func.sum(models.GadiPoint.points)).filter(models.GadiPoint.user_id == user_id).scalar() or 0
     
@@ -41,6 +43,8 @@ def get_user_rewards(user_id: int, db: Session = Depends(get_db), _user=Depends(
 
 @router.post("/referral/generate/{user_id}")
 def create_referral(user_id: int, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+    if _user.role not in ("admin", "garage") and _user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not allowed to generate referrals for other users")
     # Check if user already has an active referral code
     existing = db.query(models.Referral).filter(models.Referral.referrer_id == user_id, models.Referral.status == "Pending").first()
     if existing:
@@ -53,7 +57,7 @@ def create_referral(user_id: int, db: Session = Depends(get_db), _user=Depends(g
     return {"referral_code": code}
 
 @router.post("/points/add")
-def add_points(point_data: schemas.GadiPointCreate, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def add_points(point_data: schemas.GadiPointCreate, db: Session = Depends(get_db), _user=Depends(require_role("admin", "garage"))):
     new_points = models.GadiPoint(
         user_id=point_data.user_id, 
         points=point_data.points, 

@@ -38,6 +38,7 @@ export default function Registration() {
                {step === 1 && (
                   <div className="space-y-6">
                      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Garage Registration</h2>
+                     <p className="mt-2 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">Demo build: self-service registration is disabled. This form does not send or store anything.</p>
                      <p className="text-slate-500">Let's start with the basics.</p>
 
                      <div className="space-y-4">

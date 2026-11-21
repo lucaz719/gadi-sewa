@@ -12,6 +12,9 @@ def list_tickets(enterprise_id: int = None, db: Session = Depends(get_db), _user
     enterprise_id = scope_enterprise(_user, enterprise_id)
     if enterprise_id:
         return db.query(models.SupportTicket).filter(models.SupportTicket.enterprise_id == enterprise_id).all()
+    if _user.role != "admin":
+        # Accounts without an enterprise (e.g. customers) must not list all tickets.
+        return []
     return db.query(models.SupportTicket).all()
 
 @router.post("/tickets", response_model=schemas.SupportTicket)

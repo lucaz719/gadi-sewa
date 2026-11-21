@@ -75,14 +75,14 @@ export default function VendorDashboard() {
         <StatCard 
           title="Revenue (Month)" 
           value="NPR 4.2L" 
-          subtext={<span className="text-green-500 font-medium">+12.5% vs last month</span>}
+          subtext={<span className="text-slate-400 font-medium">Month to date</span>}
           icon="payments" 
           color="bg-green-500" 
         />
         <StatCard 
           title="Active Garages" 
           value="24" 
-          subtext={<span className="text-blue-500 font-medium">2 New this week</span>}
+          subtext={<span className="text-slate-400 font-medium">Across the network</span>}
           icon="store" 
           color="bg-blue-500" 
         />

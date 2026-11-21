@@ -112,3 +112,14 @@ def require_role(*allowed_roles: str):
             )
         return user
     return _dependency
+
+
+def scope_enterprise(user: "models.User", requested):
+    """Admins may query any enterprise; every other role is pinned to its own.
+
+    Returns the enterprise_id the caller is allowed to use, regardless of the
+    enterprise_id the client requested.
+    """
+    if user.role == "admin":
+        return requested
+    return user.enterprise_id

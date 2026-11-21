@@ -5,12 +5,13 @@ from typing import List, Dict
 from database import get_db
 import models, schemas
 from datetime import datetime, timedelta
-from api_routes.dependencies import get_current_user
+from api_routes.dependencies import get_current_user, require_role, scope_enterprise
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
 @router.get("/financial-trends")
-def get_financial_trends(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def get_financial_trends(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(require_role("admin", "garage"))):
+    enterprise_id = scope_enterprise(_user, enterprise_id)
     # Simple monthly aggregation for the last 6 months
     today = datetime.utcnow()
     trends = []
@@ -40,7 +41,8 @@ def get_financial_trends(enterprise_id: int = None, db: Session = Depends(get_db
     return trends
 
 @router.get("/job-analytics")
-def get_job_analytics(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def get_job_analytics(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(require_role("admin", "garage"))):
+    enterprise_id = scope_enterprise(_user, enterprise_id)
     if not enterprise_id:
         return {
             "total_jobs": 0,
@@ -69,7 +71,8 @@ def get_job_analytics(enterprise_id: int = None, db: Session = Depends(get_db), 
     }
 
 @router.get("/inventory-valuation")
-def get_inventory_valuation(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def get_inventory_valuation(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(require_role("admin", "garage"))):
+    enterprise_id = scope_enterprise(_user, enterprise_id)
     # Assuming inventory is global for now as per schema (no enterprise_id on InventoryItem yet)
     # But for strict isolation, we should probably return empty if we wanted to be strict.
     # However, existing schema showed InventoryItem is shared or not yet scoped.
@@ -108,7 +111,8 @@ def get_inventory_valuation(enterprise_id: int = None, db: Session = Depends(get
     }
 
 @router.get("/customer-insights")
-def get_customer_insights(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(get_current_user)):
+def get_customer_insights(enterprise_id: int = None, db: Session = Depends(get_db), _user=Depends(require_role("admin", "garage"))):
+    enterprise_id = scope_enterprise(_user, enterprise_id)
     if not enterprise_id:
         return {
             "total_customers": 0,

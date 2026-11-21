@@ -54,6 +54,7 @@ export default function Login() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center lg:text-left">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Welcome Back</h2>
+            <span className="inline-block mt-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-full">Portfolio demo · sample data only</span>
             <p className="mt-2 text-slate-600 dark:text-slate-400">Please select your role and enter your details.</p>
           </div>
 

@@ -138,7 +138,9 @@ ROLE-SPECIFIC GUIDANCE:
 
 @router.post("/chat", response_model=ChatResponse)
 def chat_with_assistant(req: ChatRequest, db: Session = Depends(get_db), _user=Depends(get_current_user)):
-    snapshot = _get_business_snapshot(db)
+    # Never trust client-supplied role: use the authenticated user's role.
+    req.user_role = _user.role
+    snapshot = _get_business_snapshot(db, _user.enterprise_id or 1)
     genai = _get_genai()
 
     # Try Gemini-powered response first
@@ -359,7 +361,13 @@ def _rule_based_chat(req: ChatRequest, snapshot: dict, db: Session) -> ChatRespo
 @router.post("/execute-action", response_model=AiActionResponse)
 def execute_ai_action(req: AiActionRequest, db: Session = Depends(get_db), _user=Depends(get_current_user)):
     """Execute an in-app action triggered by the AI assistant."""
-    eid = req.enterprise_id or 1
+    from fastapi import HTTPException
+    GARAGE_ACTIONS = {"create_job", "search_inventory", "financial_summary",
+                      "service_reminder", "daily_digest", "smart_reorder"}
+    if req.action in GARAGE_ACTIONS and _user.role not in ("admin", "garage"):
+        raise HTTPException(status_code=403, detail="This action requires a garage account")
+    # Never trust client-supplied enterprise scope for non-admins.
+    eid = (req.enterprise_id or 1) if _user.role == "admin" else (_user.enterprise_id or 1)
 
     if req.action == "create_job":
         return _action_create_job(req.params, db)

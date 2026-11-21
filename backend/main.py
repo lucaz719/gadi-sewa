@@ -22,6 +22,12 @@ def _seed_default_users() -> None:
     import logging
     from api_routes.auth import hash_password
 
+    if os.getenv("PRODUCTION"):
+        # Demo/production boots never create well-known weak credentials.
+        # Users are provisioned out-of-band with strong passwords.
+        logging.info("PRODUCTION set: skipping default user seeding.")
+        return
+
     db = SessionLocal()
     try:
         # Always check if database is empty, regardless of PRODUCTION setting
@@ -73,7 +79,13 @@ def _seed_default_users() -> None:
 
 _seed_default_users()
 
-app = FastAPI(title="GadiSewa Backend API")
+_is_production = bool(os.getenv("PRODUCTION"))
+app = FastAPI(
+    title="GadiSewa Backend API",
+    docs_url=None if _is_production else "/docs",
+    redoc_url=None if _is_production else "/redoc",
+    openapi_url=None if _is_production else "/openapi.json",
+)
 
 # CORS Configuration
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000").split(",")

@@ -16,7 +16,8 @@ def log_transaction(txn: schemas.TransactionBase, db: Session = Depends(get_db),
     txn_data = txn.model_dump()
     if _user.role != "admin":
         txn_data["enterprise_id"] = _user.enterprise_id
-    db_txn = models.Transaction(**txn_data, id=str(uuid.uuid4()), expense_type=expense_type)
+    txn_data["expense_type"] = expense_type
+    db_txn = models.Transaction(**txn_data, id=str(uuid.uuid4()))
     db.add(db_txn)
     db.commit()
     db.refresh(db_txn)

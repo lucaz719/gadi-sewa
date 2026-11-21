@@ -60,7 +60,6 @@ export default function Reports() {
             <div className="p-6 bg-white dark:bg-[#1e293b] rounded-3xl border dark:border-slate-800 shadow-sm">
                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Labor Revenue</p>
                <p className="text-2xl font-black text-red-600">NPR {jobAnalytics?.labor_revenue?.toLocaleString()}</p>
-               <p className="text-[10px] text-green-500 font-bold mt-2">↑ 8.4% vs last month</p>
             </div>
             <div className="p-6 bg-white dark:bg-[#1e293b] rounded-3xl border dark:border-slate-800 shadow-sm">
                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Stock Valuation</p>
